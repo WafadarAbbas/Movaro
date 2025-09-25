@@ -1,0 +1,10 @@
+/* IconStyles.css */
+.icon-hover {
+
+  color: grey;
+  transition: color 0.3s; /* Smooth color transition */
+}
+
+.icon-hover:hover {
+  color: #ff9f43; /* Change this to any color you prefer */
+}

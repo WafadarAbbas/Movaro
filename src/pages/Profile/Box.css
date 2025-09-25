@@ -1,0 +1,60 @@
+.box {
+  --border-angle: 0deg;
+  border-radius: 12px;
+width: 100%;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 5px 4px hsla(0, 0%, 46%, 0.55);
+  position: relative;
+  cursor: pointer;
+  background: white;
+  border: 4px solid transparent;
+  transition: all 0.3s ease;
+}
+
+ 
+.box.a:hover,
+.box.selected {  
+  opacity: 1;
+  animation: border-angle-rotate 1s linear infinite;
+  background: linear-gradient(white, white) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+     oklch(75% 0.5 0deg),       /* red-ish */
+    oklch(75% 0.5 45deg),      /* orange */
+    oklch(75% 0.5 90deg),      /* yellow */
+    oklch(75% 0.5 135deg),     /* green */
+    oklch(75% 0.5 180deg),     /* cyan */
+    oklch(75% 0.5 225deg),     /* blue */
+    oklch(75% 0.5 270deg),     /* purple */
+    oklch(75% 0.5 315deg),     /* pink */
+    oklch(75% 0.5 360deg)   
+    )
+    border-box;
+  border-radius: 6px;
+}
+
+/* Selected box tick */
+.box.selected::after {
+  content: '✔'; 
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  color: #007bff; /* blue color */
+  font-size: 23px;
+}
+
+/* Keyframes for rotating border */
+@keyframes border-angle-rotate {
+  from { --border-angle: 0deg; }
+  to { --border-angle: 360deg; }
+}
+
+/* Property definition */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}

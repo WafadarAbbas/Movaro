@@ -1,0 +1,25 @@
+/* Set up the container */
+.responsive-logo {
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive image styling */
+.responsive-img {
+    width: 100%;
+    max-width: 160px; /* Limit max width for larger screens */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Adjust the maximum width for smaller screens */
+@media (max-width: 768px) {
+    .responsive-img {
+        max-width: 120px; /* Reduce image size for tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .responsive-img {
+        max-width: 80px; /* Further reduce for mobile devices */
+    }
+}
