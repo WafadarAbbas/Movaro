@@ -104,7 +104,7 @@ const [sellerValuation, setSellerValuation] = useState(null);
         carInfoTax: contractData.carInfoTax,
         carInfoMalus: contractData.carInfoMalus,
         carValuationBySeller: contractData.carValuationBySeller,
-
+// 👇 BUYER UPDATE FIELDS
         // 👇 BUYER UPDATE FIELDS
         buyerUserId: contractData.buyerUserId, // Or user id if needed
         buyerDealStatus: contractData.buyerDealStatus,
