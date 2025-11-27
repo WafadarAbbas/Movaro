@@ -173,7 +173,7 @@ function SidebarNav() {
 	return (
 		
 <div className="menu" style={{ padding: 15, marginTop: 10 }}>
-      <h6  style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: '1.1rem' }}>Main</h6>
+      <h6  style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500, fontSize: '1.0rem' }}>Main</h6>
       {menus.map((menu, i) => (
         <NavItem key={i} menu={menu} />
       ))}
@@ -205,7 +205,7 @@ function SidebarNav() {
 
 <hr style={{ borderColor: '#aaaaaaff', borderWidth: '1px', borderStyle: 'solid' }} />
 
-<h6 style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500,  fontSize: '1.1rem' }}>StockMenu </h6>
+<h6 style={{ fontFamily: 'Nunito, sans-serif', fontWeight: 500,  fontSize: '1.0rem' }}>StockMenu </h6>
       {StockMenu.map((stockMenu, i) => (
         <NavItem key={i} menu={stockMenu} />
       ))} 

@@ -3,11 +3,11 @@
 @import "https://unpkg.com/ionicons@4.2.2/dist/css/ionicons.min.css";
 
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 1px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(255, 159, 67);
+  background: rgb(147, 147, 147);
   border-radius: 10px;
 }
 

@@ -39,14 +39,17 @@ const handleSubmit = async (values) => {
           'Content-Type': 'application/json',
         },
       });
-
+ 
      if (response.status === 200 && response.data.success) {
       const token = response.data.result.accessToken;
       const secretKey = "my-super-secret-key";
       const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
       localStorage.setItem("authToken", encryptedToken);
-     
-      setRedirect(true); // redirect kar do
+     setTimeout(() => {
+  window.location.reload();
+}, 10);
+ 
+      setRedirect(true);  
     } else {
       // API ne success=false bheja
       const errorMsg =

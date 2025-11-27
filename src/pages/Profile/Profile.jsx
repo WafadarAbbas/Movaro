@@ -17,11 +17,13 @@ import {
 import { useFormik } from "formik";
 import ApiCall from "../../Apicall/ApiCall";
 import "./Box.css";
+import LoadingSpinner from "../../Compo/spinner"; 
 
 function Profile() {
 const [selected, setSelected] = useState("");
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+   const [pageLoading, setPageLoading] = useState(false); 
  const [initialValues, setInitialValues] = useState({
     userName: "",
     name: "",
@@ -29,23 +31,26 @@ const [selected, setSelected] = useState("");
     emailAddress: "",
     isActive: false,
     fullName: "",
-    adress: "",
-    city: "",
+     
+    
     state: "",
-    country: "",
-    postalCode: "",
-    mobileNumber: "",
-    profileImage: "",
+    countary: "",
+    
+    personalContact: "",
+    profileImagePath: "",
     isSeller: false,
     isBuyer: false,
-    roleNames: ["admin"],
+    drivingLiscencePath:"",
+    roleNames: ["Default"],
      lastLoginTime: "",
   creationTime: "",
+  bankIdSSN:"",
   });
  
 
     const fetchUserData = async () => {
         setLoading(true); 
+        setPageLoading(true);
       try {
          
         const sessionResponse = await ApiCall({
@@ -77,13 +82,10 @@ const [selected, setSelected] = useState("");
     emailAddress: userData.emailAddress || "",
     isActive: userData.isActive ?? false, 
     fullName: userData.fullName || "",
-    adress: userData.adress || "",
-    city: userData.city || "",
-    state: userData.state || "",
-    country: userData.country || "",
-    postalCode: userData.postalCode || "",
-    mobileNumber: userData.mobileNumber || "",
-    profileImage: userData.profileImage || "",
+    countary: userData.countary || "", 
+    personalContact: userData.personalContact || "",
+    profileImagePath: "",
+    drivingLiscencePath:"",
     isSeller: userData.isSeller ?? false,
     isBuyer: userData.isBuyer ?? false,
     roleNames: userData.roleNames?.length ? userData.roleNames : [""],
@@ -95,13 +97,17 @@ const [selected, setSelected] = useState("");
     return path.startsWith("http") ? path : `https://localhost:44311/${path}`;
   };
 
-  setImage(getImageUrl(userData.profileImage));
+  
+  setImage(getImageUrl(userData.profileImagePath));
 }
         }
       } catch (error) {
         console.error("API Error:", error);
+        
+        
       }finally {
-    setLoading(false);  
+    setLoading(false); 
+     setPageLoading(false); 
   }
     };
   useEffect(() => {
@@ -111,49 +117,56 @@ const [selected, setSelected] = useState("");
 const formik = useFormik({
   initialValues,
   enableReinitialize: true,  
-  onSubmit: async (values, { resetForm }) => {
-     console.log(values);
-     
-      setLoading(true);
-    try {
-      const response = await ApiCall({
-        url: "https://localhost:44311/api/services/app/User/Update",
-        method: "PUT",
-        data: values,  
-      });
+onSubmit: async (values, { resetForm }) => {
+  
+ const payload = {
+    ...values,
+    
+  };
 
-      if (response.data?.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Profile Updated!",
-          text: "Your profile has been successfully updated.",
-          confirmButtonText: "OK",
-        }).then(() => {
+  console.log("Final Payload:", payload);
+
+  try {
+    setLoading(true);
      
-      window.location.reload();
+    const response = await ApiCall({
+      url: "https://localhost:44311/api/services/app/User/Update",
+      method: "PUT",
+      data: payload,
     });
-            resetForm();
-      // fetchUserData();
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: response.data?.error?.message || "Something went wrong",
-          confirmButtonText: "OK",
-        });
-      }
-    } catch (error) {
-      console.error("API Error:", error);
+
+    if (response.data?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Profile Updated!",
+        text: "Your profile has been successfully updated.",
+        confirmButtonText: "OK",
+      })
+      .then(() => {
+        window.location.reload();
+      });
+      resetForm();
+    } else {
       Swal.fire({
         icon: "error",
         title: "Update Failed",
-        text: "Something went wrong while updating your profile",
+        text: response.data?.error?.message || "Something went wrong",
         confirmButtonText: "OK",
       });
-    } finally {
-      setLoading(false);  
     }
-  },
+  } catch (error) {
+    console.error("API Error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "Something went wrong while updating your profile",
+      confirmButtonText: "OK",
+    });
+  } finally {
+    setLoading(false);
+        // setPageLoading(false);
+  }
+}
 });
 
 const handleImageChange = (e) => {
@@ -162,21 +175,30 @@ const handleImageChange = (e) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result;
-      setImage(base64String); 
-      formik.setFieldValue("profileImage", base64String);  
+      setImage(base64String);  
+      formik.setFieldValue("profileImagePath", base64String); 
     };
     reader.readAsDataURL(file);
   }
 };
+ 
+
   return (
+     <Box
+  sx={{ margin: "10px",}}    
+>
+      {pageLoading ? (
+        <LoadingSpinner />   
+      ) : (
     <Paper
       elevation={5}
       sx={{
         padding: 3,
-        margin: "20px auto",
-        borderRadius: 2,
+        borderRadius: 3,
       }}
     >
+
+      
       <Typography variant="h6" component="h1" sx={{ fontWeight: "bold" }}>
         Profile
       </Typography>
@@ -189,18 +211,19 @@ const handleImageChange = (e) => {
           backgroundColor: "black",
         }}
       />
+      
  <Box sx={{  display: "flex",
       alignItems: "center",      
       justifyContent: "center",marginBottom:2 }}>
 <input
   type="file"
   accept="image/*"
-  id="profileImage"
+  id="profileImagePath"
   style={{ display: "none" , backgroundColor:"#aaa",}}  
   onChange={handleImageChange}
 />
 
-<label htmlFor="profileImage">
+<label htmlFor="profileImagePath">
   <Box
     sx={{
       width: 150,
@@ -235,25 +258,17 @@ const handleImageChange = (e) => {
     )}
   </Box>
 </label>
-      {/* <Typography variant="caption" display="block" sx={{marginLeft:1 ,padding:1,borderRadius:3  }}>
-        Upload Image
-      </Typography> */}
+  
       
       </Box>
       <form onSubmit={formik.handleSubmit}>
-        {/* {formik.values.isProfileValidate ? (
-  <Alert severity="success" sx={{ mb: 3 , mt: 2}}>
-    Profile is validated ✅
-  </Alert>
-) : (
-  <Alert severity="error" sx={{ mb: 3,  mt: 2}}>
-    Profile is not validated ❌
-  </Alert>
-)} */}
+        
+      
         <Grid container spacing={2}>
           {/* User Details */}
           <Grid size={{xs:12,sm:6,md:6,lg:6}} >
             <TextField
+             size="small"
               fullWidth
               name="userName"
               label="Username"
@@ -264,6 +279,7 @@ const handleImageChange = (e) => {
 
           <Grid size={{xs:12,sm:6,md:6,lg:6}}>
             <TextField
+             size="small"
               fullWidth
               name="name"
               label="Name"
@@ -274,6 +290,7 @@ const handleImageChange = (e) => {
 
           <Grid size={{xs:12,sm:6,md:6,lg:6}}>
             <TextField
+             size="small"
               fullWidth
               name="surname"
               label="Surname"
@@ -285,6 +302,7 @@ const handleImageChange = (e) => {
           <Grid size={{xs:12,sm:6,md:6,lg:6}}>
             <TextField
               fullWidth
+               size="small"
               name="emailAddress"
               label="Email Address"
               type="email"
@@ -296,6 +314,7 @@ const handleImageChange = (e) => {
           <Grid size={{xs:12,sm:6,md:6,lg:6}}>
             <TextField
               fullWidth
+               size="small"
               name="fullName"
               label="Full Name"
               value={formik.values.fullName}
@@ -307,6 +326,7 @@ const handleImageChange = (e) => {
             <FormControlLabel
               control={
                 <Switch
+                 size="small"
                   checked={formik.values.isActive}
                   onChange={(e) =>
                     formik.setFieldValue("isActive", e.target.checked)
@@ -316,68 +336,7 @@ const handleImageChange = (e) => {
               label="Active"
             />
           </Grid>
-
-          {/* Address Info */}
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="adress"
-              label="Address"
-              value={formik.values.adress}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="city"
-              label="City"
-              value={formik.values.city}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="state"
-              label="State"
-              value={formik.values.state}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="country"
-              label="Country"
-              value={formik.values.country}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="postalCode"
-              label="Postal Code"
-              value={formik.values.postalCode}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
-          <Grid size={{xs:12,sm:6,md:6,lg:6}}>
-            <TextField
-              fullWidth
-              name="mobileNumber"
-              label="Mobile Number"
-              value={formik.values.mobileNumber}
-              onChange={formik.handleChange}
-            />
-          </Grid>
-
+ 
 
           
  
@@ -389,7 +348,7 @@ const handleImageChange = (e) => {
       }
       style={{
       width: "100%",
-        height: "100px",
+        height: "70px",
         border: formik.values.isBuyer ? "3px solid #1976d2" : "",
         borderRadius: "12px",
         cursor: "pointer",
@@ -406,8 +365,8 @@ const handleImageChange = (e) => {
           gap: "5px",
         }}
       >
-        <DirectionsCarIcon style={{ fontSize: 50, color: formik.values.isBuyer ? "#1976d2" : "#555" }} />
-        <h4 style={{ fontWeight: "bolder" }}>Car Buyer</h4>
+        <DirectionsCarIcon style={{ fontSize: 40, color: formik.values.isBuyer ? "#1976d2" : "#555" }} />
+        <h5 style={{ fontWeight: "bolder" }}>Car Buyer</h5>
       </div>
     </div>
  </Grid>
@@ -419,7 +378,7 @@ const handleImageChange = (e) => {
       }
       style={{
          width: "100%",
-        height: "100px",
+        height: "70px",
         border: formik.values.isSeller ? "3px solid #1976d2" : "",
         borderRadius: "12px",
         cursor: "pointer",
@@ -436,59 +395,12 @@ const handleImageChange = (e) => {
           gap: "5px",
         }}
       >
-        <DirectionsCarIcon style={{ fontSize: 50, color: formik.values.isSeller ? "#1976d2" : "#555" }} />
-        <h4 style={{ fontWeight: "bolder" }}>Car Seller</h4>
+        <DirectionsCarIcon style={{ fontSize: 40, color: formik.values.isSeller ? "#1976d2" : "#555" }} />
+        <h5 style={{ fontWeight: "bolder" }}>Car Seller</h5>
       </div>
     </div>
     </Grid>
-  
-
-
-          
-          {/* <Grid size={{xs:12,sm:4,md:4,lg:4}}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formik.values.isProfileValidate}
-                  onChange={(e) =>
-                    formik.setFieldValue("isProfileValidate", e.target.checked)
-                  }
-                />
-              }
-              label="Profile Validated"
-            />
-          </Grid> */}
-
-          {/* <Grid size={{xs:12,sm:4,md:4,lg:4}}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formik.values.isSeller}
-                  onChange={(e) =>
-                    formik.setFieldValue("isSeller", e.target.checked)
-                  }
-                />
-              }
-              label="Seller"
-            />
-          </Grid> */}
-
-          {/* <Grid size={{xs:12,sm:4,md:4,lg:4}}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formik.values.isBuyer}
-                  onChange={(e) =>
-                    formik.setFieldValue("isBuyer", e.target.checked)
-                  }
-                />
-              }
-              label="Buyer"
-            />
-          </Grid> */}
-
-
-
+   
         </Grid>
  
 
@@ -514,7 +426,10 @@ const handleImageChange = (e) => {
           
         </Box>
       </form>
+      
     </Paper>
+      )}
+    </Box>
   );
 }
 

@@ -14,7 +14,7 @@ const ProtectedRoute = () => {
 
   if (loading) return null;  
 
-  return token ? <Outlet /> : <Navigate to='/user/login-v3' />;
+  return token ? <Outlet /> : <Navigate to='/home' />;
 };
 
 export default ProtectedRoute;

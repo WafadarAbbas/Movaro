@@ -1,4 +1,4 @@
- 
+
 
 import React, { useEffect, useContext, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
@@ -7,90 +7,54 @@ import { AppSettings } from "../../config/app-settings.js";
 import myImage from "./c2.jpg";
 import myImage2 from "./c3.jpg";
 import myImage3 from "./c1.jpg";
+import myImage4 from "./ferrari.jpg";
+import myImage5 from "./lambo.jpg";
 import { styled } from "@mui/system";
 
 
 import { Box, Container, Tab, Tabs, Paper } from '@mui/material'
-
-import LoginForm from './LoginForm.jsx'
-import SignupForm from './SignupForm.jsx'
-import ApiCall from "../../Apicall/ApiCall.js";
-
-
-
-
-const StyledTabs = styled(Tabs)(() => ({
-  marginBottom: "16px",
-  
-  "& .MuiTab-root": {
-    fontWeight: "bold",
-    fontSize: "18px",
-    color: "white",
-    textTransform: "none",
-  },
-  "& .Mui-selected": {
-    color: "white !important", // active tab bhi white
-    fontWeight: "bold",
-  },
-  "& .MuiTabs-indicator": {
-    backgroundColor: "white", // underline white
-    height: "3px",
-    borderRadius: "2px",
-  },
-}));
-
-// ✅ Styled Tab
-const StyledTab = styled(Tab)(() => ({
-  textTransform: "none",
-  fontSize: "18px",
-  fontWeight: "bolder",
-}));
-
-// ✅ Illustration container
-const IllustrationContainer = styled(Box)(({ theme, tab }) => ({
-  flex: "0 0 50%",
-  position: "relative",
-  minHeight: "600px",
-  transition: "transform 0.9s ease-in-out",
-  transform: tab === 1 ? "translateX(100%)" : "translateX(0)",
-  [theme.breakpoints.down("md")]: {
-    display: "none",
-  },
-}));
-
-
-// ✅ Form container
-const FormContainer = styled(Box)(({ theme }) => ({
-  flex: "0 0 50%",
-  padding: "20px",
-  backgroundColor: "transparent",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  transition: "transform 0.9s ease-in-out",
-  [theme.breakpoints.down('md')]: {
-    flex: '1 1 auto',
-    padding: theme.spacing(4),
-    transform: 'none !important', // Disable transform on mobile
-  },
-}));
-
-// ✅ Image
-const IllustrationImage = styled("img")({
-  width: "100%",
-  height: "100%",
-  objectFit: "fill",
-});
+import LoginBox from "./logincompo/loginbox.js";
+import ForgotPasswordBox from "./logincompo/ForgotPasswordBox.js";
+ 
 
 
 function LoginV3() {
+
+  const [screen, setScreen] = useState("login");
+
   const context = useContext(AppSettings);
   const [redirect, setRedirect] = useState(false);
   const [tab, setTab] = useState(0);
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const shadows = [
+    "0 10px 32px 0 rgba(31, 38, 135, 0.65)",
+    "0 10px 32px 0 rgba(255, 0, 0, 0.65)",
+    "0 10px 32px 0 rgba(0, 255, 0, 0.65)",
+    "0 10px 32px 0 rgba(0, 0, 255, 0.75)",
+    "0 10px 32px 0 rgba(235, 116, 5, 0.85)",
+  ];
 
+  const [shadowIndex, setShadowIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShadowIndex((prev) => (prev + 1) % shadows.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+  const images = [myImage, myImage2, myImage4, myImage5];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
 
   useEffect(() => {
@@ -118,75 +82,51 @@ function LoginV3() {
   if (redirect) {
     return <Navigate to="/dashboard/v3" />;
   }
- 
+
+
   return (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-             
-            backgroundSize: "cover",
-               backgroundImage: `url(${myImage2})`,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            transition: "background-image 1s ease-in-out", // smooth transition
-            zIndex: -1,
-          }}
-        >
-         
-          <Container
-            maxWidth="lg" 
-            sx={{ 
-              minHeight: '100vh',
-             
-              display: 'flex',
-             
-              alignItems: 'center'
-            }}
-          > 
     <Box
       sx={{
-        display: "flex",
         width: "100%",
-        maxWidth: "1200px",
-        minHeight: "600px",
-        margin: "40px auto",
-        borderRadius: "50px",
-        overflow: "hidden",
-        backgroundColor: "rgba(255, 255, 255, 0.1)",  
-        backdropFilter: "blur(15px)",
-        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.85)",
+        height: "100%",
+
+        backgroundSize: "cover",
+        backgroundImage: `url(${myImage2})`,
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        transition: "background-image 1s ease-in-out",
+        zIndex: -1,
       }}
     >
-      {/* Left Side Illustration */}
-      <IllustrationContainer tab={tab}>
-        <IllustrationImage src={myImage} alt="Collaboration" />
-      </IllustrationContainer>
 
-      {/* Right Side Form */}
-      <FormContainer
+      <Container
+
         sx={{
-          transform: tab === 1 ? "translateX(-100%)" : "translateX(0)",
+          minHeight: '100vh',
+
+          display: 'flex',
+
+          alignItems: 'center'
         }}
       >
-        <Box sx={{ textAlign: "center", mb: 4 }}>
-          {/* Tabs */}
-          <StyledTabs
-            value={tab}
-            onChange={(e, newValue) => setTab(newValue)}
-            variant="fullWidth"
-          >
-            <StyledTab label="Login" />
-            <StyledTab label="Sign Up" />
-          </StyledTabs>
-        </Box>
+        <>
+          {screen === "login" && (
+            <LoginBox
+              onForgotPassword={() => setScreen("forgotPassword")}
+            />
+          )}
 
-        {/* Tab Content */}
-        {tab === 0 ? <LoginForm /> : <SignupForm />}
-      </FormContainer>
+          {screen === "forgotPassword" && (
+            <ForgotPasswordBox onBack={() => setScreen("login")} />
+          )}
+
+
+
+        </>
+      </Container>
     </Box>
-    </Container>
-     </Box>
+
+
   );
 }
 

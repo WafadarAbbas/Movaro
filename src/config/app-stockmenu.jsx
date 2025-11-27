@@ -11,6 +11,11 @@ const StockMenu = [
    
     },
 
+    
+       { path: '/Seller', icon: 'fa fa-hdd', title: 'Seller ',
+   
+    },
+
        { path: '/SellerProfile', icon: 'fa fa-hdd', title: 'SellerProfile',
    
     },

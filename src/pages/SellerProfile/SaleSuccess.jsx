@@ -6,30 +6,9 @@ import QRCode from "react-qr-code";
 
 const SaleSuccess = () => {
 
-      const qrRef = useRef();
+  
 
-  const downloadQR = () => {
-    const svg = qrRef.current.querySelector("svg");
-    const serializer = new XMLSerializer();
-    const source = serializer.serializeToString(svg);
-
-    // convert SVG → image → download
-    const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(source);
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 200;
-      canvas.height = 200;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      const pngFile = canvas.toDataURL("image/png");
-
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngFile;
-      downloadLink.download = "qr-code.png";
-      downloadLink.click();
-    };
-  };
+ 
   return (
     <Box textAlign="center" py={5}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -48,23 +27,15 @@ const SaleSuccess = () => {
       >
         <QRCode
           value="Success"
-          size={160}         // px, makes it square
-          level="M"         // error correction level (L, M, Q, H)
+          size={160}          
+          level="M"         
           bgColor="#ffffff"
           fgColor="#000000"
           includeMargin={false}
         />
 
         </Box>
-        <Box mt={2}>
-        <Button
-          variant="contained"
-          onClick={downloadQR}
-          sx={{ backgroundColor: "#ff9f43", color: "white" }}
-        >
-          Download QR
-        </Button>
-      </Box>
+       
       <Container maxWidth="sm" sx={{marginTop:5}}>
  
         <Typography variant="body1" gutterBottom sx={{marginTop:1}}>

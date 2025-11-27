@@ -1,0 +1,74 @@
+ 
+.card-stack {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: 0 auto;
+  /* perspective: 1000px; */
+ 
+  
+}
+
+ 
+.stack-card {
+  position: absolute;
+  width: clamp(190px, 26vw, 240px); 
+  height: clamp(280px, 70vw, 420px);  
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
+  top: 0;
+  left: 35%;
+  transform: translateX(-50%);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  background: linear-gradient(180deg, #ffffff 0%, #f3fbf8 100%);
+  border: 25px solid #ffffff;
+ 
+}
+
+ 
+
+ 
+.card1 {
+  transform: translateX(-160px) rotate(-8deg) translateY(-5px);
+  z-index: 1;
+  background: #ffffff;
+}
+.card2 {
+  transform: translateX(-35px) rotate(0deg) translateY(20px);
+  z-index: 3;
+   background: #ffffff;
+}
+.card3 {
+  transform: translateX(100px) rotate(4deg) translateY(50px);
+  z-index: 2;
+  background: #ffffff;
+}
+.card4 {
+  transform: translateX(130px) rotate(10deg) translateY(-15px);
+  z-index: 1;
+ background: #ffffff;
+}
+
+ 
+.stack-card.active {
+  z-index: 10;
+  transform: scale(1.05);
+  box-shadow: 0 30px 45px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+}
+
+ 
+.card1.active {
+  transform: translateX(-90px) rotate(0deg) scale(1.05);
+}
+.card2.active {
+  transform: translateX(-30px) rotate(0deg) scale(1.05);
+}
+.card3.active {
+  transform: translateX(30px) rotate(0deg) scale(1.05);
+}
+.card4.active {
+  transform: translateX(90px) rotate(0deg) scale(1.05);
+}

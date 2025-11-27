@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { AppSettings } from './../../config/app-settings.js';
-
+ 
 function LoginV2() {
 	const context = useContext(AppSettings);
 	const [redirect, setRedirect] = useState(false);

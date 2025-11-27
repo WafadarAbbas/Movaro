@@ -1,47 +1,135 @@
-import React, { useEffect, useState } from "react";
-import ApiCall from "../../Apicall/ApiCall";
+// import React, { useEffect, useState } from "react";
+// import { Container, Typography, Box, Card, CardContent } from "@mui/material";
+// import CryptoJS from "crypto-js";
 
-function Testing2() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// export default function Testing2() {
+//   const [data, setData] = useState(null);
+//   const passphrase = "MySecretKey123";
+
+//   // 🔒 Hardcoded Encrypted URL (like your example)
+//   const hardcodedURL =
+//     "http://localhost:3000/Buyer/U2FsdGVkX1%2FrPL8zPb1yxd7fzhw3xq4y2sWkSVfmy8NU1NirMn5HHz1JC3RuDDlC%2BtgDBFD7AjDHkJnTlejKJ7%2BKzyTNX6kD%2BA%2Fm4%2B18lVlq%2Bv7KH7QZhDtkzaBg5fIy";
+
+//   useEffect(() => {
+//     try {
+//       // Extract ciphertext from hardcoded URL
+//       const parts = hardcodedURL.split("/Buyer/");
+//       if (parts.length < 2) return;
+
+//       const encoded = parts[1];
+//       const ciphertext = decodeURIComponent(encoded);
+
+//       // 🔓 Decrypt using CryptoJS
+//       const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+//       const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+
+//       if (!decryptedText) {
+//         setData({ error: "❌ Decryption failed — check passphrase or ciphertext." });
+//         return;
+//       }
+
+//       // Parse JSON
+//       let parsed;
+//       try {
+//         parsed = JSON.parse(decryptedText);
+//       } catch {
+//         parsed = decryptedText;
+//       }
+
+//       setData(parsed);
+//     } catch (err) {
+//       console.error("Error during decryption:", err);
+//       setData({ error: "⚠️ Unexpected error while decrypting." });
+//     }
+//   }, []);
+
+//   return (
+//     <Container sx={{ position: "relative", mt: 6 }}>
+    
+
+//       {/* Decrypted Output */}
+//       <Card sx={{ mt: 8, p: 2, boxShadow: 4, borderRadius: 2 }}>
+//         <CardContent>
+//           <Typography variant="h6" gutterBottom>
+//             🔓 Decrypted Data (Hardcoded URL)
+//           </Typography>
+//           <pre style={{ background: "#f5f5f5", padding: "12px", borderRadius: "8px" }}>
+//             {data ? JSON.stringify(data, null, 2) : "Decrypting..."}
+//           </pre>
+//         </CardContent>
+//       </Card>
+//     </Container>
+//   );
+// }
+
+import React, { useEffect, useState } from "react";
+import { Container, Typography, Card, CardContent } from "@mui/material";
+import CryptoJS from "crypto-js";
+
+export default function Testing2() {
+  const [data, setData] = useState(null);
+  const passphrase = "MySuperSecretKey123";
+ 
+  const hardcodedURL =
+    "http://localhost:3000/Buyer/U2FsdGVkX18wwRYLui2Xs4EIR20dlQuNYDeHJOUGPY3FMpKzpaJl%2BmD4ZmNzD1GEpn0hopDVvVbPRzFFWHRPfO%2Fjiq5FXs8Gi5ab6iLSFkv2NNQ%2Fw9Wh6p3e0ABwGwG8";
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        setLoading(true);
+    try {
+      const parts = hardcodedURL.split("/Buyer/");
+      if (parts.length < 2) return;
 
-        // ✅ Session API Call
-        const sessionResponse = await ApiCall({
-          url: "https://localhost:44311/api/services/app/Session/GetCurrentLoginInformations",
-          method: "GET",
-        });
+      // ✅ Decode URL-encoded ciphertext
+      const encodedCipher = parts[1];
+      const ciphertext = decodeURIComponent(encodedCipher); 
 
-        const userId = sessionResponse.data?.result?.user?.id;
+      console.log("Decoded Cipher:", ciphertext);
 
-        if (userId) {
-          alert(`✅ User ID: ${userId}`);
-        } else {
-          alert("⚠️ User ID not found in session response");
-        }
-      } catch (err) {
-        setError(err.message || "API call failed");
-      } finally {
-        setLoading(false);
+       
+      const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+
+      console.log("Decrypted Text:", decryptedText);
+
+      if (!decryptedText) {
+        setData({ error: "❌ Decryption failed — check passphrase or ciphertext." });
+        return;
       }
-    };
 
-    fetchSession();
+      // Try parsing JSON; otherwise keep plain string
+      let parsed;
+      try {
+        parsed = JSON.parse(decryptedText);
+      } catch {
+        parsed = decryptedText;
+      }
+
+      setData(parsed);
+    } catch (err) {
+      console.error("Error during decryption:", err);
+      setData({ error: "⚠️ Unexpected error while decrypting." });
+    }
   }, []);
 
-  if (loading) return <p>Loading…</p>;
-  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
-
   return (
-    <div>
-      <h2>Session Info</h2>
-      <p>Check the alert for User ID 👆 </p>
-    </div>
+    <Container sx={{ position: "relative", mt: 6 }}>
+      <Card sx={{ mt: 8, p: 2, boxShadow: 4, borderRadius: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+             {data ? JSON.stringify(data, null, 2) : "Decrypting..."}
+          </Typography>
+          {/* <pre
+            style={{
+              background: "#f5f5f5",
+              padding: "12px",
+              borderRadius: "8px",
+              whiteSpace: "pre-wrap",
+              fontSize: "14px",
+            }}
+          >
+            {data ? JSON.stringify(data, null, 2) : "Decrypting..."}
+          </pre> */}
+        </CardContent>
+      </Card>
+    </Container>
   );
 }
-
-export default Testing2;

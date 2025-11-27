@@ -7,9 +7,9 @@ import Sidebar from './components/sidebar/sidebar.jsx';
 import SidebarRight from './components/sidebar-right/sidebar-right.jsx';
 import TopMenu from './components/top-menu/top-menu.jsx';
 import Content from './components/content/content.jsx';
-import ThemePanel from './components/theme-panel/theme-panel.jsx';
-
- 
+import { UserProvider } from "./context/UserContext.js";
+ import { CriiptoVerifyProvider } from "@criipto/verify-react";
+import { AuthProvider } from './context/AuthContext.js';
 
 
 
@@ -240,8 +240,17 @@ function App() {
 			window.removeEventListener('scroll', handleScroll);
 		};
 	}, [appTheme, appDarkMode]);
-
+ 
 	return (
+<CriiptoVerifyProvider
+      domain="jinnah-test.criipto.id"
+      clientID="urn:my:application:identifier:42807"
+      acrValues="urn:grn:authn:se:bankid:another-device"
+      redirectUri="http://localhost:3000/callback"
+       scope="openid profile"
+    >
+<AuthProvider>
+		 <UserProvider>
 		<AppSettings.Provider
 			value={{
 				appTheme,
@@ -328,11 +337,14 @@ function App() {
 				{appSidebarTwo && <SidebarRight />}
 				{appTopMenu && <TopMenu />}
 				{!appContentNone && <Content />}
-				<ThemePanel />
+			 
 			</div>
 
 
 		</AppSettings.Provider>
+		</UserProvider>
+		</AuthProvider>
+		</CriiptoVerifyProvider>
 	);
 }
 

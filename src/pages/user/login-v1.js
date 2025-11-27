@@ -29,7 +29,7 @@ function LoginV1() {
 	if (redirect) {
 		return <Navigate to='/' />;
 	}
-  
+   
 	return (
 		<div className="login login-v1">
 			<div className="login-container">

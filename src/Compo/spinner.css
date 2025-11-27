@@ -1,0 +1,84 @@
+ .pl {
+  width: 9em;
+  height: 9em;
+}
+
+.pl circle {
+  fill: none;
+  stroke-linecap: round;
+  transform-origin: 50% 50%;
+}
+
+.pl__ring1 {
+  stroke: #fd7c02;
+  stroke-width: 8;
+  stroke-dasharray: 377 377;
+  animation: ring1 4s 0s ease-in-out infinite;
+}
+
+.pl__ring2 {
+  stroke: #fc8617;
+  stroke-width: 7;
+  stroke-dasharray: 329.9 329.9;
+  animation: ring2 4s 0.04s ease-in-out infinite;
+}
+
+.pl__ring3 {
+  stroke: #fc9637;
+  stroke-width: 6;
+  stroke-dasharray: 289 289;
+  animation: ring3 4s 0.08s ease-in-out infinite;
+}
+
+.pl__ring4 {
+  stroke: #f89d48;
+  stroke-width: 5;
+  stroke-dasharray: 254.5 254.5;
+  animation: ring4 4s 0.12s ease-in-out infinite;
+}
+
+.pl__ring5 {
+  stroke: #faae66;
+  stroke-width: 4;
+  stroke-dasharray: 226.2 226.2;
+  animation: ring5 4s 0.16s ease-in-out infinite;
+}
+
+.pl__ring6 {
+  stroke: #f5bf8d;
+  stroke-width: 3;
+  stroke-dasharray: 204.2 204.2;
+  animation: ring6 4s 0.2s ease-in-out infinite;
+}
+
+/* Keyframes har ring ke liye */
+@keyframes ring1 {
+  0% {
+    stroke-dashoffset: -376.4;
+    transform: rotate(-90deg);
+  }
+  23% {
+    stroke-dashoffset: -94.2;
+    transform: rotate(360deg);
+  }
+  46%,
+  50% {
+    stroke-dashoffset: -376.4;
+    transform: rotate(810deg);
+  }
+  73% {
+    stroke-dashoffset: -94.2;
+    transform: rotate(1260deg);
+  }
+  100% {
+    stroke-dashoffset: -376.4;
+    transform: rotate(1710deg);
+  }
+}
+
+/* same pattern copy karke ring2, ring3... banane hain */
+@keyframes ring2 { from { stroke-dashoffset: -329.3; transform: rotate(-90deg);} 23%{ stroke-dashoffset: -82.4; transform: rotate(360deg);} 46%,50%{ stroke-dashoffset: -329.3; transform: rotate(810deg);} 73%{ stroke-dashoffset: -82.4; transform: rotate(1260deg);} 100%{ stroke-dashoffset: -329.3; transform: rotate(1710deg);} }
+@keyframes ring3 { from { stroke-dashoffset: -288.6; transform: rotate(-90deg);} 23%{ stroke-dashoffset: -72.2; transform: rotate(360deg);} 46%,50%{ stroke-dashoffset: -288.6; transform: rotate(810deg);} 73%{ stroke-dashoffset: -72.2; transform: rotate(1260deg);} 100%{ stroke-dashoffset: -288.6; transform: rotate(1710deg);} }
+@keyframes ring4 { from { stroke-dashoffset: -254; transform: rotate(-90deg);} 23%{ stroke-dashoffset: -63.6; transform: rotate(360deg);} 46%,50%{ stroke-dashoffset: -254; transform: rotate(810deg);} 73%{ stroke-dashoffset: -63.6; transform: rotate(1260deg);} 100%{ stroke-dashoffset: -254; transform: rotate(1710deg);} }
+@keyframes ring5 { from { stroke-dashoffset: -225.8; transform: rotate(-90deg);} 23%{ stroke-dashoffset: -56.6; transform: rotate(360deg);} 46%,50%{ stroke-dashoffset: -225.8; transform: rotate(810deg);} 73%{ stroke-dashoffset: -56.6; transform: rotate(1260deg);} 100%{ stroke-dashoffset: -225.8; transform: rotate(1710deg);} }
+@keyframes ring6 { from { stroke-dashoffset: -203.9; transform: rotate(-90deg);} 23%{ stroke-dashoffset: -51.1; transform: rotate(360deg);} 46%,50%{ stroke-dashoffset: -203.9; transform: rotate(810deg);} 73%{ stroke-dashoffset: -51.1; transform: rotate(1260deg);} 100%{ stroke-dashoffset: -203.9; transform: rotate(1710deg);} }

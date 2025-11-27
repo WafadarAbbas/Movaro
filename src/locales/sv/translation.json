@@ -1,0 +1,13 @@
+{
+  "vehicleSection": {
+    "title": "Stöd för flera fordonstyper",
+    "messages": {
+      "car": "Du valde: Bil – försäkring & skatt förklaras i guiden.",
+      "motorcycle": "Du valde: MC – försäkring & skatt förklaras i guiden.",
+      "scooter": "Du valde: Moped – försäkring & skatt förklaras i guiden.",
+      "ship": "Du valde: Husbil – försäkring & skatt förklaras i guiden.",
+      "trailer": "Du valde: Lätt lastbil – försäkring & skatt förklaras i guiden.",
+      "truck": "Du valde: Lastbil – försäkring & skatt förklaras i guiden."
+    }
+  }
+}

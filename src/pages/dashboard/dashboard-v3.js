@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate  } from "react-router-dom";
 import "bootstrap-daterangepicker/daterangepicker.css";
 import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
 import ApiCall from "../../Apicall/ApiCall";
@@ -8,6 +8,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 function DashboardV3() {
   const targetValues = [307144, 151123, 894121, 452338];
   const [counts, setCounts] = useState(targetValues.map(() => 0)); // Initialize each count at 0
+const navigate = useNavigate();
 
   useEffect(() => {
     const intervals = targetValues.map((target, index) => {
@@ -38,6 +39,7 @@ function DashboardV3() {
    
   ];
 
+ 
 
   return (
     <div>

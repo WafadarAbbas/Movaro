@@ -15,7 +15,9 @@ function Header() {
 	return (
 		<AppSettings.Consumer>
 			{({ toggleAppSidebarMobile, toggleAppSidebarEnd, toggleAppSidebarEndMobile, toggleAppTopMenuMobile, appHeaderLanguageBar, appHeaderMegaMenu, appHeaderInverse, appSidebarTwo, appTopMenu, appSidebarNone }) => (
-				<div id="header" className="app-header " data-bs-theme={appHeaderInverse ? 'dark' : ''} style={{ borderBottom: '1px solid #ddd', paddingBottom: 5 }}>
+				<div id="header" className="app-header " data-bs-theme={appHeaderInverse ? 'dark' : ''} style={{ borderBottom: '1px solid #ddd'
+					
+				 }}>
 					<div className="navbar-header" >
 						{appSidebarTwo && (
 							<button type="button" className="navbar-mobile-toggler" onClick={toggleAppSidebarEndMobile}>
@@ -83,24 +85,11 @@ function Header() {
 
 					</div>
 
-
-					{/* <div className="d-flex ">
-					 
-					 
-					 <div className="  d-none d-md-flex align-items-center "> 
-							 <Items />
-	 
-						 </div>
-  
-						 <div className="d-flex align-items-center d-none d-md-block">
  
-						 <DropdownProfile />
-						 </div>
-					 </div> */}
 					<div className="d-none d-md-block d-flex  flex-row justify-content-between  w-100">
 
 						<Items />
-						{/* <DropdownProfile /> */}
+					 
 					</div>
 				</div>
 

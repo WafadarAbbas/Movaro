@@ -1,296 +1,350 @@
-import { Box, TextField, Button, Grid, Typography, Alert, CircularProgress } from '@mui/material';
-import { useState } from 'react';
-import { Formik, Form } from 'formik';
-import "./Box.css";
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import ApiCall from '../../Apicall/ApiCall';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
- import * as Yup from "yup";
+import React, { useState } from "react";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import logo from "../../../src/assets/logoBankIdwhite.png";
+import {
+  Box,
+  Button,
+  Typography,
+  Stepper,
+  Step,
+  StepLabel,
+  TextField,
+  Paper,
+  Divider,
+  InputAdornment,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
+import { Formik, Form } from "formik";
+import Grid from "@mui/material/Grid";
+import { Link } from "react-router-dom";
 
-function SignupForm() {
-  const navigate = useNavigate();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
- const [hover, setHover] = useState(false);
- const initialValues = {
-  userName: '',
-  name: '',
-  surname: '',
-  emailAddress: '',
-  city: '',
-  isBuyer: false,
-  isSeller: false,
-  password: '', 
-};
-const validationSchema = Yup.object().shape({
-    userName: Yup.string()
-      .required("Username is required")
-      .matches(/^\S*$/, "Username cannot contain spaces"),
-    name: Yup.string().required("Name is required"),
-    surname: Yup.string().required("Surname is required"),
-    emailAddress: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
-    city: Yup.string().required("City is required"),
-    password: Yup.string().required("Password is required"),
-  });
+const steps = ["Verify with BankID", "Complete Account Details"];
 
-const handleSubmit = async (values) => {
-  setLoading(true);
-  setError("");
-  setSuccess("");
-  try {
-    const requestBody = {
-      ...values,
-isActive: true,
-      roleNames: ["Seller"],
-    };
- console.log(requestBody);
-    const response = await axios.post(
-      "https://localhost:44311/api/services/app/User/RegisterNewUser",
-      requestBody
-    );
+function BankIdStepper({ onClose, onBack }) {
+  const [activeStep, setActiveStep] = useState(0);
 
-    console.log("User created successfully:", response.data);
-
-    setSuccess("User created successfully! 🎉");  
-window.location.href = "/user/login-v3"; 
-  } catch (err) {
-    const errorMsg =
-      err.response?.data?.error?.details ||
-      err.response?.data?.error?.message ||
-      err.message ||
-      "Something went wrong!";
-    setError(errorMsg);
-    console.error("Error creating user:", errorMsg);
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const textFieldSx = {
-    mb: 2.5,
-    fontWeight: 'bolder',
-    "& .MuiOutlinedInput-root": {
-      fontWeight: 'bold',
-      "& fieldset": { borderWidth: '2px', borderColor: 'white' },
-      "&:hover fieldset": { borderWidth: '3px', borderColor: 'white' },
-      "&.Mui-focused fieldset": { borderWidth: '3px', borderColor: 'white !important' },
-    },
-    input: { color: 'white' },
-  };
-
-  const labelSx = {
-    sx: { color: 'white', "&.Mui-focused": { color: 'white !important', fontWeight: 'bolder' } },
-  };
-  
+  const handleNext = () => setActiveStep((prev) => prev + 1);
+  const handleBack = () => setActiveStep((prev) => prev - 1);
 
   return (
+    <Paper
+      elevation={5}
+      sx={{
+        // minWidth: 600,
+        maxWidth: 700,
+        mx: "auto",
+        mt: 5,
+        p: 3,
+        borderRadius: 2,
+        textAlign: "center",
+      }}
+    >
+      <Typography variant="h6" gutterBottom>
+        BankID Sign Up
+      </Typography>
 
+      <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel
+              StepIconProps={{
+                sx: {
+                  color: "#ccc",
+                  "&.Mui-active": { color: "#0097a7" },
+                  "&.Mui-completed": { color: "#0097a7" },
+                },
+              }}
+            >
+              {label}
+            </StepLabel>
+          </Step>
+        ))}
+      </Stepper>
 
-    <Box    display="flex"
-      justifyContent="center"
-      alignItems="center"
-   
-      
-      px={2}  
+      <Formik
+        initialValues={{
+          fullName: "",
+          personalNumber: "",
+          email: "",
+          phone: "",
+          drivingLicense: "",
+          bankDetails: "",
+           password: "",
+  confirmPassword: "",
+          terms: false,
+        }}
+        onSubmit={(values) => {
+          console.log("Submitted values:", values);
+          alert("Signup completed (dummy)!");
+        }}
       >
-   
- 
-      {loading && <p>Loading...</p>}
-      
-    <Formik initialValues={initialValues}  validationSchema={validationSchema}  onSubmit={handleSubmit}>
-      {({ values, handleChange }) => (
-        <Form noValidate>
-          
-          {success && (
-  <Alert
-    severity="success"
-    sx={{ mb: 3, color: "green" }}
-    onClose={() => setSuccess("")}
-  >
-    {success}
-  </Alert>
-)}
+        {({ values, handleChange, setFieldValue }) => (
+          <Form>
+            {/* Step 1 */}
+            {activeStep === 0 && (
+              <Box>
+                <Typography variant="h6" fontWeight="bold" mb={2}>
+                  Enter your Social Security Number
+                </Typography>
 
-{error && (
-  <Alert
-    severity="error"
-    sx={{ mb: 3, color: "red" }}
-    onClose={() => setError("")}
-  >
-    {error}
-  </Alert>
-)}
-<Box
-  display="flex"
-  gap={2}
-  mb={3}
-  justifyContent="center"
-  alignItems="center"
+                <Box sx={{ display: "flex", gap: 2, mb: 3  }}>
+                  <TextField
+                    fullWidth
+                     size="small"
+                    label="Social Security Number"
+                    name="personalNumber"
+                    value={values.personalNumber}
+                    onChange={handleChange}
+                  />
+            <Button
+  variant="contained"
+  size="small"
+  color="primary"
+  onClick={() => {
+    setFieldValue("fullName", "Wafadar Abbas");
+    alert("Fetched info from BankID!");
+  }}
   sx={{
-    flexDirection: { xs: "column", sm: "row" },  
+    minWidth: "auto",     // button ki width tight ho jayegi
+    px: 1.8,              // horizontal padding chhoti
+    py: 0.3,              // vertical padding chhoti
+    fontSize: "10px",     // text size chhoti
   }}
 >
-  <div
-    className={`box a ${values.isBuyer ? "selected" : ""}`}
-    onClick={() =>
-      handleChange({
-        target: { name: "isBuyer", value: !values.isBuyer },
-      })
-    }
+  GetInfo
+</Button>
+                 
+                </Box>
+
+                <Typography variant="subtitle2" color="grey" mt={2} mb={3}>
+                  Your information will be retrieved in cooperation with BankID and
+                  Bisenode.{" "}
+                  <a href="#" style={{ color: "#0097a7" }}>
+                    Read Privacy Policy
+                  </a>
+                </Typography>
+
+                <Divider sx={{ my: 2, borderColor: "grey.600" }} />
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Link component="button" underline="hover" onClick={onBack}>
+                    Back to Login
+                  </Link>
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    sx={{ fontWeight: "bold", backgroundColor: "#00acc1" }}
+                  >
+                    Next
+                  </Button>
+                </Box>
+              </Box>
+            )}
+
+            {/* Step 2 */}
+            {activeStep === 1 && (
+              <Box>
+                <Typography variant="h6" fontWeight="bold" mb={2}>
+                  Complete Your Account
+                </Typography>
+
+             
+                <Grid container spacing={2} mb={2}>
+                  <Grid size={{xs:12,sm:6,md:6,lg:6}}>
+                    <TextField
+                      fullWidth
+                       size="small"
+                      label="Full Name"
+                      name="fullName"
+                      value={values.fullName}
+                      disabled
+                      InputProps={{
+                        style: { backgroundColor: "#f5f5f5" },
+                      }}
+                    />
+                  </Grid>
+                  <Grid size={{xs:12,sm:6,md:6,lg:6}}>
+                    <TextField
+                      fullWidth
+                       size="small"
+                      label="Personal Number"
+                      name="personalNumber"
+                      value={values.personalNumber}
+                      disabled
+                      InputProps={{
+                        style: { backgroundColor: "#f5f5f5" },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+              
+                <Grid container spacing={2} mb={2}>
+                  <Grid size={{xs:12,sm:6,md:6,lg:6}}>
+                    <TextField
+                      fullWidth
+                       size="small"
+                      label="Email"
+                      name="email"
+                      value={values.email}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+                  <Grid size={{xs:12,sm:6,md:6,lg:6}}>
+                    <TextField
+                      fullWidth
+                       size="small"
+                      label="Phone Number"
+                      name="phone"
+                      value={values.phone}
+                      onChange={handleChange}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">+46</InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={2} mb={2}>
+ <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+  <Button
+    variant="outlined"
+    component="label"
+    fullWidth
+    // size="small"
+    sx={{
+      textTransform: "none",
+      color: "grey.700",          // text grey
+      borderColor: "grey.400",    // border grey
+      "&:hover": {
+        borderColor: "grey.600",  // hover par thoda dark
+        backgroundColor: "grey.100",
+      },
+      justifyContent: "flex-start", // text left align jaise TextField
+    }}
+    startIcon={<CloudUploadIcon sx={{ color: "grey.600" }} />} // icon bhi grey
   >
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        gap: "5px",
+    Upload Driving License
+    <input
+      type="file"
+      accept="image/*"
+      hidden
+      name="drivingLicense"
+      onChange={(event) => {
+        if (event.target.files && event.target.files[0]) {
+          setFieldValue("drivingLicense", event.target.files[0]); // Formik
+        }
       }}
-    >
-      <DirectionsCarIcon style={{ fontSize: 50 }} />
-      <h4 style={{ fontWeight: "bolder" }}>Car Buyer</h4>
-    </div>
-  </div>
-
-  <div
-    className={`box a ${values.isSeller ? "selected" : ""}`}
-    onClick={() =>
-      handleChange({
-        target: { name: "isSeller", value: !values.isSeller },
-      })
-    }
-  >
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        gap: "5px",
-      }}
-    >
-      <DirectionsCarIcon style={{ fontSize: 50 }} />
-      <h4 style={{ fontWeight: "bolder" }}>Car Seller</h4>
-    </div>
-  </div>
-</Box>
-
-       
-             <Grid  container spacing={2} justifyContent="center" alignItems="center">
-  <Grid size={{sx:12,sm:6,md:6}} display="flex" justifyContent="center" alignItems="center">
-    <TextField
-      fullWidth
-      name="userName"
-      label="userName"
-      required
-      value={values.userName}
-      onChange={handleChange}
-      disabled={loading}
-      sx={textFieldSx}
-      InputLabelProps={labelSx}
     />
-  </Grid>
-
-  <Grid size={{sx:12,sm:6,md:6}}>
-    <TextField
-      fullWidth
-      name="name"
-      label="First Name"
-      required
-      value={values.name}
-      onChange={handleChange}
-      disabled={loading}
-      sx={textFieldSx}
-      InputLabelProps={labelSx}
-    />
-  </Grid>
-
-  <Grid size={{sx:12,sm:6,md:6}}>
-    <TextField
-      fullWidth
-      name="surname"
-      label="Last Name"
-      required
-      value={values.surname}
-      onChange={handleChange}
-      disabled={loading}
-      sx={textFieldSx}
-      InputLabelProps={labelSx}
-    />
-  </Grid>
-
-  <Grid size={{sx:12,sm:6,md:6}}>
-    <TextField
-      fullWidth
-      name="emailAddress"
-      label="Email Address"
-      type="email"
-      required
-      value={values.emailAddress}
-      onChange={handleChange}
-      disabled={loading}
-      sx={textFieldSx}
-      InputLabelProps={labelSx}
-    />
-  </Grid>
-
-  <Grid size={{sx:12,sm:6,md:6}}>
-    <TextField
-      fullWidth
-      name="city"
-      label="City"
-      required
-      value={values.city}
-      onChange={handleChange}
-      disabled={loading}
-      sx={textFieldSx}
-      InputLabelProps={labelSx}
-    />
-  </Grid>
-        <Grid size={{sx:12,sm:6,md:6}}>
-                <TextField
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  required
-                  value={values.password}
-                  onChange={handleChange}
-                  disabled={loading}
-                  sx={textFieldSx}
-                  InputLabelProps={labelSx}
-                />
-              </Grid>
+  </Button>
+  {values.drivingLicense && (
+    <Typography variant="caption" color="textSecondary">
+      {values.drivingLicense.name}
+    </Typography>
+  )}
 </Grid>
 
 
-          
-            <Box sx={{textAlign:'center'}}> 
-              <Button
-                type="submit"
-                variant="contained"
-                size="medium"
-                disabled={loading}
-                sx={{ mt: 1 }}
-              >
-                {loading ? <CircularProgress size={24} /> : 'Sign Up'}
-              </Button>
-              <Typography variant="body2" color="white" align="center" sx={{ mt: 2}}>
-                By signing up, you agree to our Terms and Privacy Policy
-              </Typography>
-        </Box>
-         
-        </Form>
-      )}
-    </Formik>
-    </Box>
+                  <Grid size={{xs:12,sm:6,md:6,lg:6}}>
+                    <TextField
+                     size="small"
+                      fullWidth
+                      label="Bank Details (optional)"
+                      name="bankDetails"
+                      value={values.bankDetails}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={2} mb={2}>
+  <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+    <TextField
+      fullWidth
+      size="small"
+      label="Password"
+      type="password"
+      name="password"
+      value={values.password}
+      onChange={handleChange}
+    />
+  </Grid>
+
+  <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+    <TextField
+      fullWidth
+      size="small"
+      label="Confirm Password"
+      type="password"
+      name="confirmPassword"
+      value={values.confirmPassword}
+      onChange={handleChange}
+    />
+  </Grid>
+</Grid>
+
+
+                {/* Terms */}
+                <Box
+                  sx={{
+                    p: 2,
+                    border: "1px solid #ddd",
+                    borderRadius: 2,
+                    mb: 3,
+                    textAlign: "left",
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="terms"
+                        checked={values.terms}
+                        onChange={handleChange}
+                      />
+                    }
+                    label={
+                      <Typography variant="subtitle3">
+                        By logging in, you confirm that your information is processed in accordance with{" "}
+                        <a href="#" target="_blank" style={{ color: "#0097a7" }}>
+                          Klargo’s Privacy Policy
+                        </a>{" "}
+                        and used only to verify your identity and secure transactions.
+                      </Typography>
+                    }
+                  />
+                </Box>
+
+                <Divider sx={{ my: 3, borderColor: "grey.600" }} />
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Button onClick={handleBack}>Back</Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      mb: 1,
+                      backgroundColor: "#00acc1",
+                      fontWeight: "bold",
+                      padding: 1,
+                      color: "white",
+                    }}
+                  >
+                    Sign Up with BankID
+                    <img
+                      src={logo}
+                      alt="BankID Logo"
+                      style={{ width: 30, marginLeft: 8 }}
+                    />
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </Form>
+        )}
+      </Formik>
+    </Paper>
   );
 }
 
-export default SignupForm;
+export default BankIdStepper;

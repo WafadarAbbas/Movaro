@@ -1,0 +1,13 @@
+{
+  "vehicleSection": {
+    "title": "Support for multiple vehicle types",
+    "messages": {
+      "car": "You selected: Car – insurance & tax explained in the guide.",
+      "motorcycle": "You selected: Motorcycle – insurance & tax explained in the guide.",
+      "scooter": "You selected: Scooter – insurance & tax explained in the guide.",
+      "ship": "You selected: Motorhome – insurance & tax explained in the guide.",
+      "trailer": "You selected: Light truck – insurance & tax explained in the guide.",
+      "truck": "You selected: Truck – insurance & tax explained in the guide."
+    }
+  }
+}
