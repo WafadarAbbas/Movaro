@@ -10,7 +10,8 @@ import Content from './components/content/content.jsx';
 import { UserProvider } from "./context/UserContext.js";
  import { CriiptoVerifyProvider } from "@criipto/verify-react";
 import { AuthProvider } from './context/AuthContext.js';
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 function App() {	
@@ -337,7 +338,12 @@ function App() {
 				{appSidebarTwo && <SidebarRight />}
 				{appTopMenu && <TopMenu />}
 				{!appContentNone && <Content />}
-			 
+			    <ToastContainer 
+    position="top-right" 
+    autoClose={false} 
+    closeOnClick={true} 
+    draggable={true} 
+  />
 			</div>
 
 

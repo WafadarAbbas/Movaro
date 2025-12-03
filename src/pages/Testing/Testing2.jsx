@@ -71,7 +71,7 @@ export default function Testing2() {
   const passphrase = "MySuperSecretKey123";
  
   const hardcodedURL =
-    "http://localhost:3000/Buyer/U2FsdGVkX18wwRYLui2Xs4EIR20dlQuNYDeHJOUGPY3FMpKzpaJl%2BmD4ZmNzD1GEpn0hopDVvVbPRzFFWHRPfO%2Fjiq5FXs8Gi5ab6iLSFkv2NNQ%2Fw9Wh6p3e0ABwGwG8";
+    "http://localhost:3000/Buyer/U2FsdGVkX1%2FWPQykmw9OLgyJirfuFUXwG%2ButeMMnBMg9adER9OvmtxA%2Bnvar3rzK0GTyjTUiuPLypjk2xIkVXmrJP1LhVTpWtOazg3TEu6%2BnRiTvJb0cJWiBrL%2BPnCWO";
 
   useEffect(() => {
     try {

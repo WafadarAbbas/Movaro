@@ -434,6 +434,7 @@ const Home = () => {
 
       <Box sx={{
         bgcolor: "#fffbf9ff",
+            minHeight: "100vh", 
         py: 6,
       }}>
         <Container>

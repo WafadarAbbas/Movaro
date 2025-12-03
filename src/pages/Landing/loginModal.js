@@ -655,6 +655,7 @@ const signupFormik = useFormik({
         if (response.data?.result?.accessToken) {
  
            const token = response.data.result.accessToken;
+            //  localStorage.setItem("authToken2", token);
                 const secretKey = "my-super-secret-key";
                 const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
                 localStorage.setItem("authToken", encryptedToken);

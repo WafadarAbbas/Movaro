@@ -44,7 +44,7 @@ const AppRoute = [
       
       {
         path: 'dashboard/*',
-        element: <ProtectedRoute />,   
+        // element: <ProtectedRoute />,   
 		// element: <Outlet />,
         children: [
        
@@ -84,14 +84,14 @@ const AppRoute = [
 
 {
   path: 'Profile',
-      element: <ProtectedRoute />, 
+      // element: <ProtectedRoute />, 
   children: [
     { path: '', element: <Profile /> }
   ]
 },
 {
   path: 'SellerProfile',
-      element: <ProtectedRoute />, 
+      // element: <ProtectedRoute />, 
   children: [
     { path: '', element: <SellerProfile /> }
   ]
@@ -99,7 +99,7 @@ const AppRoute = [
 
 {
   path: 'Seller',
-      element: <ProtectedRoute />, 
+      // element: <ProtectedRoute />, 
   children: [
     { path: '', element: <Seller /> }
   ]
