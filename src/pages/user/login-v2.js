@@ -31,22 +31,16 @@ function LoginV2() {
     setRedirect(true);
   };
 
-  useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass('p-0');
+ useEffect(() => {
+  context.setAppHeaderNone(true);   
 
-    return function cleanUp() {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass('');
-    };
-		
-		// eslint-disable-next-line
-	}, []);
+  return () => {
+    context.setAppHeaderNone(false);  
+  };
+}, []);
 
   if (redirect) {
-    return <Navigate to='/dashboard/v3' />;
+    return <Navigate to='/dashboard' />;
   }
 
   return (

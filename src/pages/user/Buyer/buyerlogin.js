@@ -1,292 +1,4 @@
-// import React, { useState } from "react";
-// import {
-//   Box,
-//   Button,
-//   Typography,
-//   Link,
-//   Paper,
-//   Divider,
-//   Container,
-//   CircularProgress
-// } from "@mui/material";
-// import VpnKeyIcon from "@mui/icons-material/VpnKey";
-// import AccountCircle from "@mui/icons-material/AccountCircle";
-// import { useCriiptoVerify } from "@criipto/verify-react";
-// import { TextField, InputAdornment } from "@mui/material";
-//  import { useNavigate } from "react-router-dom";
-// import LockIcon from "@mui/icons-material/Lock";
-// import logo from "../../../assets/logoBankIdwhite.png"
-// import EmailIcon from "@mui/icons-material/Email";
-// import { useFormik } from "formik";
-// import * as Yup from "yup";
-// import axios from "axios";
-// import Swal from "sweetalert2";
-// import CryptoJS from 'crypto-js'; 
-
-// function BuyerLogin({ onForgotPassword }) {
-// const navigate = useNavigate();
-//     const { loginWithRedirect } = useCriiptoVerify();
-//     const [loading, setLoading] = useState(false);
-//   const [apiError, setApiError] = useState("");
-
-//   const handleLoginBankID = async () => {
-//     localStorage.setItem("role", "buyer");
-//     await loginWithRedirect({
-//       acrValues: "urn:grn:authn:se:bankid:another-device",  
-//     });
-//   };
-
-// const formik = useFormik({
-//     initialValues: {
-//       email: "",
-//       password: "",
-//     },
-//     validationSchema: Yup.object({
-//       email: Yup.string().required("Email or Username is required"),
-//       password: Yup.string().required("Password is required"),
-//     }),
-//     onSubmit: async (values, { resetForm }) => {
-//       setApiError("");
-//       try {
-//         setLoading(true);
-
-//         const payload = {
-//           userNameOrEmailAddress: values.email,
-//           password: values.password,
-//         };
-
-//         const response = await axios.post(
-//           "https://localhost:44311/api/TokenAuth/Authenticate",
-//           payload,
-//           {
-//             headers: { "Content-Type": "application/json" },
-//           }
-//         );
-
-//         console.log("✅ API Response:", response.data);
-
-//         if (response.data?.result?.accessToken) {
-//           Swal.fire({
-//             icon: "success",
-//             title: "Login Successful!",
-//             text: "You are now logged in.",
-//              timer: 500, 
-//   showConfirmButton: false,  
-//           });
-//            const token = response.data.result.accessToken;
-//                 const secretKey = "my-super-secret-key";
-//                 const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
-//                 localStorage.setItem("authToken", encryptedToken);
-
-
-//           resetForm();
-//            navigate("/BuyerSuccess");
-
-//         } else {
-//           const backendError =
-//             response.data?.error?.details ||
-//             response.data?.error?.message ||
-//             response.data?.message ||
-//             "Invalid credentials or unexpected response.";
-
-//           setApiError(backendError);
-
-//         }
-//       } catch (error) {
-//         console.error("❌ API Error:", error);
-
-//         const backendError =
-//           error.response?.data?.error?.details ||
-//           error.response?.data?.error?.message ||
-//           error.response?.data?.message ||
-//           "Something went wrong while logging in.";
-
-//         setApiError(backendError);
-
-//       } finally {
-//         setLoading(false);
-//       }
-//     },
-//   });
-//   return (
-//    <Box sx={{ margin: "auto"  }}>
-//       <Box
-//         sx={{
-//           maxWidth: 600,
-//           margin: "auto",
-//           mt: 2,
-//           p: 3,
-//           borderRadius: 3,
-//           boxShadow: "0px 8px 15px rgba(0,0,0,0.4)",
-//           backgroundColor: "white",
-//         }}
-//         component={Paper}
-//       >
-//         <Typography variant="h5" fontWeight="bold" gutterBottom>
-//          Buyer Log in
-//         </Typography>
-//         <Typography variant="subtitle2" color="grey">
-//           You need to login to verify
-//         </Typography>
-
-//         <Divider sx={{ my: 2, borderColor: "grey.600" }} />
-
-//         {/* ✅ FORM */}
-//         <form onSubmit={formik.handleSubmit}>
-//           <TextField
-//             fullWidth
-//             size="small"
-//             margin="normal"
-//             label="Email / Username"
-//             placeholder="Enter your email or username"
-//             name="email"
-//             value={formik.values.email}
-//             onChange={formik.handleChange}
-//             onBlur={formik.handleBlur}
-//             error={formik.touched.email && Boolean(formik.errors.email)}
-//             helperText={formik.touched.email && formik.errors.email}
-//             InputProps={{
-//               startAdornment: (
-//                 <InputAdornment position="start">
-//                   <AccountCircle color="action" fontSize="small" />
-//                 </InputAdornment>
-//               ),
-//             }}
-//           />
-
-//           <TextField
-//             fullWidth
-//             label="Password"
-//             type="password"
-//             placeholder="Enter password"
-//             size="small"
-//             margin="normal"
-//             name="password"
-//             value={formik.values.password}
-//             onChange={formik.handleChange}
-//             onBlur={formik.handleBlur}
-//             error={formik.touched.password && Boolean(formik.errors.password)}
-//             helperText={formik.touched.password && formik.errors.password}
-//             InputProps={{
-//               startAdornment: (
-//                 <InputAdornment position="start">
-//                   <LockIcon color="action" fontSize="small" />
-//                 </InputAdornment>
-//               ),
-//             }}
-//           />
-
-//           {apiError && (
-//             <Typography color="error" variant="body2" mt={1}>
-//               {apiError}
-//             </Typography>
-//           )}
-
-//          <Button
-//   fullWidth
-//   variant="contained"
-//   type="submit"
-//   disabled={loading}
-//   sx={{
-//     mb: 1,
-//     mt: 2,
-//     backgroundColor: "#ff9f63",
-//     fontWeight: "bold",
-//     padding: 1,
-//     borderRadius:10,
-//     "&:disabled": {
-//       backgroundColor: "#ff9f63",
-//       color: "#fff",
-//       cursor: "not-allowed",
-//     },
-//   }}
-// >
-//   {loading ? (
-//     <>
-//       <CircularProgress
-//         size={22}
-//         color="inherit"
-//         sx={{ mr: 1 }}
-//       />
-//       Logging in...
-//     </>
-//   ) : (
-//     <>
-//       <AccountCircle sx={{ marginRight: 1 }} /> LOG IN TO YOUR ACCOUNT
-//     </>
-//   )}
-// </Button>
-
-//         </form>
-
-//         <Box>
-//           <Button
-//             fullWidth
-//             variant="contained"
-//             sx={{
-//               mb: 1,
-//               backgroundColor: "#ff9f63",
-//               fontWeight: "bold",
-//               padding: 1,
-//               borderRadius:10
-//             }}
-//             onClick={handleLoginBankID}
-//           >
-//             LOGIN WITH BANKID
-//             <img
-//               src={logo}
-//               alt="BankID Logo"
-//               style={{ width: 30, marginLeft: 3 }}
-//             />
-//           </Button>
-//         </Box>
-
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: "column",
-//             alignItems: "center",
-//             mt: 1,
-//           }}
-//         >
-
-//         </Box>
-//       </Box>
-
-//       <Container
-//         maxWidth="xs"
-//         sx={{
-//           textAlign: "center",
-//           backgroundColor: "#ffd231ff",
-//           p: 1,
-//           borderBottomLeftRadius: 12,
-//           borderBottomRightRadius: 12,
-//           display: "flex",
-//           justifyContent: "center",
-//           alignItems: "center",
-//           cursor: "pointer",
-//           boxShadow: "0px -4px 6px rgba(0,0,0,0.2)",
-//         }}
-//         onClick={() => navigate("/user/buyerRegister-v2")}
-//       >
-//         <Typography
-//           variant="subtitle2"
-//           fontWeight="bold"
-//           sx={{ textDecoration: "underline" }}
-//         >
-//           Sign up for new account
-//         </Typography>
-//       </Container>
-//     </Box>
-
-
-//   );
-// }
-
-// export default BuyerLogin;
-
-
-
+ 
 import React, { useState } from "react";
 import {
   Box,
@@ -313,7 +25,9 @@ import CryptoJS from "crypto-js";
 import logo from "../../../assets/logoBankIdwhite.png";
 import { useCriiptoVerify } from "@criipto/verify-react";
 import { useAuth } from "../../../context/AuthContext.js";
+import { useTranslation } from "react-i18next";
 function BuyerLogin() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
@@ -331,7 +45,7 @@ function BuyerLogin() {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  // ✅ Login Formik
+
   const loginFormik = useFormik({
     initialValues: {
       emailAddress: "",
@@ -502,14 +216,15 @@ function BuyerLogin() {
 
 
 
-       <Box textAlign="center" mb={3}>
-                      <Typography variant="h5" fontWeight="bold">
-                        Sign in to Klargo
-                      </Typography>
-                      <Typography variant="subtitle2" mt={1} sx={{ color: "#475569" }}>
-                        Choose how you want to log in.
-                      </Typography>
-                    </Box>
+        <Box textAlign="center" mb={3}>
+          <Typography variant="h5" fontWeight="bold">
+            {t("buyerauth.signInTitle")}
+          </Typography>
+
+          <Typography variant="subtitle2" mt={1} sx={{ color: "#475569" }}>
+            {t("buyerauth.signInSubtitle")}
+          </Typography>
+        </Box>
 
         <Box sx={{ backgroundColor: "#f5f6fa", borderRadius: 3, p: 0.9, display: "inline-block", width: "100%" }}>
           <Tabs
@@ -521,7 +236,7 @@ function BuyerLogin() {
             sx={{ minHeight: "unset", "& .MuiTabs-flexContainer": { gap: "16px" } }}
           >
             <Tab
-              label="BANKID"
+              label={t("buyerauth.tabs.bankId")}
               sx={{
                 textTransform: "none",
                 fontSize: "0.9rem",
@@ -535,7 +250,7 @@ function BuyerLogin() {
               }}
             />
             <Tab
-              label="EMAIL & PASSWORD"
+              label={t("buyerauth.tabs.emailPassword")}
               sx={{
                 textTransform: "none",
                 fontSize: "0.9rem",
@@ -557,14 +272,14 @@ function BuyerLogin() {
         {tabValue === 0 && (
           <Box sx={{ mt: 3, textAlign: "center", borderRadius: 3, p: 1, minWidth: "450px", }}>
             <Typography variant="body2" sx={{ color: "#4b5563", mb: 2 }}>
-              🔒 Secure login using your Swedish BankID.
+              {t("buyerauth.bankid.secureText")}
             </Typography>
             <Box>
               <Button
                 fullWidth
                 variant="contained"
                 sx={{
-                   
+
                   mt: 2,
                   backgroundColor: "#ff9f63",
                   fontWeight: "bold",
@@ -572,7 +287,7 @@ function BuyerLogin() {
                 }}
                 onClick={handleLoginBankID}
               >
-                LOGIN WITH BANKID
+                {t("buyerauth.bankid.loginButton")}
                 <img
                   src={logo}
                   alt="BankID Logo"
@@ -593,46 +308,46 @@ function BuyerLogin() {
                 "&:hover": { borderColor: "#ff9f63", backgroundColor: "#fff7f2" },
               }}
             >
-              SHOW QR CODE
+              {t("buyerauth.bankid.loginButton")}
             </Button>
-   <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mt: 3,
-                        mb: 1,
-                      }}
-                    >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 3,
+                mb: 1,
+              }}
+            >
 
-                      <Box sx={{ flex: 1, height: "1px", backgroundColor: "#e5e7eb" }} />
-
-
-                      <Typography
-                        sx={{
-                          color: "#6b7280",
-                          fontSize: "0.8rem",
-                          fontWeight: 500,
-                          px: 1.5,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        or
-                      </Typography>
+              <Box sx={{ flex: 1, height: "1px", backgroundColor: "#e5e7eb" }} />
 
 
-                      <Box sx={{ flex: 1, height: "1px", backgroundColor: "#e5e7eb" }} />
-                    </Box>
-                                        
-                      
-               <Typography
-                  textAlign="center"
-                  mt={3}
-                  fontSize="0.85rem"
-                  color="#ff"
-                >
-                 Need help logging in?{" "}
-                </Typography>
+              <Typography
+                sx={{
+                  color: "#6b7280",
+                  fontSize: "0.8rem",
+                  fontWeight: 500,
+                  px: 1.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                or
+              </Typography>
+
+
+              <Box sx={{ flex: 1, height: "1px", backgroundColor: "#e5e7eb" }} />
+            </Box>
+
+
+            <Typography
+              textAlign="center"
+              mt={3}
+              fontSize="0.85rem"
+              color="#ff"
+            >
+              {t("buyerauth.bankid.needHelp")}{" "}
+            </Typography>
           </Box>
         )}
 
@@ -653,13 +368,13 @@ function BuyerLogin() {
                     mb: 1,
                   }}
                 >
-                  Email
+                  {t("buyerauth.bankid.secureText")}
                 </FormLabel>
                 <TextField
                   fullWidth
                   size="small"
 
-                  placeholder="Email"
+                  placeholder={t("buyerauth.email.emailPlaceholder")}
                   name="emailAddress"
                   value={loginFormik.values.emailAddress}
                   onChange={loginFormik.handleChange}
@@ -686,11 +401,11 @@ function BuyerLogin() {
                     display: "block",
                   }}
                 >
-                  Password
+                  {t("buyerauth.email.passwordLabel")}
                 </FormLabel>
                 <TextField
                   fullWidth
-                  placeholder="Password"
+                  placeholder={t("buyerauth.email.passwordPlaceholder")}
                   type="password"
                   size="small"
 
@@ -717,27 +432,22 @@ function BuyerLogin() {
                   sx={{ mt: 3, backgroundColor: "#ff9f63", fontWeight: "bold", }}
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={22} color="inherit" /> : "LOG IN"}
+                  {loading ? (
+                    <CircularProgress size={22} color="inherit" />
+                  ) : (
+                    t("buyerauth.email.loginButton")
+                  )}
                 </Button>
 
 
 
-                <Typography
-                  textAlign="center"
-                  mt={2}
-                  fontSize="0.85rem"
-                  color="#334155"
-                >
-                  New to Klargo?{" "}
+                <Typography textAlign="center" mt={2} fontSize="0.85rem" color="#334155">
+                  {t("buyerauth.email.newToKlargo")}{" "}
                   <span
-                    style={{
-                      color: "#ff9f63",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
+                    style={{ color: "#ff9f63", fontWeight: 600, cursor: "pointer" }}
                     onClick={() => setIsLogin(false)}
                   >
-                    CREATE AN ACCOUNT
+                    {t("buyerauth.email.createAccount")}
                   </span>
                 </Typography>
 
@@ -754,7 +464,7 @@ function BuyerLogin() {
                     mb: 1,
                   }}
                 >
-                  Email
+                  {t("buyerauth.email.emailLabel")}
                 </FormLabel>
                 <TextField
                   fullWidth
@@ -780,7 +490,7 @@ function BuyerLogin() {
                     mt: 2,
                   }}
                 >
-                  Password
+                  {t("buyerauth.email.passwordLabel")}
                 </FormLabel>
                 <TextField
                   fullWidth
@@ -803,7 +513,11 @@ function BuyerLogin() {
                   sx={{ mt: 2, backgroundColor: "#ff9f63", fontWeight: "bold", borderRadius: 2 }}
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={22} color="inherit" /> : "CREATE ACCOUNT"}
+                  {loading ? (
+                    <CircularProgress size={22} color="inherit" />
+                  ) : (
+                    t("buyerauth.email.createAccountButton")
+                  )}
                 </Button>
 
 
@@ -813,7 +527,7 @@ function BuyerLogin() {
                   fontSize="0.85rem"
                   color="#334155"
                 >
-                  Already have an account?{" "}
+                  {t("buyerauth.email.alreadyHaveAccount")}{" "}
                   <span
                     style={{
                       color: "#ff9f63",
@@ -822,7 +536,7 @@ function BuyerLogin() {
                     }}
                     onClick={() => setIsLogin(true)}
                   >
-                    LOG IN
+                    {t("buyerauth.email.login")}
                   </span>
                 </Typography>
               </form>
@@ -845,13 +559,31 @@ function BuyerLogin() {
         <Divider sx={{ mt: 2, borderColor: "#979797ff" }} />
 
         <Box mt={3} textAlign="center">
-          <Typography variant="caption" color="#6b7280" fontSize="0.7rem">
-            By continuing, you agree to our{" "}
-            <span style={{ color: "#ff9f63", cursor: "pointer" }}>Terms of Service</span>{" "}
-            and{" "}
-            <span style={{ color: "#ff9f63", cursor: "pointer" }}>Privacy Policy</span>.
+          <Typography variant="caption" sx={{ color: "#6b7280", fontSize: "0.7rem" }}>
+            {t("buyerauth.legal.agreementText")}{" "}
+            <span
+              style={{
+                color: "#ff9f63",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              {t("buyerauth.legal.terms")}
+            </span>{" "}
+            {t("buyerauth.legal.and")}{" "}
+            <span
+              style={{
+                color: "#ff9f63",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              {t("buyerauth.legal.privacy")}
+            </span>
+            .
           </Typography>
         </Box>
+
       </Paper>
 
 

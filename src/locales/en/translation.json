@@ -1,13 +1,512 @@
 {
-  "vehicleSection": {
-    "title": "Support for multiple vehicle types",
-    "messages": {
-      "car": "You selected: Car – insurance & tax explained in the guide.",
-      "motorcycle": "You selected: Motorcycle – insurance & tax explained in the guide.",
-      "scooter": "You selected: Scooter – insurance & tax explained in the guide.",
-      "ship": "You selected: Motorhome – insurance & tax explained in the guide.",
-      "trailer": "You selected: Light truck – insurance & tax explained in the guide.",
-      "truck": "You selected: Truck – insurance & tax explained in the guide."
+  "chooseAction": {
+    "title": "What do you want to do today?",
+    "subtitle": "Buy and sell vehicles safely!",
+    "sellCardTitle": "I want to sell",
+    "sellCardDesc": "Create a sale, set price and terms, and get a code for the buyer.",
+    "buyCardTitle": "I want to buy",
+    "buyCardDesc": "Enter registration number or scan the seller’s QR code to continue."
+  },
+  "home": {
+    "heroTitle": "Safe vehicle transaction in one flow",
+    "heroSubtitle": "Contracts, payment, ownership transfer and insurance. Everything guided between seller and buyer.",
+    "startDeal": "Start the deal",
+    "seeHowItWorks": "See how it works",
+    "security": {
+      "bankId": "BankID",
+      "dataSecurity": "Data security in Sweden",
+      "trustedSources": "Vehicle data from trusted sources",
+      "partners": "BankID · Zmarta · Bilvision · Klarna · Tink · Nordea"
+    },
+    "cards": {
+      "contract": {
+        "title": "Contract",
+        "line1": "Legally binding agreement",
+        "line2": "Parties: verified with BankID",
+        "line3": "Vehicle: OWN 457",
+        "line4": "Time: 12:41 • Ref: •••9Q2F"
+      },
+      "payment": {
+        "title": "Payment",
+        "line1": "Amount: 349,000 SEK",
+        "line2": "Method: bank transfer",
+        "line3": "Partner: Trustly",
+        "line4": "Payout: normally 1–2 banking days"
+      },
+      "insurance": {
+        "title": "Insurance offer",
+        "line1": "Insurance offer ready",
+        "line2": "Start: at purchase",
+        "line3": "Example:",
+        "line4": "Länsförsäkringar, Folksam, Trygg-Hansa, ICA"
+      },
+      "ownership": {
+        "title": "Ownership transfer",
+        "line1": "Transportstyrelsen",
+        "line2": "Opens automatically",
+        "line3": "Details pre-filled",
+        "line4": "Sign with BankID",
+        "line5": "Confirmation in Klargo"
+      }
+    },
+    "vehicles": {
+      "title": "Support for multiple vehicle types",
+      "car": {
+        "label": "Car",
+        "message": "You chose: Car – insurance & tax explained in guide."
+      },
+      "motorcycle": {
+        "label": "Motorcycle",
+        "message": "You chose: Motorcycle – insurance & tax explained in guide."
+      },
+      "scooter": {
+        "label": "Scooter",
+        "message": "You chose: Scooter – insurance & tax explained in guide."
+      },
+      "ship": {
+        "label": "RV",
+        "message": "You chose: RV – insurance & tax explained in guide."
+      },
+      "trailer": {
+        "label": "Light truck",
+        "message": "You chose: Light truck – insurance & tax explained in guide."
+      },
+      "truck": {
+        "label": "Truck",
+        "message": "You chose: Truck – insurance & tax explained in guide."
+      }
+    },
+    "dealCards": {
+      "dealCardsSectionTitle": "Choose how you want to continue",
+      "sell": {
+        "title": "I want to sell",
+        "text": "Create the deal, set price and terms, sign it. Payment from the buyer is confirmed in real time in the app. Ownership transfer opens automatically at Transportstyrelsen and the confirmation appears in Klargo.",
+        "list": [
+          "Price & terms",
+          "BankID signing",
+          "Confirmed payment"
+        ],
+        "button": "Explore seller flow"
+      },
+      "buy": {
+        "title": "I want to buy",
+        "text": "Connect via registration number or QR. Pay safely and get real-time confirmation. Choose financing or pay directly via bank transfer. Insurance and price directly in the app. Ownership transfer opens automatically at Transportstyrelsen and the confirmation appears in Klargo.",
+        "list": [
+          "Registration number or QR",
+          "Financing or direct",
+          "Insurance in the app"
+        ],
+        "button": "Explore buyer flow"
+      }
+    },
+    "confirmationText": "Real-time confirmation means that the payment is registered and acknowledged in the app. Payout to bank account normally takes 1–2 banking days.",
+    "serviceCardsSectionTitle": "All-in-one, step by step",
+    "serviceCards": [
+      {
+        "icon": "ShieldOutlinedIcon",
+        "title": "Verify with BankID",
+        "text": "Secure identification for both parties."
+      },
+      {
+        "icon": "DescriptionOutlinedIcon",
+        "title": "Create and sign contract",
+        "text": "Shared terms and price, digitally signed."
+      },
+      {
+        "icon": "CreditCardOutlinedIcon",
+        "title": "Pay safely",
+        "text": "Real-time confirmation in the app. Payout within 1–2 banking days."
+      },
+      {
+        "icon": "CheckCircleOutlineOutlinedIcon",
+        "title": "Complete ownership transfer",
+        "text": "Transportstyrelsen opens automatically. Sign with BankID."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Choose insurance",
+        "text": "Multiple options with instant confirmation in the app."
+      }
+    ],
+    "whyChooseKlargo": [
+      {
+        "icon": "PersonOutlineIcon",
+        "title": "All-in-one flow",
+        "text": "Both seller and buyer see the same thing and follow the same process."
+      },
+      {
+        "icon": "LockOutlinedIcon",
+        "title": "Secure payment",
+        "text": "Money is handled safely until the deal is complete. Real-time confirmation."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Correct order",
+        "text": "Guidance that mirrors the ownership transfer process at Transportstyrelsen."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Documents in place",
+        "text": "Contracts, receipts, and insurance documents are saved."
+      }
+    ],
+    "whyKlargo": "Why Choose Klargo",
+    "pricingSectionTitle": "A simple price tag",
+    "pricingAmount": "149",
+    "pricingCurrency": "kr",
+    "pricingSubtitle": "per transaction",
+    "pricingText": "Applies to all vehicle types in Klargo.",
+    "pricingFooter": "No percentages | No hidden fees",
+    "faqSectionTitle": "Frequently Asked Questions",
+    "faqItems": [
+      {
+        "title": "How fast will I get the money?",
+        "content": "You see the payment confirmed in real-time in the app. Payout to your account usually occurs within 1–2 banking days."
+      },
+      {
+        "title": "How does the ownership transfer work?",
+        "content": "The seller completes the ownership transfer at Transportstyrelsen. Klargo opens the service automatically and fills in your details. You sign with BankID and see the confirmation in the app."
+      },
+      {
+        "title": "Can I choose financing as a buyer?",
+        "content": "Yes. You can apply in the app and get a quick response via our partners. You can also pay directly via bank transfer."
+      },
+      {
+        "title": "If the vehicle has a loan, can we complete the purchase?",
+        "content": "Yes. We guide how it is handled in the transaction and document the agreement."
+      },
+      {
+        "title": "Does the insurance apply immediately?",
+        "content": "Yes. You choose the insurance start in the flow and get confirmation in the app."
+      },
+      {
+        "title": "How much does it cost?",
+        "content": "Always 149 SEK per transaction regardless of the vehicle price."
+      }
+    ],
+    "guideSectionTitle": "Learn the process",
+    "stepCards": [
+      {
+        "title": "Vehicle ownership transfer step by step",
+        "description": "Correct order and terminology according to Transportstyrelsen."
+      },
+      {
+        "title": "Buying and selling used vehicles",
+        "description": "Fraud protection, odometer readings, and documentation."
+      },
+      {
+        "title": "Financing and insurance",
+        "description": "How car loans and insurance work in practice."
+      }
+    ],
+    "loanSectionTitle": "About car loans in Klargo",
+    "loanDescription": "Financing is offered via partners. Individual assessment and terms apply. Effective interest depends on credit profile and loan duration.",
+    "loanExampleTitle": "Example",
+    "loanExampleList": [
+      "Effective interest from 5.99%",
+      "Setup fee from 0 SEK",
+      "Exact terms shown in the app before applying"
+    ],
+    "loanLinks": "FAQ about financing",
+    "loanLinks2": "Privacy and credit assessment",
+    "partnersSectionTitle": "Partners and Security",
+    "partnersSectionSubtitle": "Klargo uses established payment, data, and insurance partners. Exact offers may vary per deal.",
+    "partnersList": [
+      "BankID",
+      "Bilvision",
+      "Trustly",
+      "Klarna",
+      "Tink",
+      "Nordea",
+      "Zmarta"
+    ],
+    "navLinks": [
+      {
+        "key": "howItWorks",
+        "label": "How it works"
+      },
+      {
+        "key": "pricing",
+        "label": "Pricing"
+      },
+      {
+        "key": "faq",
+        "label": "FAQ"
+      },
+      {
+        "key": "guides",
+        "label": "Guides"
+      }
+    ],
+    "loginButton": "Login"
+  },
+  "auth": {
+    "signInTitle": "Sign in to Klargo",
+    "signInSubtitle": "Choose how you want to log in.",
+    "tabs": {
+      "bankId": "BANKID",
+      "emailPassword": "EMAIL & PASSWORD"
+    },
+    "bankId": {
+      "secureLogin": "Secure login using your Swedish BankID.",
+      "openBankId": "OPEN BANKID",
+      "showQRCode": "SHOW QR CODE",
+      "needHelp": "Need help logging in?",
+      "agreementTextStart": "By continuing, you agree to our",
+      "agreementTextMiddle": "and",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "Email",
+    "password": "Password",
+    "passwordPlaceholder": "At least 6 characters",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "At least 6 characters",
+    "createAccount": "CREATE ACCOUNT",
+    "login": "LOG IN",
+    "alreadyHaveAccount": "Already have an account",
+    "forgotPassword": "Forgot your password?",
+    "newToKlargo": "New to Klargo",
+    "agreementTextStart": "By continuing, you agree to our",
+    "agreementTextMiddle": "and",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "seller": {
+    "headerTitle1": "Sell Your Vehicle Here",
+    "headerTitle": "What Do You Want To Sell Today?",
+    "headerSubtitle": "Buy and sell vehicles safely!",
+    "startSaleTitle": "Start Your Sale",
+    "startSaleSubtitle": "Enter the registration number of the car you want to sell",
+    "SaleCreated": "The sale has been created",
+    "askBuyer": "Ask the buyer to scan the QR code or enter the registration number in their app to connect to the sale.",
+    "available": "Available to buyer: Yes",
+    "proceed": "Proceed to purchase contract.",
+    "sellCarForTitle": "What do you want to sell the car for?",
+    "registrationNo": "Registration No",
+    "vehicle": "Vehicle",
+    "vehicleYears": "Vehicle Years",
+    "numberOfUsers": "Number of Users",
+    "axleWeight": "Axle Weight",
+    "fuel": "Fuel",
+    "fetchingCarDetails": "Fetching car details...",
+    "vehicleInformation": "Vehicle Information",
+    "car": {
+      "steps": {
+        "registrationNo": "Registration No",
+        "vehicleDesignation": "Vehicle Designation",
+        "tradeName": "Trade Name",
+        "yearModel": "Year Model",
+        "vehicleYears": "Vehicle Years",
+        "registrationDate": "Registration Date",
+        "numberOfUsers": "Number of Users",
+        "axleWeight": "Axle Weight",
+        "fourWheelDrive": "4-Wheel Drive",
+        "fuel": "Fuel",
+        "evConfig": "EV Config",
+        "inspectionDate": "Inspection Date",
+        "prevInspectionDate": "Previous Inspection Date",
+        "inspectionStation": "Inspection Station",
+        "inspectionGroup": "Inspection Group",
+        "feedingStall": "Feeding Stall",
+        "tax": "Tax",
+        "malus": "Malus",
+        "valuation": "Valuation",
+        "yes": "Yes",
+        "no": "No"
+      }
+    },
+    "deliveryRisk": {
+      "title": "Delivery and risk",
+      "description": "The risk passes to the buyer when the vehicle is taken into possession. This means that the buyer is responsible for the vehicle from the time of handover."
+    },
+    "conditionDefects": {
+      "title": "Condition and defects",
+      "line1": "The vehicle is sold in its existing condition.",
+      "line2": "Defects can also be claimed in its existing condition if the seller has provided incorrect information, omitted essential information, or if the vehicle is significantly worse than could reasonably be expected.",
+      "line3": "Notify defects without undue delay and no later than two years from delivery."
+    },
+    "debts": {
+      "title": "Debts",
+      "subtitle": "Choose how you want to handle any debts.",
+      "options": {
+        "none": "No debts",
+        "seller": "Debts exist. The seller pays before delivery.",
+        "buyer": "Debts exist. The buyer pays and deducts from the price."
+      }
+    },
+    "loan": {
+      "title": "Loan or lien",
+      "description": "If a lien or credit is not settled upon delivery, the buyer may stop enforcement or cancel the purchase.",
+      "options": {
+        "none": "No loan or lien",
+        "seller": "Loan or lien exists. The seller settles before delivery.",
+        "buyer": "Loan exists, settled upon delivery. The buyer pays net to the bank and the rest to the seller."
+      }
+    },
+    "ownership": {
+      "title": "Right of ownership and documents",
+      "description1": "The right of ownership remains with the seller until full payment has been received.",
+      "description2": "Upon delivery, the seller hands over the documents that remain, such as registration certificate part 2 and service records.",
+      "description3": "The seller certifies that the vehicle is not subject to a driving ban upon delivery."
+    },
+    "transportAgency": {
+      "title": "The Swedish Transport Agency",
+      "description1": "The parties undertake to carry out the change of ownership without delay in the Swedish Transport Agency's app or e-service upon delivery.",
+      "description2": "This agreement proves the agreement. The registration takes place at the Swedish Transport Agency."
+    },
+    "noVehicleTypes": "No Vehicle Types Found"
+  },
+  "buyer": {
+    "headerTitle": "What do you want to do today?",
+    "headerSubtitle": "Buy and sell vehicles safely!",
+    "subHeaderTitle": "What do you want to buy?",
+    "startPurchaseTitle": "Start your car purchase",
+    "startPurchaseSubtitle": "Enter the registration number of the car you are interested in",
+    "connectSellerTitle": "Connect with Seller",
+    "connectSellerSubtitle": "Click the button below to notify the seller.",
+    "dealConnected": "Buyer deal successfully connected! ✅",
+    "sellerValuation": "Car Valuation by Seller: {{valuation}}",
+    "waitingValuation": "Waiting for seller to add valuation...",
+    "vehicleInformation": "Vehicle Information",
+    "registrationNo": "Registration No",
+    "vehicleDesignation": "Vehicle Designation",
+    "tradeName": "Trade Name",
+    "vehicleYears": "Vehicle Years",
+    "registrationDate": "Registration Date",
+    "numberOfUsers": "Number of Users",
+    "waxelbarge": "Waxelbarge",
+    "fourWheelDrive": "4-Wheel Drive",
+    "fuel": "Fuel",
+    "inspectionDate": "Inspection Date",
+    "previousInspectionDate": "Previous Inspection Date",
+    "inspectionStation": "Inspection Station",
+    "inspectionGroup": "Inspection Group",
+    "feedingStall": "Feeding Stall",
+    "tax": "Tax",
+    "malus": "Malus",
+    "valuation": "Valuation",
+    "pricePayment": "Price and Payment",
+    "pricePaymentInfo": "Delivery will only take place when full payment is confirmed in the app.",
+    "deliveryRisk": "Delivery and risk",
+    "deliveryRiskInfo": "The risk passes to the buyer when the vehicle is taken into possession. This means that the buyer is responsible for the vehicle from the time of handover.",
+    "conditionTitle": "Condition and defects",
+    "conditionInfo1": "The vehicle is sold in its existing condition.",
+    "conditionInfo2": "Defects can also be claimed in its existing condition if the seller has provided incorrect information, omitted essential information, or if the vehicle is significantly worse than could reasonably be expected.",
+    "conditionInfo3": "Notify defects without undue delay and at the latest within two years of delivery.",
+    "debtsTitle": "Debts",
+    "debtsInfo": "Choose how you want to handle any debts.",
+    "debtsNone": "No debts",
+    "debtsSeller": "Debts exist. The seller pays before delivery.",
+    "debtsBuyer": "Debts exist. The buyer pays and deducts from the price.",
+    "loanTitle": "Loan or lien",
+    "loanInfo": "If a lien or credit is not settled upon delivery, the buyer may stop enforcement or cancel the purchase.",
+    "loanNone": "No loan or lien",
+    "loanSeller": "Loan or lien exists. The seller settles before delivery.",
+    "loanBuyer": "Loan exists, settled upon delivery. The buyer pays net to the bank and the rest to the seller.",
+    "ownershipTitle": "Right of ownership and documents",
+    "ownershipInfo1": "The right of ownership remains with the seller until full payment has been received.",
+    "ownershipInfo2": "Upon delivery, the seller hands over the documents that remain, such as registration certificate part 2 and service records.",
+    "ownershipInfo3": "The seller certifies that the vehicle is not subject to a driving ban upon delivery.",
+    "transportTitle": "The Swedish Transport Agency",
+    "transportInfo1": "The parties undertake to carry out the change of ownership without delay in the Swedish Transport Agency's app or e-service upon delivery.",
+    "transportInfo2": "This agreement proves the agreement. The registration takes place at the Swedish Transport Agency.",
+    "updating": "Updating...",
+    "connected": "Connected!",
+    "connectWithSeller": "Connect with Seller"
+  },
+  "footer": {
+    "tagline": "A safe vehicle transaction in one flow",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "faq": "Questions & Answers",
+    "guides": "Guides",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "support": "Support",
+    "press": "Press",
+    "about": "About us",
+    "copyright": "© 2024 Klargo. All rights reserved."
+  },
+  "buyerauth": {
+    "signInTitle": "Sign in to Klargo",
+    "signInSubtitle": "Choose how you want to log in.",
+    "tabs": {
+      "bankId": "BankID",
+      "emailPassword": "Email & Password"
+    },
+    "bankid": {
+      "secureText": "🔒 Secure login using your Swedish BankID.",
+      "loginButton": "Login with BankID",
+      "showQr": "Show QR code",
+      "needHelp": "Need help logging in?"
+    },
+    "email": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "Email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "loginButton": "Log in",
+      "createAccountButton": "Create account",
+      "newToKlargo": "New to Klargo?",
+      "alreadyHaveAccount": "Already have an account?",
+      "createAccount": "Create an account",
+      "login": "Log in"
+    },
+    "legal": {
+      "agreementText": "By continuing, you agree to our",
+      "terms": "Terms of Service",
+      "and": "and",
+      "privacy": "Privacy Policy"
+    },
+      "step0": {
+      "loading": "Loading contract...",
+      "title": "Connect with Seller",
+      "vehicleType": "Vehicle Type",
+      "name": "Name",
+      "registrationNo": "Registration No",
+      "firstInspectionDate": "First Inspection Date",
+      "registrationDate": "Registration Date",
+      "contractId": "Contract ID",
+      "updating": "Updating...",
+      "connected": "Connected!",
+      "connect": "Connect with Seller",
+      "next": "Next",
+      "noData": "No contract data found",
+      "na": "N/A"
+    },
+      "step1": {
+      "title": "Buyer deal successfully connected! ✅",
+      "valuation": "Car Valuation by Seller: {{value}}",
+      "waiting": "Waiting for seller to add valuation...",
+      "next": "Next"
+    },
+    "step2": {
+      "title": "Vehicle Information",
+      "loading": "Loading vehicle information...",
+      "priceInfo": "Price and Payment",
+      "priceDesc": "Delivery will only take place when full payment is confirmed in the app.",
+      "deliveryInfo": "Delivery and risk",
+      "deliveryDesc": "The risk passes to the buyer when the vehicle is taken into possession. This means that the buyer is responsible for the vehicle from the time of handover.",
+      "conditionInfo": "Condition and defects",
+      "conditionDesc1": "The vehicle is sold in its existing condition.",
+      "conditionDesc2": "Defects can also be claimed if the seller provided incorrect or missing information, or if the vehicle is significantly worse than expected.",
+      "conditionDesc3": "Report defects without undue delay and no later than two years from delivery.",
+      "debts": "Debts",
+      "debtsDesc": "Choose how you want to handle any debts.",
+      "loan": "Loan or lien",
+      "loanDesc": "If a lien or credit is not settled upon delivery, the buyer may stop enforcement or cancel the purchase.",
+      "ownership": "Right of ownership and documents",
+      "ownershipDesc1": "The right of ownership remains with the seller until full payment has been received.",
+      "ownershipDesc2": "Upon delivery, the seller hands over remaining documents like registration certificate part 2 and service records.",
+      "ownershipDesc3": "The seller certifies that the vehicle is not subject to a driving ban upon delivery.",
+      "transportAgency": "The Swedish Transport Agency",
+      "transportAgencyDesc1": "The parties undertake to carry out the change of ownership without delay in the Swedish Transport Agency's app or e-service upon delivery.",
+      "transportAgencyDesc2": "This agreement proves the agreement. The registration takes place at the Swedish Transport Agency.",
+      "next": "Next"
     }
   }
 }

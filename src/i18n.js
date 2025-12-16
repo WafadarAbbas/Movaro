@@ -9,11 +9,16 @@ const resources = {
   sv: { translation: translationSV }
 };
 
-i18n.use(initReactI18next).init({
-  resources,
-  lng: "sv",
-  fallbackLng: "en",
-  interpolation: { escapeValue: false }
-});
+// Get saved language from localStorage, else default to English
+const savedLanguage = localStorage.getItem("appLanguage") || "en";
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: savedLanguage, // 🔹 default English
+    fallbackLng: "en",  // 🔹 fallback English
+    interpolation: { escapeValue: false }
+  });
 
 export default i18n;

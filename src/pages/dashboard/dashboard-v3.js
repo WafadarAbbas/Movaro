@@ -5,6 +5,7 @@ import "font-awesome/css/font-awesome.min.css"; // Import Font Awesome CSS
 import ApiCall from "../../Apicall/ApiCall";
 import InfoCard from "./boxes/InfoCard";
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Box, Paper, Typography, Grid, Container } from "@mui/material";
 function DashboardV3() {
   const targetValues = [307144, 151123, 894121, 452338];
   const [counts, setCounts] = useState(targetValues.map(() => 0)); // Initialize each count at 0
@@ -42,7 +43,7 @@ const navigate = useNavigate();
  
 
   return (
-    <div>
+    <Container  maxWidth="xl">
     <div className="row mt-3">
       {targetValues.map((target, index) => (
         <div className="col-xl-3" key={index}>
@@ -149,7 +150,7 @@ const navigate = useNavigate();
       </div>
 
 
-    </div>
+    </Container>
   );
 }
 

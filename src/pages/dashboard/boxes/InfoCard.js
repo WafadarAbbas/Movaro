@@ -23,11 +23,11 @@ const InfoCard = ({ backgroundColor, amount, label, iconClass }) => {
           fontSize: 40,
           color: 'white',
           cursor: 'pointer',
-          transition: 'transform 0.3s ease', // Smooth transition for scaling
-          transform: isHovered ? 'scale(1.7)' : 'scale(1)', // Zoom effect on hover
+          transition: 'transform 0.3s ease', 
+          transform: isHovered ? 'scale(1.7)' : 'scale(1)',  
         }}
-        onMouseEnter={() => setIsHovered(true)} // Set hovered state to true
-        onMouseLeave={() => setIsHovered(false)} // Set hovered state to false
+        onMouseEnter={() => setIsHovered(true)} 
+        onMouseLeave={() => setIsHovered(false)}  
       ></span>
     </div>
   );

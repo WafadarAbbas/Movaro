@@ -1,58 +1,43 @@
-import React, { useRef, useState, useEffect ,useContext} from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { Formik, Form, Field } from "formik";
 import { AppSettings } from "./../../config/app-settings.js";
 import * as Yup from "yup";
-import { Switch, FormControlLabel } from "@mui/material"
+import { FormControlLabel } from "@mui/material"
 import Swal from "sweetalert2";
-import { PhotoCamera } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 import { FaCar, FaMotorcycle, FaShip, FaTrailer, FaTruck, } from "react-icons/fa";
 import { MdElectricScooter } from "react-icons/md";
-import SearchIcon from "@mui/icons-material/Search";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
-import NumbersIcon from "@mui/icons-material/Numbers";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SpeedIcon from "@mui/icons-material/Speed";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import PaletteIcon from "@mui/icons-material/Palette";
-import PersonIcon from "@mui/icons-material/Person";
-import CategoryIcon from "@mui/icons-material/Category";
-import AutoModeIcon from "@mui/icons-material/AutoMode";
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
-import { FaMoneyBillWave, FaEdit } from "react-icons/fa";
+import { Search as SearchIcon } from "@mui/icons-material";
+import { FaEdit } from "react-icons/fa";
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-import AirlineSeatReclineNormalIcon from "@mui/icons-material/AirlineSeatReclineNormal";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel"
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import BusinessIcon from "@mui/icons-material/Business";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import LuggageIcon from "@mui/icons-material/Luggage";
 import CircularProgress from "@mui/material/CircularProgress";
 import "../../Compo/LoadingText.css";
-import { Stepper, Step, StepLabel, Button, Box, InputAdornment, Typography, TextField, Paper, Divider, Grid, Container, Tooltip, IconButton } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
+import { Stepper, Step, StepLabel, Button, Box, Typography, TextField, Paper, Divider, Grid, Container, RadioGroup, Radio } from "@mui/material";
+import { motion } from "framer-motion";
 import ApiCall from "../../Apicall/ApiCall";
 import QRCode from "react-qr-code";
 import CryptoJS from "crypto-js";
-import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UpadteValuation from "./updatevaluation";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import DescriptionIcon from "@mui/icons-material/Description";
+import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import FormGroup from '@mui/material/FormGroup';
 
 
-const steps = ["Choose Vehicles", "Documnents", "Vehicle", "Sale Created", "Submission", "Contract"];
+const steps = ["Choose Vehicles", "Vehicle", "Sale Created", "Submission", "Contract"];
 
 
 function SellerProfile() {
   const createRef = useRef(null);
   const refClose = useRef(null);
-
+  const { t, i18n } = useTranslation();
 
   // -------------------Maneging States-------------------------------
-
+  const [value, setValue] = useState("");
   const [activeStep, setActiveStep] = useState(0);
   const [vehicleData, setVehicleData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,12 +45,9 @@ function SellerProfile() {
   const [submitted, setSubmitted] = useState(false);
   const [registration, setRegistration] = useState("");
   const [carData, setCarData] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [userId, setUserId] = useState(null);
   const [storedId, setStoredId] = useState(null);
   const [contractData, setContractData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [fetchedCarInfo, setFetchedCarInfo] = useState(null);
   const [updatedCarInfoId, setUpdatedCarInfoId] = useState(null);
   const [lastId, setLastId] = useState(null);
@@ -74,7 +56,7 @@ function SellerProfile() {
   const [finalContract, setFinalContract] = useState(null);
   const [finalContractvaluation, setfinalContractvaluation] = useState(null);
   const [contractId, setcontractId] = useState(null);
-   const [carId, setcarId] = useState(null);
+  const [carId, setcarId] = useState(null);
   const [QR, setQR] = useState("");
   const [buyerConnected, setBuyerConnected] = useState(false);
   const [buyerToastShown, setBuyerToastShown] = useState(false);
@@ -87,18 +69,13 @@ function SellerProfile() {
     }
   }, []);
 
-   useEffect(() => {
-      context.handleSetAppSidebarNone(true);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("p-0");
-  
-      return () => {
-        context.handleSetAppSidebarNone(false);
-        context.handleSetAppHeaderNone(false);
-        context.handleSetAppContentClass("");
-      };
-  
-    }, []);
+  useEffect(() => {
+    if (carData) {
+      toast.success("Retrieved vehicle information", {
+        position: "bottom-center"
+      });
+    }
+  }, [carData]);
 
   useEffect(() => {
     if (activeStep === 3) {
@@ -131,7 +108,7 @@ function SellerProfile() {
             time: currentTime,
           };
 
-          console.log("🧩 Data to Encrypt:", minimalData);
+          console.log("Data to Encrypt:", minimalData);
 
 
           const secretKey = "MySuperSecretKey123";
@@ -171,24 +148,29 @@ function SellerProfile() {
         .nullable()
         .required("Please select a vehicle type"),
     }),
-
-    Yup.object({
-      sellerDrivingLicensePath: Yup.string()
-        .required("Driving license is required"),
-      sellerDrivingLicenseValidate: Yup.boolean()
-        .oneOf([true], "You must validate the Driving license"),
-    }),
+ 
   ];
-
-
-
-
-
-
+ 
   // ------------------- Api Calls-------------------------------
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await ApiCall({
+          url: "https://localhost:44311/api/services/app/Session/GetCurrentLoginInformations",
+          method: "GET",
+        });
+        const id = response.data?.result?.user?.id;
+        setUserId(id);
+      } catch (err) {
+        console.error("Error fetching user ID:", err);
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
 
-  // Api call For Vehicle options
+   
   useEffect(() => {
     const fetchVehicleOptions = async () => {
       try {
@@ -214,6 +196,7 @@ function SellerProfile() {
       fetchVehicleOptions();
     }
   }, [activeStep]);
+ 
 
 
   useEffect(() => {
@@ -239,22 +222,6 @@ function SellerProfile() {
   }, [storedId]);
 
 
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const response = await ApiCall({
-          url: "https://localhost:44311/api/services/app/Session/GetCurrentLoginInformations",
-          method: "GET",
-        });
-        const id = response.data?.result?.user?.id;
-        setUserId(id);
-      } catch (err) {
-        console.error("Error fetching user ID:", err);
-      }
-    };
-
-    fetchUserId();
-  }, []);
 
   const handleSearch = async () => {
     if (!registration) return;
@@ -274,9 +241,6 @@ function SellerProfile() {
         setCarData(raw);
 
         const finalData = convertCarData(raw);
-
-        console.log("Converted:", finalData);
-
 
       } else if (response?.error) {
 
@@ -357,104 +321,77 @@ function SellerProfile() {
   };
 
 
-useEffect(() => {
-  if (activeStep !== 3 || !contractData?.id) return;
+  useEffect(() => {
+    if (activeStep !== 3 || !contractData?.id) return;
 
-  let interval; // 👈 interval yahan declare
+    let interval;  
 
-  const fetchBuyerStatus = async () => {
-    try {
-      const res = await ApiCall({
-        url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
-        method: "GET",
-      });
-
-      const latest = res?.result || res?.data?.result;
-      const isConnected = latest?.buyerDealConnected ?? false;
-
-      setBuyerConnected(isConnected);
-
-      // 🎉 Toast only once
-      if (isConnected && !buyerToastShown) {
-        toast.success("🎉 Buyer connected to deal!", {
-          position: "top-right",
+    const fetchBuyerStatus = async () => {
+      try {
+        const res = await ApiCall({
+          url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
+          method: "GET",
         });
-        setBuyerToastShown(true);
-      }
 
-      // 🛑 STOP POLLING WHEN CONNECTED
-      if (isConnected && interval) {
-        clearInterval(interval);
-      }
+        const latest = res?.result || res?.data?.result;
+        const isConnected = latest?.buyerDealConnected ?? false;
 
-    } catch (err) {
-      console.error("Error fetching buyerDealConnected:", err);
-    }
+        setBuyerConnected(isConnected);
+
+         
+        if (isConnected && !buyerToastShown) {
+          toast.success("🎉 Buyer connected to deal!", {
+            position: "top-right",
+          });
+          setBuyerToastShown(true);
+        }
+
+         
+        if (isConnected && interval) {
+          clearInterval(interval);
+        }
+
+      } catch (err) {
+        console.error("Error fetching buyerDealConnected:", err);
+      }
+    };
+
+    fetchBuyerStatus();
+    interval = setInterval(fetchBuyerStatus, 20000);
+
+    return () => clearInterval(interval);
+  }, [activeStep, contractData?.id, buyerToastShown]);
+
+
+  const convertCarData = (carData) => {
+    return {
+      registrationNo: carData?.registreringsnummer || "",
+      vehicleDesignation: carData?.fordonsuppgifter?.fordonsbenamning || "",
+      tradeName: carData?.fordonsuppgifter?.handelsbeteckning || "",
+      yearModel: carData?.fordonsuppgifter?.arsmodell || "",
+      vehicleYears: carData?.fordonsuppgifter?.fordonsar?.toString() || "",
+      registrationDate: carData?.fordonsuppgifter?.registreringsdatum || null,
+      numberOfUsers: carData?.fordonBrukareAgare?.antalBrukare?.toString() || "",
+      waxelbarge: carData?.tekniskData?.vaxellada || "",
+      fourWheelDrive: carData?.tekniskData?.fyrhjulsdrift || false,
+      fuel: carData?.tekniskData?.drivmedel?.map(x => x.drivmedel).join(", ") || "",
+      electricVehicleConfiguration: carData?.miljoklassning?.elfordonKonfiguration || "",
+      inspectionDate: carData?.besiktning?.besiktningsdatum || null,
+      inspectionDateEMPTY: carData?.besiktning?.besiktningsdatumTOM || null,
+      dispensationInspectionGroup: carData?.besiktning?.dispensbesiktningsgrupp || "",
+      inspectionGroup: carData?.besiktning?.besiktningsgrupp || "",
+      feedingStall: carData?.besiktning?.matarstallning?.toString() || "",
+      inspectionStation: carData?.besiktning?.besiktningsstation || "",
+      inspectionProgramCode: carData?.besiktning?.besiktningsprogramkod?.toString() || "",
+      previousInspectionDate: carData?.besiktning?.foregaendeBesiktningsdatum || null,
+      previousInspectionProgramCode: carData?.besiktning?.foregaendeBesiktningsprogramkod?.toString() || "",
+      tax: carData?.beraknat?.skatt?.skatt?.toString() || "",
+      malus: carData?.beraknat?.skatt?.malus?.toString() || "",
+    };
   };
-
-  fetchBuyerStatus();
-  interval = setInterval(fetchBuyerStatus, 10000);
-
-  return () => clearInterval(interval);
-}, [activeStep, contractData?.id, buyerToastShown]);
-
-
-  // const convertCarData = (carData) => {
-  //   return {
-  //     registrationNo: carData?.registreringsnummer || "",
-  //     vehicleDesignation: carData?.fordonsuppgifter?.fordonsbenamning || "",
-  //     tradeName: carData?.fordonsuppgifter?.handelsbeteckning || "",
-  //     yearModel: carData?.fordonsuppgifter?.arsmodell || "",
-  //     vehicleYears: carData?.fordonsuppgifter?.fordonsar?.toString() || "",
-  //     registrationDate: carData?.fordonsuppgifter?.registreringsdatum || null,
-  //     numberOfUsers: carData?.fordonBrukareAgare?.antalBrukare?.toString() || "",
-  //     waxelbarge: carData?.tekniskData?.vaxellada || "",
-  //     fourWheelDrive: carData?.tekniskData?.fyrhjulsdrift || false,
-  //     fuel: carData?.tekniskData?.drivmedel?.map(x => x.drivmedel).join(", ") || "",
-  //     electricVehicleConfiguration: carData?.miljoklassning?.elfordonKonfiguration || "",
-  //     inspectionDate: carData?.besiktning?.besiktningsdatum || null,
-  //     inspectionDateEMPTY: carData?.besiktning?.besiktningsdatumTOM || null,
-  //     dispensationInspectionGroup: carData?.besiktning?.dispensbesiktningsgrupp || "",
-  //     inspectionGroup: carData?.besiktning?.besiktningsgrupp || "",
-  //     feedingStall: carData?.besiktning?.matarstallning?.toString() || "",
-  //     inspectionStation: carData?.besiktning?.besiktningsstation || "",
-  //     inspectionProgramCode: carData?.besiktning?.besiktningsprogramkod?.toString() || "",
-  //     previousInspectionDate: carData?.besiktning?.foregaendeBesiktningsdatum || null,
-  //     previousInspectionProgramCode: carData?.besiktning?.foregaendeBesiktningsprogramkod?.toString() || "",
-  //     tax: carData?.beraknat?.skatt?.skatt?.toString() || "",
-  //     malus: carData?.beraknat?.skatt?.malus?.toString() || "",
-  //   };
-  // };
 
  
-const convertCarData = () => {
-  return {
-    registrationNo: "ABS111",
-    vehicleDesignation: "TOYOTA PRIUS",
-    tradeName: "",
-    yearModel: "",
-    vehicleYears: "2006",
-    registrationDate: "2006-11-24T00:00:00",
-    numberOfUsers: "7",
-    waxelbarge: "V",
-    fourWheelDrive: false,
-    fuel: "Bensin, El",
-    electricVehicleConfiguration: null,
-    inspectionDate: "2025-08-14T00:00:00",
-    inspectionDateEMPTY: "2026-10-31T00:00:00",
-    dispensationInspectionGroup: null,
-    inspectionGroup: "36/24/14",
-    feedingStall: "388358",
-    inspectionStation: "CARSPECT STOCKHOLM BOTKYRKA NORSBORG",
-    inspectionProgramCode: "6",
-    previousInspectionDate: "2025-08-11T00:00:00",
-    previousInspectionProgramCode: "5",
-    tax: "360",
-    malus: null
-  };
-};
-
-const [refreshFinalContract, setRefreshFinalContract] = useState(false);
+  const [refreshFinalContract, setRefreshFinalContract] = useState(false);
   useEffect(() => {
     const fetchFinalContract = async () => {
       if (activeStep === 5 && lastId) {
@@ -470,7 +407,7 @@ const [refreshFinalContract, setRefreshFinalContract] = useState(false);
             setFinalContract(finalData);
             setfinalContractvaluation(finalData.carValuationBySeller || null)
             setcontractId(finalData.id || null)
-             setcarId(finalData.carInfoId || null)
+            setcarId(finalData.carInfoId || null)
           } else {
             Swal.fire("⚠️ Warning", "Final contract data not found!", "warning");
           }
@@ -481,101 +418,137 @@ const [refreshFinalContract, setRefreshFinalContract] = useState(false);
     };
 
     fetchFinalContract();
-  }, [activeStep, lastId,refreshFinalContract]);
+  }, [activeStep, lastId, refreshFinalContract]);
+
+  const InfoRow = ({ icon, label, value }) => (
+    <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
 
 
-
-  return (
-    <Paper
-      elevation={4}
-      sx={{
-        margin: "10px auto",
-        p: 2,
-        borderRadius: 3,
-        backgroundColor: "#fff",
-      }}
-    >
-      <Typography variant="h6" fontWeight="bold" align="center" gutterBottom>
-        Sell Your Vehicle Here
-      </Typography>
-
-      <Stepper
-        activeStep={activeStep}
-        alternativeLabel
+      <Box
         sx={{
-          mb: 2,
-          "& .MuiStepLabel-label": {
-            fontSize: "0.8rem", // smaller text
-          },
-          "& .MuiSvgIcon-root": {
-            width: "17px",
-            height: "17px",
-          },
-          "& .MuiStepConnector-line": {
-            minHeight: "2px",
-          },
-          "& .MuiStepLabel-root .Mui-completed": {
-            color: "green",
-          },
-          "& .MuiStepLabel-root .Mui-active": {
-            color: "#ff9f43",
-          },
-          "& .MuiStepLabel-label.Mui-active": {
-            fontWeight: "bold",
-          },
+          backgroundColor: "#fdf6f0ff",
+          p: 1,
+          borderRadius: "10px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: 36,
+          minHeight: 36
         }}
       >
-        {steps.map((label, index) => (
-          <Step key={index}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+        {icon}
+      </Box>
 
 
-      <Divider sx={{ height: 1, backgroundColor: "#a1a0a0ff" }} />
+      <Box sx={{ display: "flex", flexDirection: "column", textAlign: "left" }}>
+        <Typography fontSize="12px" color="gray">
+          {label}
+        </Typography>
+        <Typography fontSize="14px" fontWeight="bold">
+          {value || "N/A"}
+        </Typography>
+      </Box>
 
-      {/* ------------------ FORM 1 ------------------ */}
-      {activeStep < 2 && (
-        <Formik
+    </Box>
+  );
 
-          initialValues={{
-            vahicleTypeOptionId: null,
-            vahicleTypeOptionName: "",
-            sellerDrivingLicensePath: "",
-            sellerDrivingLicenseValidate: false,
-            vahicleTypeOptionVahicleTypeName: ""
+  return (
+    <Container maxWidth="md">
+      <Paper
+        elevation={4}
+        sx={{
+          margin: "10px auto",
+          p: 2,
+          borderRadius: 3,
+          backgroundColor: "#fff",
+        }}
+      >
+
+        <Stepper
+          activeStep={activeStep}
+          alternativeLabel
+          sx={{
+            mb: 2,
+            mt: 1,
+            width: "100%",
+            overflow: "hidden",
+            "& .MuiStepLabel-label": {
+              fontSize: "0.8rem",
+              "@media (max-width: 600px)": { fontSize: "0.60rem" },
+            },
+            "& .MuiSvgIcon-root": {
+              width: "17px",
+              height: "17px",
+            },
+            "& .MuiStepConnector-line": {
+              minHeight: "2px",
+            },
+            "& .MuiStepLabel-root .Mui-completed": {
+              color: "green",
+            },
+            "& .MuiStepLabel-root .Mui-active": {
+              color: "#ff9f43",
+            },
+            "& .MuiStepLabel-label.Mui-active": {
+              fontWeight: "bold",
+            },
           }}
-          validationSchema={validationSchemas[activeStep]}
-          onSubmit={async (values, { setSubmitting, resetForm }) => {
-            if (activeStep === 1) {
+        >
+          {steps.map((label, index) => (
+            <Step key={index}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
 
 
+        <Divider sx={{ height: 1, backgroundColor: "#a1a0a0ff" }} />
+
+        {activeStep < 1 && (
+          <Formik
+            initialValues={{
+              vahicleTypeOptionId: null,
+              vahicleTypeOptionName: "",
+              vahicleTypeOptionVahicleTypeName: ""
+            }}
+
+            validationSchema={validationSchemas[activeStep]}
 
 
-              const finalValues = {
-                ...values,
-                sellerUserId: userId,
-                creatorUserId: userId,
-                id: storedId,
-                sellerDealStatus: contractData.sellerDealStatus,
-                sellerDealActive: contractData.sellerDealActive,
-                sellerDealComplete: contractData.sellerDealComplete,
-                carInfoId: contractData.carInfoId,
-                creationTime: new Date().toISOString(),
-                lastModificationTime: new Date().toISOString(),
-                buyerDealStatus: '',
-                lastModifierUserId: 0
-              };
-
-
-
-
+            onSubmit={async (values, { setSubmitting, resetForm }) => {
               try {
                 setLoading(true);
                 setSubmitting(true);
-                setErrorMessage("");
-                setSuccessMessage("");
+
+
+                const storedIdFromLocal = parseInt(localStorage.getItem("currentContractID"), 10);
+
+
+                if (!storedIdFromLocal || storedIdFromLocal !== storedId) {
+                  Swal.fire("❌ Error", "Contract ID mismatch. Cannot update contract.", "error");
+                  return;
+                }
+
+
+                const finalValues = {
+                  ...values,
+                  sellerUserId: userId,
+                  creatorUserId: userId,
+                  id: storedId,
+                  sellerDealStatus: contractData.sellerDealStatus,
+                  sellerDealActive: contractData.sellerDealActive,
+                  sellerDealComplete: contractData.sellerDealComplete,
+                  carInfoId: contractData.carInfoId,
+                  creationTime: new Date().toISOString(),
+                  lastModificationTime: new Date().toISOString(),
+                  buyerDealStatus: "",
+                  sellerDrivingLicensePath: "",
+                  sellerDrivingLicenseValidate: true,
+                  lastModifierUserId: 0
+                };
+
+
+
                 const response = await ApiCall({
                   url: "https://localhost:44311/api/services/app/ContractMain/Update",
                   method: "PUT",
@@ -583,1102 +556,1094 @@ const [refreshFinalContract, setRefreshFinalContract] = useState(false);
                 });
 
                 if (response?.data?.success) {
-
-                  setSuccessMessage("✅ Data submitted successfully!");
-
                   resetForm();
                   setSubmitted(true);
                   setActiveStep(2);
                 } else {
-
-                  setErrorMessage(response?.data?.error || "❌ Submission failed");
-
+                  Swal.fire("❌ Error", response?.data?.error?.message || "Submission failed.", "error");
                 }
-              } catch (err) {
 
-                setErrorMessage(err.message || "❌ Submission failed");
+              } catch (err) {
+                Swal.fire("❌ Error", err.message || "Submission failed.", "error");
               } finally {
                 setLoading(false);
                 setSubmitting(false);
               }
+            }}
 
-            } else {
-              setActiveStep((prev) => prev + 1);
-            }
-          }}
-        >
-          {({ errors, touched, handleSubmit, values, setFieldValue, isSubmitting }) => (
-            <Form onSubmit={handleSubmit}>
-              <AnimatePresence mode="wait">
-                {activeStep === 0 && (
-                  <motion.div
-                    key="step1"
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -100, opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <Container maxWidth="md">
-                      <Typography
-                        variant="h6"
-                        align="center"
-                        gutterBottom
-                        sx={{ fontWeight: "bold", marginBottom: 3, marginTop: 1 }}
-                      >
-                        What Do You Want To Sell Today?
-                      </Typography>
+          >
+            {({ submitForm, setFieldValue }) => (
+              <Form>
 
-                      {loading ? (
+                <Container maxWidth="md">
+                  <Typography variant="h6" align="center" fontWeight="bold" mb={2} mt={1}>
+                    {t("seller.headerTitle")}
+                  </Typography>
+                  <Typography variant="subtitle1" align="center" color="text.secondary" mb={1}>
+                    {t("seller.headerSubtitle")}
+                  </Typography>
 
+                  <Container maxWidth="sm"  >
+
+                    {loading ? (
+                      <Box display="flex" justifyContent="center" alignItems="center" py={6}>
                         <div className="loader"></div>
-
-                      ) : error ? (
-                        <Typography color="error">{error}</Typography>
-                      ) : vehicleData.length > 0 ? (
-                        <Grid container spacing={6}>
-                          {vehicleData.map((veh) => {
-                            const isSelected = values.vahicleTypeOptionId === veh.id;
-                            return (
-                              <Grid size={{ xs: 6, sm: 6, md: 4 }} key={veh.id}>
-                                <Paper
-                                  elevation={isSelected ? 6 : 2}
-                                  onClick={() => {
-                                    if (values.vahicleTypeOptionId === veh.id) {
-
-                                      setFieldValue("vahicleTypeOptionId", null);
-                                      setFieldValue("vahicleTypeOptionName", "");
-                                      setFieldValue("vahicleTypeOptionVahicleTypeName", "");
-
-                                    } else {
-
-                                      setFieldValue("vahicleTypeOptionId", veh.id);
-                                      setFieldValue("vahicleTypeOptionName", veh.vahicleTypeName);
-                                      setFieldValue("vahicleTypeOptionVahicleTypeName", veh.vahicleTypeName);
-
-                                    }
-                                  }}
-                                  sx={{
-
-                                    borderRadius: 2,
-                                    textAlign: "center",
-                                    cursor: "pointer",
-                                    border: isSelected ? "2px solid #ff9f43" : "2px solid #ccc",
-                                    backgroundColor: isSelected ? "#fbf2eaff" : "#fff",
-                                    position: "relative",
-
-                                    transition: "all 0.1s ease",
-                                    "&:hover": {
-                                      transform: "scale(1.02)",
-                                      border: "2px solid #ff9f43",
-                                      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-                                      "& svg": { color: "#ff9f43" },
-                                    },
-                                  }}
-                                >
-                                  {isSelected && (
-                                    <Box
-                                      sx={{
-                                        position: "absolute",
-                                        top: 8,
-                                        right: 8,
-                                        width: 20,
-                                        height: 20,
-                                        borderRadius: "50%",
-                                        backgroundColor: "#ff9f43",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "#fff",
-                                        fontSize: 14,
-                                      }}
-                                    >
-                                      ✓
-                                    </Box>
-                                  )}
-
-                                  {/* Icon */}
-                                  <Box sx={{ fontSize: 40, mb: 1 }}>
-                                    {veh.vahicleTypeName.toLowerCase().includes("car") && <FaCar />}
-                                    {veh.vahicleTypeName.toLowerCase().includes("motorcycle") && <FaMotorcycle />}
-                                    {veh.vahicleTypeName.toLowerCase().includes("truck") && <FaTruck />}
-                                    {veh.vahicleTypeName.toLowerCase().includes("boat") && <FaShip />}
-                                    {veh.vahicleTypeName.toLowerCase().includes("camper") && <FaTrailer />}
-                                    {veh.vahicleTypeName.toLowerCase().includes("moped") && <MdElectricScooter />}
-                                  </Box>
-
-                                  <Typography>{veh.vahicleTypeName}</Typography>
-                                </Paper>
-
-                              </Grid>
-                            );
-                          })}
-                        </Grid>
-                      ) : (
-                        <Typography>No vehicle types found</Typography>
-                      )}
-
-                      {touched.vahicleTypeOptionId &&
-                        errors.vahicleTypeOptionId && (
-                          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                            {errors.vahicleTypeOptionId}
-                          </Typography>
-                        )}
-                    </Container>
-                  </motion.div>
-                )}
-
-                {activeStep === 1 && (
-                  <motion.div
-                    key="step2"
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -100, opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <Box mb={1} mt={1} textAlign="center">
-                      <Typography
-                        variant="h6"
-                        align="center"
-                        gutterBottom
-                        sx={{ fontWeight: "bold", marginBottom: 1 }}
-                      >
-                        Verify yourself as Seller
+                      </Box>
+                    ) : error ? (
+                      <Typography color="error" align="center" fontWeight="bold" py={3}>
+                        {error}
                       </Typography>
-                      <Container maxWidth="md" >
-                        <Typography
-                          variant="subtitle2"
-                          align="center"
-                          // gutterBottom
-                          sx={{ marginBottom: 2 }}
-                        >
-                          To sell a vehicle through Movaro you need to upload picture of your driving licence. This is security requirement form Sweden transport agency, and is only done once
-                        </Typography>
-                      </Container>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        id="sellerDrivingLicensePath"
-                        style={{ display: "none" }}
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
+                    ) : vehicleData.length === 0 ? (
+                      <Typography align="center" fontWeight="bold" py={3}>
+                        {t("seller.noVehicleTypes")}
+                      </Typography>
+                    ) : (
+                      <Grid container spacing={3} mb={3}>
+                        {vehicleData.map((veh) => (
+                          <Grid size={{ xs: 6, sm: 6, md: 4 }} key={veh.id}>
+                            <Paper
+                              elevation={3}
+                              onClick={() => {
+                                setFieldValue("vahicleTypeOptionId", veh.id);
+                                setFieldValue("vahicleTypeOptionName", veh.vahicleTypeName);
+                                setFieldValue("vahicleTypeOptionVahicleTypeName", veh.vahicleTypeName);
 
-                              setFieldValue("sellerDrivingLicensePath", reader.result);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                      <label htmlFor="sellerDrivingLicensePath">
-                        <Paper
-                          sx={{
-                            p: 1,
-                            border: "1px dashed #ccc",
-                            cursor: "pointer",
-                            borderRadius: 2,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 210,
-                            height: 150,
-                            overflow: "hidden",
-                            textAlign: "center",
-                            flexDirection: "column",
-                            "&:hover": { backgroundColor: "#f5f5f5" },
-                          }}
-                        >
-                          {values.sellerDrivingLicensePath ? (
-                            <img
-                              src={values.sellerDrivingLicensePath}
-                              alt="Uploaded"
-                              style={{ width: "100%", height: "100%", objectFit: "fill" }}
-                            />
-                          ) : (
-                            <>
-                              <PhotoCamera sx={{ fontSize: 40, color: "#ccc", mb: 1 }} />
-                              <Typography variant="body2" color="textSecondary">
-                                Click to upload image
+                                setTimeout(() => {
+                                  submitForm();
+                                }, 0);
+                              }}
+
+                              sx={{
+                                borderRadius: 2,
+                                textAlign: "center",
+                                cursor: "pointer",
+                                border: "1px solid #ccc",
+                                backgroundColor: "white",
+                                transition: "0.2s",
+                                "&:hover": {
+                                  border: "1px solid #ff9f43",
+                                  transform: "scale(1.05)"
+                                }
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 55,
+                                  height: 55,
+                                  borderRadius: "50%",
+                                  backgroundColor: "#fbe7d4ff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontSize: 24,
+                                  margin: "8px auto"
+                                }}
+                              >
+                                {veh.vahicleTypeName.toLowerCase().includes("car") && <FaCar color="#ff9f43" />}
+                                {veh.vahicleTypeName.toLowerCase().includes("motorcycle") && <FaMotorcycle color="#ff9f43" />}
+                                {veh.vahicleTypeName.toLowerCase().includes("truck") && <FaTruck color="#ff9f43" />}
+                                {veh.vahicleTypeName.toLowerCase().includes("boat") && <FaShip color="#ff9f43" />}
+                                {veh.vahicleTypeName.toLowerCase().includes("camper") && <FaTrailer color="#ff9f43" />}
+                                {veh.vahicleTypeName.toLowerCase().includes("moped") && <MdElectricScooter color="#ff9f43" />}
+                              </Box>
+
+                              <Typography fontWeight="bold" py={1}>
+                                {veh.vahicleTypeName}
                               </Typography>
-                            </>
-                          )}
-                        </Paper>
-                      </label>
-
-                      {touched.sellerDrivingLicensePath && errors.sellerDrivingLicensePath && (
-                        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                          {errors.sellerDrivingLicensePath}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    <Box mt={3} display="flex" justifyContent="center">
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={values.sellerDrivingLicenseValidate}
-                            size="small"
-                            onChange={(e) =>
-                              setFieldValue("sellerDrivingLicenseValidate", e.target.checked)
-                            }
-                            sx={{
-                              "& .MuiSwitch-switchBase.Mui-checked": {
-                                color: "#ff9f63",
-                              },
-                              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                backgroundColor: "#ff9f63",
-                              },
-                            }}
-                          />
-                        }
-                        label="I confirm the document is valid"
-                      />
-                    </Box>
-                    <Box>  {errorMessage && (
-                      <div className="mt-3 p-2 text-red-600 bg-red-100 border border-red-300 rounded">
-                        {errorMessage}
-                      </div>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
                     )}
+                  </Container>
+                </Container>
 
-                      {successMessage && (
-                        <div className="mt-3 p-2 text-green-600 bg-green-100 border border-green-300 rounded">
-                          {successMessage}
-                        </div>
-                      )}</Box>
-
-
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Navigation */}
-              <Box display="flex" justifyContent="space-between" mt={5}>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={() => setActiveStep((prev) => prev - 1)}
-                  sx={{ color: "#ff9f43" }}
-                >
-                  Back
-                </Button>
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{ backgroundColor: "#ff9f43", color: "white" }}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <CircularProgress size={24} sx={{ color: "white" }} />
-                  ) : activeStep === 1 ? (
-                    "Submit Documents"
-                  ) : (
-                    "Next"
-                  )}
-                </Button>
-              </Box>
-
-            </Form>
-          )}
-        </Formik>
-      )}
-
-      {/* ------------------ FORM 2 ------------------ */}
-      {activeStep === 2 && (
-        <Formik
-          initialValues={{
-            // valuationBySeller: carData?.valuationBySeller || "",
-          }}
-          enableReinitialize
+              </Form>
+            )}
+          </Formik>
+        )}
 
 
 
-          onSubmit={async (values, { setSubmitting }) => {
-            // if (!carData) {
-            //   Swal.fire("Error", "Please search for the car first!", "error");
-            //   return;
-            // }
 
-            // setError("");
-            // setSubmitting(true);
-
-            try {
-              const carCreateRes = await ApiCall({
-                url: "https://localhost:44311/api/services/app/CarInfo/Create",
-                method: "POST",
-                data: convertCarData(carData),
-              });
+        {/* ------------------ FORM 2 ------------------ */}
+        {activeStep === 2 && (
+          <Formik
+            initialValues={{
+               
+            }}
+            enableReinitialize
 
 
-              if (carCreateRes?.success === false) {
-                const backendError =
-                  carCreateRes?.error?.details ||
-                  carCreateRes?.error?.message ||
-                  "Car creation failed.";
 
-                Swal.fire("❌ Error", backendError, "error");
-                setSubmitting(false);
+            onSubmit={async (values, { setSubmitting }) => {
+              if (!carData) {
+                Swal.fire("Error", "Please search for the car first!", "error");
                 return;
               }
 
+              setError("");
+              setSubmitting(true);
 
-              const newCarData = carCreateRes?.result || carCreateRes?.data?.result;
+              try {
+                const carCreateRes = await ApiCall({
+                  url: "https://localhost:44311/api/services/app/CarInfo/Create",
+                  method: "POST",
+                  data: convertCarData(carData),
+                });
 
 
-              if (!newCarData?.id) {
-                console.warn("Car created but ID not received. Skipping alert.");
+                if (carCreateRes?.success === false) {
+                  const backendError =
+                    carCreateRes?.error?.details ||
+                    carCreateRes?.error?.message ||
+                    "Car creation failed.";
+
+                  Swal.fire("❌ Error", backendError, "error");
+                  setSubmitting(false);
+                  return;
+                }
+
+
+                const newCarData = carCreateRes?.result || carCreateRes?.data?.result;
+
+
+                if (!newCarData?.id) {
+                  console.warn("Car created but ID not received. Skipping alert.");
+                  setSubmitting(false);
+                  return;  
+                }
+
+
+                const contractRes = await ApiCall({
+                  url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
+                  method: "GET",
+                });
+
+                const latestContract = contractRes?.result || contractRes?.data?.result;
+
+                if (!latestContract) {
+                  throw new Error("Failed to fetch latest contract data.");
+                }
+
+
+                const contractPayload = {
+                  ...latestContract,
+                  carInfoId: newCarData.id,
+                  carInfoVehicleDesignation: newCarData.vehicleDesignation,
+                  carInfoTradeName: newCarData.tradeName,
+                  carInfoYearModel: newCarData.yearModel,
+                  carInfoVehicleYears: newCarData.vehicleYears,
+                  carInfoRegistrationDate: newCarData.registrationDate,
+                  carInfoNumberOfUsers: newCarData.numberOfUsers,
+                  carInfoWaxelbarge: newCarData.waxelbarge,
+                  carInfoFourWheelDrive: newCarData.fourWheelDrive?.toString() || "False",
+                  carInfoFuel: newCarData.fuel,
+                  carInfoElectricVehicleConfiguration: newCarData.electricVehicleConfiguration,
+                  carInfoInspectionDate: newCarData.inspectionDate,
+                  carInfoInspectionDateEMPTY: newCarData.inspectionDateEMPTY,
+                  carInfoDispensationInspectionGroup: newCarData.dispensationInspectionGroup,
+                  carInfoInspectionGroup: newCarData.inspectionGroup,
+                  carInfoFeedingStall: newCarData.feedingStall,
+                  carInfoInspectionStation: newCarData.inspectionStation,
+                  carInfoInspectionProgramCode: newCarData.inspectionProgramCode,
+                  carInfoPreviousInspectionDate: newCarData.previousInspectionDate,
+                  carInfoPreviousInspectionProgramCode: newCarData.previousInspectionProgramCode,
+                  carInfoTax: newCarData.tax,
+                  carInfoMalus: newCarData.malus,
+                  carValuationBySeller: 0,
+                  vahicleTypeOptionVahicleTypeName: latestContract.vahicleTypeOptionName || "",
+                  vahicleTypeOptionId: latestContract.vahicleTypeOptionId,
+                  sellerDealComplete: false,
+                  sellerDrivingLicensePath: "",
+                };
+
+
+                const contractUpdateRes = await ApiCall({
+                  url: "https://localhost:44311/api/services/app/ContractMain/Update",
+                  method: "PUT",
+                  data: contractPayload,
+                });
+
+                const status = contractUpdateRes?.status;
+                const isError =
+                  contractUpdateRes?.success === false || status >= 400;
+
+                if (!isError && (status === 200 || status === 201)) {
+                  Swal.fire("✅ Success", "Contract updated successfully!", "success");
+                  setValuationSubmitted(true);
+                  setActiveStep(3);
+                } else {
+                  const errMsg =
+                    contractUpdateRes?.error?.details ||
+                    contractUpdateRes?.error?.message ||
+                    "Something went wrong while updating the contract.";
+                  Swal.fire("❌ Error", errMsg, "error");
+                }
+              } catch (error) {
+                console.error("❌ Error during submission:", error);
+                Swal.fire("❌ Error", error.message || "Unexpected error occurred.", "error");
+              } finally {
                 setSubmitting(false);
-                return; // optional: if you want to stop further execution
               }
+            }}
 
 
-              const contractRes = await ApiCall({
-                url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
-                method: "GET",
-              });
 
-              const latestContract = contractRes?.result || contractRes?.data?.result;
 
-              if (!latestContract) {
-                throw new Error("Failed to fetch latest contract data.");
-              }
 
-             
-              const contractPayload = {
-                ...latestContract,
-                carInfoId: newCarData.id,
-                carInfoVehicleDesignation: newCarData.vehicleDesignation,
-                carInfoTradeName: newCarData.tradeName,
-                carInfoYearModel: newCarData.yearModel,
-                carInfoVehicleYears: newCarData.vehicleYears,
-                carInfoRegistrationDate: newCarData.registrationDate,
-                carInfoNumberOfUsers: newCarData.numberOfUsers,
-                carInfoWaxelbarge: newCarData.waxelbarge,
-                carInfoFourWheelDrive: newCarData.fourWheelDrive?.toString() || "False",
-                carInfoFuel: newCarData.fuel,
-                carInfoElectricVehicleConfiguration: newCarData.electricVehicleConfiguration,
-                carInfoInspectionDate: newCarData.inspectionDate,
-                carInfoInspectionDateEMPTY: newCarData.inspectionDateEMPTY,
-                carInfoDispensationInspectionGroup: newCarData.dispensationInspectionGroup,
-                carInfoInspectionGroup: newCarData.inspectionGroup,
-                carInfoFeedingStall: newCarData.feedingStall,
-                carInfoInspectionStation: newCarData.inspectionStation,
-                carInfoInspectionProgramCode: newCarData.inspectionProgramCode,
-                carInfoPreviousInspectionDate: newCarData.previousInspectionDate,
-                carInfoPreviousInspectionProgramCode: newCarData.previousInspectionProgramCode,
-                carInfoTax: newCarData.tax,
-                carInfoMalus: newCarData.malus,
-                carValuationBySeller: 0,
-                vahicleTypeOptionVahicleTypeName: latestContract.vahicleTypeOptionName || "",
-                vahicleTypeOptionId: latestContract.vahicleTypeOptionId,
-                sellerDealComplete: false,
-                sellerDrivingLicensePath: "",
-              };
 
-              
-              const contractUpdateRes = await ApiCall({
-                url: "https://localhost:44311/api/services/app/ContractMain/Update",
-                method: "PUT",
-                data: contractPayload,
-              });
 
-              const status = contractUpdateRes?.status;
-              const isError =
-                contractUpdateRes?.success === false || status >= 400;
-
-              if (!isError && (status === 200 || status === 201)) {
-                Swal.fire("✅ Success", "Contract updated successfully!", "success");
-                setValuationSubmitted(true);
-                setActiveStep(3);
-              } else {
-                const errMsg =
-                  contractUpdateRes?.error?.details ||
-                  contractUpdateRes?.error?.message ||
-                  "Something went wrong while updating the contract.";
-                Swal.fire("❌ Error", errMsg, "error");
-              }
-            } catch (error) {
-              console.error("❌ Error during submission:", error);
-              Swal.fire("❌ Error", error.message || "Unexpected error occurred.", "error");
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-
-
-
-
-
-
-
-        >
-          {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => (
-            <Form onSubmit={handleSubmit}>
-              <Box textAlign="center" mt={2}>
-                <Typography variant="h5" fontWeight="bold">
-                  Start Your Sale
-                </Typography>
-                <Typography variant="subtitle1" mt={1}>
-                  Enter the registration number of the car you want to sell
-                </Typography>
-
-
-                <Box display="flex" justifyContent="center" alignItems="center" mt={3} gap={1}>
-                  <TextField
-                    placeholder="Enter registration number"
-                    variant="outlined"
-                    size="small"
-                    value={registration}
-                    onChange={(e) => setRegistration(e.target.value)}
-                    sx={{ width: "300px", backgroundColor: "#fff", borderRadius: "8px" }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon color="action" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleSearch}
-                    disabled={loading}
-                    sx={{
-                      backgroundColor: "#ff9f43",
-                      "&:hover": { backgroundColor: "#e68a33" },
-                      textTransform: "none",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    {loading ? "Searching..." : "Search"}
-                  </Button>
-                </Box>
-
-                {carData && (
-                  <Paper
-                    elevation={4}
-                    sx={{
-                      mt: 4,
-                      p: 2,
-                      maxWidth: 1200,
-                      mx: "auto",
-                      textAlign: "left",
-                      borderRadius: "16px",
-                      background: "linear-gradient(140deg, #ffffffff 20%, #fad3aeff 100%)",
-                    }}
-                  >
-                    <Typography variant="h6" color="primary" fontWeight="bold" gutterBottom>
-                      {carData.registrationNo}
-                    </Typography>
-                    <Box style={{ textAlign: "center", marginBottom: 20 }}>
-                      {carData.profileImage ? (
-                        <img
-                          src={carData.profileImage}
-                          alt="Car"
-                          style={{
-                            width: 300,
-                            height: 150,
-                            objectFit: "cover",
-                            borderRadius: 10,
-                            border: "2px solid #ccc",
-                          }}
-                        />
-                      ) : (
-                        <DirectionsCarIcon sx={{ fontSize: 80, color: "gray" }} />
-                      )}
-                    </Box>
-
-
-
-
-                    <Grid container spacing={1}>
-                      <Grid size={{ xs: 12, md: 4 }} >
-                        <Typography margin={1}><ConfirmationNumberIcon /> <b>Registration:</b> {carData?.registreringsnummer}</Typography>
-                        <Typography margin={1}><DirectionsCarIcon /> <b>Vehicle Designation:</b> {carData?.fordonsuppgifter?.fordonsbenamning || "N/A"}</Typography>
-                        <Typography margin={1}><BusinessIcon /> <b>Trade Name:</b> {carData?.fordonsuppgifter?.handelsbeteckning || "N/A"}</Typography>
-                        <Typography margin={1}><NumbersIcon /> <b>Vehicle Years:</b> {carData?.fordonsuppgifter?.fordonsar || "N/A"}</Typography>
-                        <Typography margin={1}><CalendarMonthIcon /> <b>Year Model:</b> {carData?.fordonsuppgifter?.arsmodell || "N/A"}</Typography>
-                        <Typography margin={1}>
-                          <LocalGasStationIcon /> <b>Fuel:</b> {carData?.tekniskData?.drivmedel?.map(d => d.drivmedel).join(", ") || "N/A"}
-                        </Typography>
-                        <Typography margin={1}>
-                          <SettingsIcon /> <b>Gearbox:</b> {carData?.tekniskData?.vaxellada || "N/A"}
-                        </Typography>
-                        <Typography margin={1}><SpeedIcon /> <b>Electric Vehicle Config:</b> {carData?.miljoklassning?.elfordonKonfiguration || "N/A"}</Typography>
-                        <Typography margin={1}><SettingsSuggestIcon /> <b>Four Wheel Drive:</b> {carData?.tekniskData?.fyrhjulsdrift ? "Yes" : "No"}</Typography>
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 4 }} >
-                        <Typography margin={1}><CategoryIcon /> <b>Inspection Group:</b> {carData?.besiktning?.besiktningsgrupp || "N/A"}</Typography>
-                        <Typography margin={1}><AutoModeIcon /> <b>Dispensation Inspection Group:</b> {carData?.besiktning?.dispensbesiktningsgrupp || "N/A"}</Typography>
-                        <Typography margin={1}><SettingsSuggestIcon /> <b>Previous Inspection Program:</b> {carData?.besiktning?.foregaendeBesiktningsprogramkod || "N/A"}</Typography>
-                        <Typography margin={1}>
-                          <InsertDriveFileIcon /> <b>Inspection Date:</b> {carData?.besiktning?.besiktningsdatum === "0001-01-01T00:00:00" ? "N/A" : carData?.besiktning?.besiktningsdatum}
-                        </Typography>
-
-                        <Typography margin={1}><SpeedIcon /> <b>Feeding Stall:</b> {carData?.besiktning?.matarstallning || "N/A"}</Typography>
-                        <Typography margin={1}><CategoryIcon /> <b>Tax:</b> {carData?.beraknat?.skatt?.skatt || "N/A"}</Typography>
-                      </Grid>
-
-                      <Grid size={{ xs: 12, md: 4 }} >
-                        <Typography margin={1}><PersonIcon /> <b>Number of Users:</b> {carData?.fordonBrukareAgare?.antalBrukare || "N/A"}</Typography>
-                        <Typography margin={1}>
-                          <DirectionsCarIcon /> <b>Previous Inspection Date:</b> {carData?.besiktning?.foregaendeBesiktningsdatum === "0001-01-01T00:00:00" ? "N/A" : carData?.besiktning?.foregaendeBesiktningsdatum}
-                        </Typography>
-                        <Typography margin={1}>
-                          <AutoModeIcon /> <b>Registration Date:</b> {carData?.fordonsuppgifter?.registreringsdatum === "0001-01-01T00:00:00" ? "N/A" : carData?.fordonsuppgifter?.registreringsdatum}
-                        </Typography>
-                        <Typography margin={1}><SettingsIcon /> <b>Inspection Program Code:</b> {carData?.besiktning?.besiktningsprogramkod || "N/A"}</Typography>
-                        <Typography margin={1}><SettingsIcon /> <b>Inspection Station:</b> {carData?.besiktning?.besiktningsstation || "N/A"}</Typography>
-                        <Typography margin={1}>
-                          <CheckCircleIcon /> <b>Contract Signed by Seller:</b> N/A
-                        </Typography>
-                        <Typography margin={1}><NumbersIcon /> <b>Malus:</b> {carData?.beraknat?.skatt?.malus || "N/A"}</Typography>
-                      </Grid>
-                    </Grid>
-
-
-
-                  </Paper>
-                )}
-
-
-                {error && (
-                  <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
-                    {error}
-                  </div>
-                )}
-
-
-        <Box display="flex" justifyContent="flex-end" mt={5}>
-  <Button
-    type="submit"
-    variant="contained"
-    sx={{
-      backgroundColor: "#ff9f43",
-      color: "white",
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
-    }}
-  >
-    {isSubmitting ? (
-      <>
-        <CircularProgress size={20} color="inherit" />
-        Submitting...
-      </>
-    ) : (
-      "Submit"
-    )}
-  </Button>
-</Box>
-              </Box>
-            </Form>
-          )}
-        </Formik>
-      )}
-
-      {/* ------------------ FORM 3 ------------------ */}
-
-      {activeStep === 3 && (
-
-
-        <Formik
-          initialValues={{
-            sellerDealComplete: true,
-          }}
-          onSubmit={async (values, { setSubmitting }) => {
-            // if (!contractData || !carData) {
-            //   Swal.fire("⚠️ Warning", "Missing contract or car data!", "warning");
-            //   return;
-            // }
-
-            try {
-
-              const response = await ApiCall({
-                url: `https://localhost:44311/api/services/app/ContractMain/Get?Id=${contractData.id}`,
-                method: "GET",
-              });
-
-              const contractData2 = response.result || response.data?.result;
-
-
-
-
-
-              if (!contractData2) {
-                Swal.fire("❌ Error", "Failed to fetch latest contract data!", "error");
-                return;
-              }
-
-              const payload = {
-                ...contractData2,
-                sellerDealComplete: true,
-                sellerDrivingLicensePath: "",
-              };
-
-
-
-              const updateRes = await ApiCall({
-                url: "https://localhost:44311/api/services/app/ContractMain/Update",
-                method: "PUT",
-                data: payload,
-              });
-
-
-
-
-              const status = updateRes?.status;
-              const isError = updateRes?.success === false || status >= 400;
-
-              if (!isError && (status === 200 || status === 201)) {
-
-                const respData = updateRes?.data || updateRes;
-
-
-                const returnedCarInfoId =
-                  respData?.result?.carInfoId ??
-                  respData?.carInfoId ??
-                  respData?.result?.carInfo?.id ??
-                  null;
-
-                const returnedId =
-                  respData?.result?.id ??
-                  respData?.id ??
-                  null;
-
-
-                if (returnedCarInfoId) setUpdatedCarInfoId(returnedCarInfoId);
-
-
-                if (returnedId) setLastId(returnedId);
-
-
-                Swal.fire("✅ Success", "Contract updated successfully!", "success");
-                setActiveStep(4);
-              } else {
-                const errorMsg =
-                  updateRes?.error?.details ||
-                  updateRes?.error?.message ||
-                  "Something went wrong while updating the contract.";
-                Swal.fire("❌ Error", errorMsg, "error");
-              }
-            } catch (err) {
-              console.error("❌ Error finalizing contract:", err);
-
-              const errorMsg =
-                err.response?.data?.error?.details ||
-                err.response?.data?.error?.message ||
-                "Unexpected server error occurred.";
-
-              Swal.fire("❌ Error", errorMsg, "error");
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-        >
-          {({ handleSubmit, isSubmitting }) => (
-            <Form onSubmit={handleSubmit}>
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Box textAlign="center" py={2}>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Sale is now created!
+          >
+            {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => (
+              <Form onSubmit={handleSubmit}>
+                <Box textAlign="center" mt={2}>
+                  <Typography variant="h5" fontWeight="bold">
+                    {t("seller.startSaleTitle")}
+                  </Typography>
+                  <Typography variant="subtitle1" mt={1}>
+                    {t("seller.startSaleSubtitle")}
                   </Typography>
 
 
-                  <Box
-                    sx={{
-                      display: "inline-block",
-                      padding: 1,
-                      bgcolor: "background.paper",
-                      borderRadius: 1,
-                      boxShadow: 2,
-                    }}
-                  >
+                  <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={3} gap={1}>
+                    <TextField
+                      placeholder="Enter registration number"
+                      variant="outlined"
+                      size="small"
+                      value={registration}
+                      onChange={(e) => setRegistration(e.target.value)}
+                      sx={{ width: "300px", backgroundColor: "#fff", borderRadius: "8px" }}
+                    // InputProps={{
+                    //   startAdornment: (
+                    //     <InputAdornment position="start">
+                    //       <SearchIcon color="action" />
+                    //     </InputAdornment>
+                    //   ),
+                    // }}
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={handleSearch}
+                      disabled={loading}
+                      sx={{
+                        backgroundColor: "#ff9f43",
+                        "&:hover": { backgroundColor: "#e68a33" },
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        borderRadius: "10px",
+                        minWidth: "50px",   // optional: button width for icon
+                        padding: "6px"      // optional: icon padding
+                      }}
+                    >
+                      {loading ? "..." : <SearchIcon />}
+                    </Button>
+                  </Box>
 
 
-                    {QR ? (
-                      <QRCode
-                        value={QR}
-                        size={220}
-                        level="M"
-                        bgColor="#ffffff"
-                        fgColor="#000000"
-                        includeMargin={false}
-                      />
-                    ) : (
-                      <Typography color="gray" fontSize="14px">
-                        Generating QR...
+
+
+               
+                  {error && (
+                    <div style={{ color: "red", fontSize: "14px", marginTop: "5px" }}>
+                      {error}
+                    </div>
+                  )}
+
+
+                  {carData && (
+                    <Box display="flex" justifyContent="flex-end" mt={5}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#ff9f43",
+                          color: "white",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <CircularProgress size={20} color="inherit" />
+                            Submitting...
+                          </>
+                        ) : (
+                          "Submit"
+                        )}
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+              </Form>
+            )}
+          </Formik>
+        )}
+
+        {/* ------------------ FORM 3 ------------------ */}
+
+        {activeStep === 3 && (
+
+
+          <Formik
+            initialValues={{
+              sellerDealComplete: true,
+            }}
+            onSubmit={async (values, { setSubmitting }) => {
+              // if (!contractData || !carData) {
+              //   Swal.fire("⚠️ Warning", "Missing contract or car data!", "warning");
+              //   return;
+              // }
+
+              try {
+
+                const response = await ApiCall({
+                  url: `https://localhost:44311/api/services/app/ContractMain/Get?Id=${contractData.id}`,
+                  method: "GET",
+                });
+
+                const contractData2 = response.result || response.data?.result;
+
+
+
+
+
+                if (!contractData2) {
+                  Swal.fire("❌ Error", "Failed to fetch latest contract data!", "error");
+                  return;
+                }
+
+                const payload = {
+                  ...contractData2,
+                  sellerDealComplete: true,
+                  sellerDrivingLicensePath: "",
+                };
+
+
+
+                const updateRes = await ApiCall({
+                  url: "https://localhost:44311/api/services/app/ContractMain/Update",
+                  method: "PUT",
+                  data: payload,
+                });
+
+
+
+
+                const status = updateRes?.status;
+                const isError = updateRes?.success === false || status >= 400;
+
+                if (!isError && (status === 200 || status === 201)) {
+
+                  const respData = updateRes?.data || updateRes;
+
+
+                  const returnedCarInfoId =
+                    respData?.result?.carInfoId ??
+                    respData?.carInfoId ??
+                    respData?.result?.carInfo?.id ??
+                    null;
+
+                  const returnedId =
+                    respData?.result?.id ??
+                    respData?.id ??
+                    null;
+
+
+                  if (returnedCarInfoId) setUpdatedCarInfoId(returnedCarInfoId);
+
+
+                  if (returnedId) setLastId(returnedId);
+
+
+                  Swal.fire("✅ Success", "Contract updated successfully!", "success");
+                  setActiveStep(4);
+                } else {
+                  const errorMsg =
+                    updateRes?.error?.details ||
+                    updateRes?.error?.message ||
+                    "Something went wrong while updating the contract.";
+                  Swal.fire("❌ Error", errorMsg, "error");
+                }
+              } catch (err) {
+                console.error("❌ Error finalizing contract:", err);
+
+                const errorMsg =
+                  err.response?.data?.error?.details ||
+                  err.response?.data?.error?.message ||
+                  "Unexpected server error occurred.";
+
+                Swal.fire("❌ Error", errorMsg, "error");
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+          >
+            {({ handleSubmit, isSubmitting }) => (
+              <Form onSubmit={handleSubmit}>
+                <motion.div
+                  key="step4"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Box textAlign="center" py={2}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      {t("seller.SaleCreated")}
+                    </Typography>
+
+
+                    <Box
+                      sx={{
+                        display: "inline-block",
+                        padding: 1,
+                        bgcolor: "background.paper",
+                        borderRadius: 1,
+                        boxShadow: 2,
+                      }}
+                    >
+
+
+                      {QR ? (
+                        <QRCode
+                          value={QR}
+                          size={220}
+                          level="M"
+                          bgColor="#ffffff"
+                          fgColor="#000000"
+                          includeMargin={false}
+                        />
+                      ) : (
+                        <Typography color="gray" fontSize="14px">
+                          Generating QR...
+                        </Typography>
+                      )}
+
+
+                    </Box>
+
+                    <Container maxWidth="sm" sx={{ marginTop: 5 }}>
+
+                      <Typography variant="body2" gutterBottom sx={{ marginTop: 1 }}>
+                        {t("seller.askBuyer")}
                       </Typography>
-                    )}
 
+                      <Typography variant="subtitle2" color="green" gutterBottom sx={{
+                        marginTop: 2, backgroundColor: "#c6f7d4ff", p: 1,
+                        borderRadius: 1,
+                      }}>
+                        ✅ {t("seller.available")}
+                      </Typography>
+
+                      <Typography variant="subtitle2" color="green" fontWeight="bold" sx={{
+                        marginTop: 2, backgroundColor: "#c6f7d4ff", p: 1,
+                        borderRadius: 1,
+                      }}>
+                        {t("seller.proceed")}
+                      </Typography>
+
+                    </Container>
 
                   </Box>
 
-                  <Container maxWidth="sm" sx={{ marginTop: 5 }}>
-
-                    <Typography variant="body2" gutterBottom sx={{ marginTop: 1 }}>
-                      Ask the buyer to scan the QR code or enter the registration number in
-                      their app to connect to the deal.
-                    </Typography>
-
-                    <Typography variant="subtitle2" color="green" gutterBottom sx={{
-                      marginTop: 2, backgroundColor: "#c6f7d4ff", p: 1,
-                      borderRadius: 1,
-                    }}>
-                      ✅ Available for the buyer: Yes
-                    </Typography>
-
-                    <Typography variant="subtitle2" color="green" fontWeight="bold" sx={{
-                      marginTop: 2, backgroundColor: "#c6f7d4ff", p: 1,
-                      borderRadius: 1,
-                    }}>
-                      Proceed to the purchase contract.
-                    </Typography>
-
-                  </Container>
-
-                </Box>
-
-                <Box display="flex" justifyContent="center" gap={2} mt={3}>
-
-                  <Button
-                    variant="outlined"
-                    color="warning"
-                    onClick={() => setActiveStep(2)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="success"
-                    disabled={!buyerConnected}
-                  >
-                    {isSubmitting ? "Finalizing..." : "Start Sale"}
-                  </Button>
+                  <Box display="flex" justifyContent="center" gap={2} mt={3}>
 
 
-                </Box>
-              </motion.div>
-            </Form>
-          )}
-        </Formik>
-
-      )}
-
-      {/* ------------------ STEP 4 ------------------ */}
-
-
-      {activeStep === 4 && (
-        <Formik
-          initialValues={{
-
-          }}
-          enableReinitialize
-          onSubmit={async (values, { setSubmitting }) => {
-            try {
-              if (!fetchedContractInfo) {
-                Swal.fire("⚠️ Warning", "No contract info to submit!", "warning");
-                return;
-              }
-              const rawValue = values.carValuationBySeller.replace(/\s/g, "");
-
-              const payload = {
-                ...fetchedContractInfo,
-                sellerDrivingLicensePath: "",
-                carValuationBySeller: rawValue,
-              };
-
-              const response = await ApiCall({
-                url: "https://localhost:44311/api/services/app/ContractMain/Update",
-                method: "PUT",
-                data: payload,
-              });
-
-              const isSuccess = response?.success === true || response?.status === 200;
-
-              if (isSuccess) {
-                Swal.fire("✅ Success", "Contract submitted successfully!", "success");
-                setActiveStep(5);
-              } else {
-                Swal.fire(
-                  "❌ Error",
-                  response?.error?.details || "Failed to submit contract!",
-                  "error"
-                );
-              }
-            } catch (error) {
-              console.error("❌ Error submitting contract:", error);
-              Swal.fire("❌ Error", "Unexpected server error occurred!", "error");
-            } finally {
-              setSubmitting(false);
-            }
-          }}
-        >
-          {({ handleSubmit, values, isSubmitting, setFieldValue }) => (
-            <Form onSubmit={handleSubmit}>
-              <motion.div
-                key="step5"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 30 }}
-                transition={{ duration: 0.4 }}
-              >
-                <Box>     <Typography
-                  variant="h6"
-                  align="center"
-                  gutterBottom
-                  sx={{ fontWeight: "bold", marginBottom: 3, marginTop: 1 }}
-                >
-                  What Do You Want To Sell the car for?
-                </Typography></Box>
-                {fetchedCarInfo ? (
-                  <Paper
-                    elevation={4}
-                    sx={{ p: 3, mt: 2, borderRadius: 3, border: "1px solid #d7d7d7ff" }}
-                  >
-                    <Typography variant="h6" gutterBottom mb={2} sx={{ fontWeight: "bold" }}>
-                      <strong> {fetchedCarInfo?.name} </strong>
-                    </Typography>
-
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Typography><strong>Registration No:</strong> {fetchedCarInfo?.registrationNo}</Typography>
-                        <Typography><strong>Vehicle:</strong> {fetchedCarInfo?.vehicleDesignation}</Typography>
-                        <Typography><strong>Vehicle Years:</strong> {fetchedCarInfo?.vehicleYears}</Typography>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 6 }}>
-                        <Typography><strong>Number Of Users:</strong> {fetchedCarInfo?.numberOfUsers}</Typography>
-                        <Typography><strong>Waxel barge:</strong> {fetchedCarInfo?.waxelbarge}</Typography>
-                        <Typography><strong>Fuel:</strong> {fetchedCarInfo?.fuel}</Typography>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-                ) : (
-                  <Typography align="center" sx={{ mt: 4, color: "gray" }}>
-                    Fetching Car details...
-                  </Typography>
-                )}
-                <Box display="flex" justifyContent="center" mt={2}>
-                  <TextField
-                    label="Valuation by Seller"
-                    size="small"
-                    value={values.carValuationBySeller}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\s/g, "");
-                      if (!/^\d*$/.test(value)) return;
-
-
-                      const formatted = new Intl.NumberFormat("en-US")
-                        .format(Number(value))
-                        .replace(/,/g, " ");
-
-                      setFieldValue("carValuationBySeller", formatted);
-                    }}
-                    variant="outlined"
-                    sx={{ width: "100%", maxWidth: 200 }}
-                  />
-                  {values.carValuationBySeller && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ m: 1, fontStyle: "italic" }}
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="success"
+                      disabled={!buyerConnected}
                     >
-                      {numberToWords(
-                        parseInt(values.carValuationBySeller.replace(/\s/g, ""))
-                      )}
+                      {isSubmitting ? "Finalizing..." : "Start Sale"}
+                    </Button>
+
+
+                  </Box>
+                </motion.div>
+              </Form>
+            )}
+          </Formik>
+
+        )}
+
+        {/* ------------------ STEP 4 ------------------ */}
+
+
+        {activeStep === 4 && (
+          <Formik
+            initialValues={{
+
+            }}
+            enableReinitialize
+            onSubmit={async (values, { setSubmitting }) => {
+              try {
+                if (!fetchedContractInfo) {
+                  Swal.fire("⚠️ Warning", "No contract info to submit!", "warning");
+                  return;
+                }
+                const rawValue = values.carValuationBySeller.replace(/\s/g, "");
+
+                const payload = {
+                  ...fetchedContractInfo,
+                  sellerDrivingLicensePath: "",
+                  carValuationBySeller: rawValue,
+                };
+
+                const response = await ApiCall({
+                  url: "https://localhost:44311/api/services/app/ContractMain/Update",
+                  method: "PUT",
+                  data: payload,
+                });
+
+                const isSuccess = response?.success === true || response?.status === 200;
+
+                if (isSuccess) {
+                  Swal.fire("✅ Success", "Contract submitted successfully!", "success");
+                  setActiveStep(5);
+                } else {
+                  Swal.fire(
+                    "❌ Error",
+                    response?.error?.details || "Failed to submit contract!",
+                    "error"
+                  );
+                }
+              } catch (error) {
+                console.error("❌ Error submitting contract:", error);
+                Swal.fire("❌ Error", "Unexpected server error occurred!", "error");
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+          >
+            {({ handleSubmit, values, isSubmitting, setFieldValue }) => (
+              <Form onSubmit={handleSubmit}>
+                <motion.div
+                  key="step5"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 30 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Box>     <Typography
+                    variant="h6"
+                    align="center"
+                    gutterBottom
+                    sx={{ fontWeight: "bold", marginBottom: 3, marginTop: 1 }}
+                  >
+                    {t("seller.sellCarForTitle")}
+                  </Typography></Box>
+                  {fetchedCarInfo ? (
+                    <Paper
+                      elevation={4}
+                      sx={{ p: 3, mt: 2, borderRadius: 3, border: "1px solid #d7d7d7ff" }}
+                    >
+                      <Typography variant="h6" gutterBottom mb={2} sx={{ fontWeight: "bold" }}>
+                        <strong> {fetchedCarInfo?.name} </strong>
+                      </Typography>
+
+                      <Grid container spacing={2}>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography>
+                            <strong>{t("seller.registrationNo")}:</strong> {fetchedCarInfo?.registrationNo}
+                          </Typography>
+                          <Typography>
+                            <strong>{t("seller.vehicle")}:</strong> {fetchedCarInfo?.vehicleDesignation}
+                          </Typography>
+                          <Typography>
+                            <strong>{t("seller.vehicleYears")}:</strong> {fetchedCarInfo?.vehicleYears}
+                          </Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography>
+                            <strong>{t("seller.numberOfUsers")}:</strong> {fetchedCarInfo?.numberOfUsers}
+                          </Typography>
+                          <Typography>
+                            <strong>{t("seller.axleWeight")}:</strong> {fetchedCarInfo?.waxelbarge}
+                          </Typography>
+                          <Typography>
+                            <strong>{t("seller.fuel")}:</strong> {fetchedCarInfo?.fuel}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+
+                    </Paper>
+                  ) : (
+                    <Typography align="center" sx={{ mt: 4, color: "gray" }}>
+                      {t("seller.fetchingCarDetails")}
                     </Typography>
                   )}
-                </Box>
+                  <Box display="flex" justifyContent="center" mt={2}>
+                    <TextField
+                      label="Valuation by Seller"
+                      size="small"
+                      value={values.carValuationBySeller}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\s/g, "");
+                        if (!/^\d*$/.test(value)) return;
 
-                <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting || !values.carValuationBySeller}
-                    sx={{
-                      backgroundColor: "#ff9f43",    
-                      color: "#fff",                
-                      "&:hover": {
-                        backgroundColor: "#e78c35",  
-                      }
-                    }}
-                  >
-                    {isSubmitting ? "Submitting..." : "Submit"}
-                  </Button>
-                </Box>
 
-              </motion.div>
-            </Form>
-          )}
-        </Formik>
-      )}
+                        const formatted = new Intl.NumberFormat("en-US")
+                          .format(Number(value))
+                          .replace(/,/g, " ");
 
-      {activeStep === 5 && (
-        <  Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            margin: "40px auto",
+                        setFieldValue("carValuationBySeller", formatted);
+                      }}
+                      variant="outlined"
+                      sx={{ width: "100%", maxWidth: 200 }}
+                    />
+                    {values.carValuationBySeller && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ m: 1, fontStyle: "italic" }}
+                      >
+                        {numberToWords(
+                          parseInt(values.carValuationBySeller.replace(/\s/g, ""))
+                        )}
+                      </Typography>
+                    )}
+                  </Box>
 
-          }}
-        >
+                  <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={isSubmitting || !values.carValuationBySeller}
+                      sx={{
+                        backgroundColor: "#ff9f43",
+                        color: "#fff",
+                        "&:hover": {
+                          backgroundColor: "#e78c35",
+                        }
+                      }}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit"}
+                    </Button>
+                  </Box>
 
-          <Typography
-            variant="h6"
-            sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}
+                </motion.div>
+              </Form>
+            )}
+          </Formik>
+        )}
+
+        {activeStep === 5 && (
+          <  Paper
+            elevation={3}
+            sx={{
+              p: 4,
+              margin: "40px auto",
+
+            }}
           >
-            Vehicle Information
-          </Typography>
 
-          {!finalContract ? (
-            <Typography>Loading vehicle information...</Typography>
-          ) : (
+            <Typography
+              variant="h6"
+              sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}
+            >
+              {t("seller.vehicleInformation")}
+            </Typography>
+
+            {!finalContract ? (
+              <Typography>Loading vehicle information...</Typography>
+            ) : (
+              <Box
+                sx={{
+                  border: "1px solid #ccc",
+                  boxShadow: 3,
+                  borderRadius: 2,
+                  p: 2,
+                }}
+              >
+                <DataRow
+                  label={t("seller.car.steps.registrationNo")}
+                  value={finalContract.carInfoRegistrationNo || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.vehicleDesignation")}
+                  value={finalContract.carInfoVehicleDesignation || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.tradeName")}
+                  value={finalContract.carInfoTradeName || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.yearModel")}
+                  value={finalContract.carInfoYearModel || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.vehicleYears")}
+                  value={finalContract.carInfoVehicleYears || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.registrationDate")}
+                  value={finalContract.carInfoRegistrationDate || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.numberOfUsers")}
+                  value={finalContract.carInfoNumberOfUsers || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.axleWeight")}
+                  value={finalContract.carInfoWaxelbarge || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.fourWheelDrive")}
+                  value={
+                    finalContract.carInfoFourWheelDrive?.toString().toLowerCase() === "true"
+                      ? t("seller.car.steps.yes")
+                      : t("seller.car.steps.no")
+                  }
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.fuel")}
+                  value={finalContract.carInfoFuel || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.evConfig")}
+                  value={finalContract.carInfoElectricVehicleConfiguration || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.inspectionDate")}
+                  value={finalContract.carInfoInspectionDate || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.prevInspectionDate")}
+                  value={finalContract.carInfoPreviousInspectionDate || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.inspectionStation")}
+                  value={finalContract.carInfoInspectionStation || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.inspectionGroup")}
+                  value={finalContract.carInfoInspectionGroup || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.feedingStall")}
+                  value={finalContract.carInfoFeedingStall || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.tax")}
+                  value={finalContract.carInfoTax || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.malus")}
+                  value={finalContract.carInfoMalus || "-"}
+                />
+
+                <DataRow
+                  label={t("seller.car.steps.valuation")}
+                  value={
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {finalContract.carValuationBySeller || "-"}
+                      <FaEdit
+                        onClick={() => createRef.current.click()}
+                        style={{
+                          cursor: "pointer",
+                          fontSize: "20px",
+                          color: "#ff9f63",
+                          marginLeft: 8,
+                        }}
+                        title="Edit"
+                      />
+                    </Typography>
+                  }
+                />
+              </Box>
+
+            )}
+
+
+
+
+
             <Box
               sx={{
                 border: "1px solid #ccc",
                 boxShadow: 3,
                 borderRadius: 2,
                 p: 2,
+                mt: 2,
               }}
             >
-              <DataRow label="Registration No" value={finalContract.carInfoRegistrationNo || "-"} />
-              <DataRow label="Vehicle Designation" value={finalContract.carInfoVehicleDesignation || "-"} />
-              <DataRow label="Trade Name" value={finalContract.carInfoTradeName || "-"} />
-              <DataRow label="Year Model" value={finalContract.carInfoYearModel || "-"} />
-              <DataRow label="Vehicle Years" value={finalContract.carInfoVehicleYears || "-"} />
-              <DataRow label="Registration Date" value={finalContract.carInfoRegistrationDate || "-"} />
-              <DataRow label="Number of Users" value={finalContract.carInfoNumberOfUsers || "-"} />
-              <DataRow label="Waxelbarge" value={finalContract.carInfoWaxelbarge || "-"} />
-              <DataRow
-                label="4-Wheel Drive"
-                value={
-                  finalContract.carInfoFourWheelDrive?.toString().toLowerCase() === "true"
-                    ? "Yes"
-                    : "No"
-                }
-              />
-              <DataRow label="Fuel" value={finalContract.carInfoFuel || "-"} />
-              <DataRow label="EV Config" value={finalContract.carInfoElectricVehicleConfiguration || "-"} />
-              <DataRow label="Inspection Date" value={finalContract.carInfoInspectionDate || "-"} />
-              <DataRow
-                label="Prev Inspection Date"
-                value={finalContract.carInfoPreviousInspectionDate || "-"}
-              />
-              <DataRow
-                label="Inspection Station"
-                value={finalContract.carInfoInspectionStation || "-"}
-              />
-              <DataRow
-                label="Inspection Group"
-                value={finalContract.carInfoInspectionGroup || "-"}
-              />
-              <DataRow
-                label="Feeding Stall"
-                value={finalContract.carInfoFeedingStall || "-"}
-              />
-              <DataRow label="Tax" value={finalContract.carInfoTax || "-"} />
-              <DataRow label="Malus" value={finalContract.carInfoMalus || "-"} />
-              <DataRow
-                label="Valuation"
-                value={
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    {finalContract.carValuationBySeller || "-"}
-                    <FaEdit
-                      onClick={() => createRef.current.click()}
-                      style={{
-                        cursor: "pointer",
-                        fontSize: "20px",
-                        color: "blue",
-                      }}
-                      title="Edit"
-                    />
-                  </Typography>
-                }
-              />
-
-            </Box>
-          )}
-
-
-
-
-
-          <Box sx={{
-            border: '1px solid #ccc',
-            boxShadow: 3,
-            borderRadius: 2,
-            p: 2,
-            mt: 2
-          }}>
-            <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AirportShuttleIcon />
-              Delivery and risk
-            </Typography>
-            <Box
-              sx={{
-                backgroundColor: '#f1efefff',
-                borderRadius: 3,
-                p: 2,
-                mt: 1
-              }}
-            >
-              <Typography variant="body3" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <ReportGmailerrorredIcon sx={{ fontSize: 16 }} />
-                The risk passes to the buyer when the vehicle is taken into possession.
-                <br />
-                This means that the buyer is responsible for the vehicle from the time of handover.
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <AirportShuttleIcon />
+                {t("seller.deliveryRisk.title")}
               </Typography>
 
+              <Box
+                sx={{
+                  backgroundColor: "#f1efefff",
+                  borderRadius: 3,
+                  p: 2,
+                  mt: 1,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ display: "flex", alignItems: "flex-start", gap: 0.5 }}
+                >
+                  <ReportGmailerrorredIcon sx={{ fontSize: 16, mt: "2px" }} />
+                  {t("seller.deliveryRisk.description")}
+                </Typography>
+              </Box>
             </Box>
 
 
-          </Box>
+
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                boxShadow: 3,
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <AirportShuttleIcon />
+                {t("seller.conditionDefects.title")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.conditionDefects.line1")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
+                {t("seller.conditionDefects.line2")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
+                {t("seller.conditionDefects.line3")}
+              </Typography>
+            </Box>
 
 
-          <Box sx={{
-            border: '1px solid #ccc',
-            boxShadow: 3,
-            borderRadius: 2,
-            p: 2,
-            mt: 2
-          }}>
-            <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AirportShuttleIcon />
-              Condition and defects
-            </Typography>
-
-            <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-              The vehicle is sold in its existing condition.
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
-              Defects can also be claimed in its existing condition if the seller has provided incorrect information, omitted essential information, or if the vehicle is significantly worse than could reasonably be expected.
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
-              Meddela fel utan onödigt dröjsmål och senast inom två år från leverans.
-            </Typography>
-          </Box>
 
 
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                boxShadow: 3,
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <AccountBalanceIcon />
+                {t("seller.debts.title")}
+              </Typography>
 
-        </Paper>
-      )}
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.debts.subtitle")}
+              </Typography>
+
+              <FormGroup sx={{ mt: 1, gap: 0.5 }}>
+                <FormControlLabel
+                  value="none"
+                  disabled
+                  control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} />}
+                  label={<Typography variant="body2" color="text.secondary">{t("seller.debts.options.none")}</Typography>}
+                />
+
+                <FormControlLabel
+                  value="seller"
+                  control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} />}
+                  label={<Typography variant="body2" color="text.secondary">{t("seller.debts.options.seller")}</Typography>}
+                />
+
+                <FormControlLabel
+                  value="buyer"
+                  disabled
+                  control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} />}
+                  label={<Typography variant="body2" color="text.secondary">{t("seller.debts.options.buyer")}</Typography>}
+                />
+              </FormGroup>
+            </Box>
+
+
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                boxShadow: 3,
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <HomeWorkIcon />
+                {t("seller.loan.title")}
+              </Typography>
+
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 1,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "grey.100",
+                  color: "text.secondary",
+                  border: "1px solid",
+                  borderColor: "grey.300",
+                }}
+              >
+                {t("seller.loan.description")}
+              </Typography>
+
+              <RadioGroup
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                sx={{ mt: 1 }}
+              >
+                <FormControlLabel
+                  value="none"
+                  control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 14 } }} />}
+                  label={<Typography variant="body1">{t("seller.loan.options.none")}</Typography>}
+                />
+
+                <FormGroup sx={{ gap: 0.5 }}>
+                  <FormControlLabel
+                    value="seller"
+                    control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 16 } }} />}
+                    label={<Typography variant="body2" color="text.secondary">{t("seller.loan.options.seller")}</Typography>}
+                  />
+                  <FormControlLabel
+                    value="buyer"
+                    control={<Radio sx={{ "& .MuiSvgIcon-root": { fontSize: 16 } }} />}
+                    label={<Typography variant="body2" color="text.secondary">{t("seller.loan.options.buyer")}</Typography>}
+                  />
+                </FormGroup>
+              </RadioGroup>
+            </Box>
+
+
+
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                boxShadow: 3,
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <DescriptionIcon />
+                {t("seller.ownership.title")}
+              </Typography>
+
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 1,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "grey.100",
+                  color: "text.secondary",
+                }}
+              >
+                {t("seller.ownership.description1")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.ownership.description2")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.ownership.description3")}
+              </Typography>
+            </Box>
+
+
+            <Box
+              sx={{
+                border: "1px solid #ccc",
+                boxShadow: 3,
+                borderRadius: 2,
+                p: 2,
+                mt: 2,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <DirectionsCarFilledIcon />
+                {t("seller.transportAgency.title")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.transportAgency.description1")}
+              </Typography>
+
+              <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+                {t("seller.transportAgency.description2")}
+              </Typography>
+            </Box>
+
+
+
+
+          </Paper>
+        )}
 
 
 
 
 
 
-      <UpadteValuation open={createRef} close={refClose} contractId={contractId} carvaluation={finalContractvaluation}  carId={carId}  onUpdated={() => setRefreshFinalContract(prev => !prev)} />
-    </Paper>
+        <UpadteValuation open={createRef} close={refClose} contractId={contractId} carvaluation={finalContractvaluation} carId={carId} onUpdated={() => setRefreshFinalContract(prev => !prev)} />
+      </Paper>
+    </Container>
   );
 }
 
@@ -1697,33 +1662,3 @@ const DataRow = ({ label, value }) => (
 );
 
 
-{/* <Box sx={{
-            border: '1px solid #ccc',
-            boxShadow: 3,
-            borderRadius: 2,
-            p: 2,
-            mt: 2
-          }}>
-            <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FaMoneyBillWave />
-              Price and Payment
-            </Typography>
-            <Typography variant="body1" sx={{ fontWeight: 'bold', mt: 1 }}>
-              {finalContractvaluation}
-            </Typography>
-            <Box
-              sx={{
-                backgroundColor: '#f1efefff',
-                borderRadius: 10,
-                p: 1,
-                mt: 1
-              }}
-            >
-              <Typography variant="body3" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <ReportGmailerrorredIcon sx={{ fontSize: 16 }} />
-                Delivery will only take place when full payment is confirmed in the app.
-              </Typography>
-            </Box>
-
-
-          </Box> */}

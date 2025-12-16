@@ -74,7 +74,7 @@ const handleSubmit = async (values) => {
 
 
    if (redirect) {
-    return <Navigate to='/dashboard/v3' />;
+    return <Navigate to='/dashboard' />;
   }
 
   return (

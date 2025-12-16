@@ -1,20 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import {   Navigate, useNavigate } from 'react-router-dom';
 import { AppSettings } from './../../config/app-settings.js';
-import CloudUploadIcon from "@mui/icons-material/CloudUpload"
-import logo from "../../../src/assets/logoBankIdwhite.png";
+ import logo from "../../../src/assets/logoBankIdwhite.png";
 import Swal from "sweetalert2";
 import {
   Box,
   Button,
   Typography,
-  Stepper,
-  Step,
-  StepLabel,
+ 
   TextField,
   Paper,
   Divider,
-  InputAdornment,
+  
   FormControlLabel,
   Checkbox,
   Container,
@@ -24,12 +21,10 @@ import {
 import { useAuth } from "../../context/AuthContext.js";
 import { Formik, Form } from "formik";
 import Grid from "@mui/material/Grid";
-import myImage2 from "./c3.jpg";
-import ApiCall from '../../Apicall/ApiCall.js';
 import axios from 'axios';
 import * as Yup from "yup";
 
-const steps = ["Verify with BankID", "Complete Account Details"];
+ 
 
 
 function RegisterV3() {
@@ -43,27 +38,18 @@ function RegisterV3() {
 
   const [redirect, setRedirect] = useState(false);
 
-  useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass('p-0');
+ useEffect(() => {
+  context.setAppHeaderNone(true);   
 
-    return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass('');
-    };
-    // eslint-disable-next-line
-  }, []);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    setRedirect(true);
+  return () => {
+    context.setAppHeaderNone(false);  
   };
+}, []);
+
+  
 
   if (redirect) {
-    return <Navigate to='/dashboard/v3' />;
+    return <Navigate to='/dashboard' />;
   }
   const validationSchema = Yup.object({
     emailAddress: Yup.string()

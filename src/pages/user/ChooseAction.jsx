@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useUser } from "../../context/UserContext.js";
 import {
   Box,
@@ -10,14 +11,17 @@ import {
   Grid,
   Container,
   CircularProgress,
+  Paper,
 } from "@mui/material";
+
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Formik, Form } from "formik";
 import { AppSettings } from "./../../config/app-settings.js";
 import ApiCall from "../../Apicall/ApiCall.js";
 import Swal from "sweetalert2";
-import LoadingSpinner from "../../Compo/spinner.jsx"; 
+import LoadingSpinner from "../../Compo/spinner.jsx";
 const ChooseAction = () => {
+  const { t } = useTranslation(); 
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const context = useContext(AppSettings);
@@ -40,33 +44,23 @@ const ChooseAction = () => {
     fetchUserId();
   }, []);
 
-  useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass("p-0");
+  //  useEffect(() => {
+  //   context.setAppHeaderNone(true);   
 
-    return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("");
-    };
+  //   return () => {
+  //     context.setAppHeaderNone(false);  
+  //   };
+  // }, []);
 
-  }, []);
   const { refreshUserInfo } = useUser();
   return (
     <Container
-      maxWidth="sm"
+      maxWidth="md"
       sx={{
         textAlign: "center",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        marginTop: 3,
       }}
     >
-            {loading ? (
-              <LoadingSpinner />   
-            ) : (
       <Formik
         enableReinitialize
         initialValues={{
@@ -81,183 +75,77 @@ const ChooseAction = () => {
           carInfoId: null,
           carValuationBySeller: 0
         }}
-        // onSubmit={async (values) => {
-        //   setLoading(true);
-        //   try {
-        //     const response = await ApiCall({
-        //       url: "https://localhost:44311/api/services/app/ContractMain/Create",
-        //       method: "POST",
-        //       data: values,
-        //     });
+        onSubmit={async (values) => {
+          setLoading(true);
+          try {
+            const response = await ApiCall({
+              url: "https://localhost:44311/api/services/app/ContractMain/Create",
+              method: "POST",
+              data: values,
+            });
 
-        //     const id = response.data?.result?.id;
-        //     if (id) {
-        //       localStorage.setItem("currentContractID", id);
-        //     }
+            if (response && response.status === 200) {
+              const id = response.data?.result?.id;
+              if (id) localStorage.setItem("currentContractID", id);
 
-        //     if (values.sellerDealStatus === "Seller") {
+              refreshUserInfo();
 
-
-        //       setTimeout(() => {
-        //         refreshUserInfo();
-        //         navigate("/SellerProfile");
-        //       }, 200);
-        //     } else if (values.sellerDealStatus === "Buyer") {
-        //       setTimeout(() => {
-        //         refreshUserInfo();
-        //         navigate("/");
-        //       }, 200);
-        //     }
-        //   } catch (error) {
-        //     console.error("API Error:", error);
-        //   } finally {
-        //     setLoading(false);
-        //   }
-        // }}
-onSubmit={async (values) => {
-  setLoading(true);
- 
-
-  try {
-    const response = await ApiCall({
-      url: "https://localhost:44311/api/services/app/ContractMain/Create",
-      method: "POST",
-      data: values,
-    });
-
-    // ApiCall returns response for success, or error data for failure
-    if (response && response.status === 200) {
-      // Successful response, navigate accordingly
-      const id = response.data?.result?.id;
-      if (id) localStorage.setItem("currentContractID", id);
-
-      refreshUserInfo();
-
-      if (values.sellerDealStatus === "Seller") {
-        navigate("/SellerProfile");
-      } else if (values.sellerDealStatus === "Buyer") {
-        navigate("/");
-      }
-    } else {
-      // Backend returned an error
-      const backendMessage =
-        response?.error?.message ||
-        response?.message ||
-        "Something went wrong!";
-      Swal.fire("Error", backendMessage, "error");
-    }
-  } catch (error) {
-    // Unexpected error (network, code issues, etc.)
-    const message = error?.message || "Something went wrong!";
-    Swal.fire("Error", message, "error");
-  } finally {
-    setLoading(false);
- 
-  }
-}}
-
-
-
-
+              if (values.sellerDealStatus === "Seller") {
+                navigate("/SellerProfile");
+              } else if (values.sellerDealStatus === "Buyer") {
+                navigate("/BuyerProfile");
+              }
+            } else {
+              const backendMessage =
+                response?.error?.message || response?.message || "Something went wrong!";
+              Swal.fire("Error", backendMessage, "error");
+            }
+          } catch (error) {
+            const message = error?.message || "Something went wrong!";
+            Swal.fire("Error", message, "error");
+          } finally {
+            setLoading(false);
+          }
+        }}
       >
         {({ values, setFieldValue, submitForm }) => (
           <Form>
- 
-            <Box>
+            <Paper
+              elevation={1}
+              sx={{
+                px: { xs: 2, md: 15 },
+                py: { xs: 5, md: 5 },
+                borderRadius: "12px",
+                transition: "0.4s ease",             
+                filter: loading ? "blur(8px)" : "none",    
+                pointerEvents: loading ? "none" : "auto", 
+                opacity: loading ? 0.5 : 1,
+              }}
+            >
               <Typography variant="h5" fontWeight="bold" mb={1}>
-                What do you want to do today?
+                 {t("chooseAction.title")}
               </Typography>
 
               <Typography variant="body1" color="text.secondary" mb={4}>
-                Buy and sell vehicles safely!
+                 {t("chooseAction.subtitle")}
               </Typography>
 
               <Grid container spacing={2}>
-                {/* SELLER CARD */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-            
+
+                <Grid size={{ xs: 6, sm: 6 }}>
                   <Card
                     onClick={() => {
                       setFieldValue("sellerDealStatus", "Seller");
-                   
                       submitForm();
                     }}
                     sx={{
                       borderRadius: 3,
                       textAlign: "center",
-                      p: 2,
+                      p: 1,
                       boxShadow: 3,
                       cursor: "pointer",
-
                       border: "2px solid transparent",
                       transition: "0.3s",
-
-                      "&:hover": {
-                        transform: "translateY(-6px)",
-                        borderColor: "#ff9f43",
-
-                        boxShadow:
-                          "0px 8px 22px rgba(255, 159, 67, 0.4)", 
-
-                      },
-                    }}
-                  >
-                    <CardContent>
-                      <Box
-                        sx={{
-                          backgroundColor: "#fcebdaff",
-                          width: 60,
-                          height: 60,
-                          borderRadius: "50%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          mx: "auto",
-                          mb: 2,
-                        }}
-                      >
-                        <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
-                      </Box>
-
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        I want to sell
-                      </Typography>
-
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 2, mb: 2 }}
-                      >
-                        Create a sale, set price and terms, and get a code for the buyer.
-                      </Typography>
-
-   
-                    </CardContent>
-                  </Card>
-
-
-
-                </Grid>
-
-                {/* BUYER CARD */}
-                <Grid size={{ xs: 12, sm: 6 }}>
-  
-                  <Card
-                    onClick={() => {
-                      setFieldValue("sellerDealStatus", "Buyer");
-                     
-                      submitForm();
-                    }}
-                    sx={{
-                      borderRadius: 3,
-                      textAlign: "center",
-                      p: 2,
-                      boxShadow: 3,
-                      cursor: "pointer",
-
-                      border: "2px solid transparent",
-                      transition: "0.3s",
-
                       "&:hover": {
                         transform: "translateY(-6px)",
                         borderColor: "#ff9f43",
@@ -281,38 +169,78 @@ onSubmit={async (values) => {
                       >
                         <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
                       </Box>
-
                       <Typography variant="subtitle1" fontWeight="bold">
-                        I want to buy
+                       {t("chooseAction.sellCardTitle")}
                       </Typography>
-
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ mt: 2, mb: 2 }}
+                        sx={{ mt: 1, mb: 2 }}
                       >
-                        Enter registration number or scan the seller’s QR code to continue.
+                      {t("chooseAction.sellCardDesc")}
                       </Typography>
-  
-                      
                     </CardContent>
                   </Card>
-
-
                 </Grid>
+
+
+               <Grid size={{ xs: 6, sm: 6 }}>
+  <Card
+    onClick={() => {
+      navigate("/BuyerProfile");  
+    }}
+    sx={{
+      borderRadius: 3,
+      textAlign: "center",
+      p:1,
+      boxShadow: 3,
+      cursor: "pointer",
+      border: "2px solid transparent",
+      transition: "0.3s",
+      "&:hover": {
+        transform: "translateY(-6px)",
+        borderColor: "#ff9f43",
+        boxShadow: "0px 8px 22px rgba(255, 159, 67, 0.4)",
+      },
+    }}
+  >
+    <CardContent sx={{ p: 1 }}>
+      <Box
+        sx={{
+          backgroundColor: "#fcebdaff",
+          width: 60,
+          height: 60,
+          borderRadius: "50%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          mx: "auto",
+          mb: 2,
+        }}
+      >
+        <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
+      </Box>
+      <Typography variant="subtitle1" fontWeight="bold">
+        {t("chooseAction.buyCardTitle")}
+      </Typography>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ mt: 2, mb: 2 }}
+      >
+      {t("chooseAction.buyCardDesc")}
+      </Typography>
+    </CardContent>
+  </Card>
+</Grid>
+
               </Grid>
-            </Box>
+            </Paper>
           </Form>
         )}
       </Formik>
-
-    //                                  {loading && (
-    //   <Box sx={{ mt: 2, textAlign: "center" }}>
-    //     <CircularProgress size={24}  sx={{ color: "#ff9f43" }} />
-    //   </Box>
-    // )}
-      )}
     </Container>
+
   );
 };
 

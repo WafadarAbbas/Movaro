@@ -1,7 +1,7 @@
  
 .card-stack {
   position: relative;
-  width: 320px;
+  width: 280px;
   height: 320px;
   margin: 0 auto;
   /* perspective: 1000px; */
@@ -16,7 +16,7 @@
   height: clamp(280px, 70vw, 420px);  
   border-radius: 20px;
   padding: 1.5rem;
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.33);
   top: 0;
   left: 35%;
   transform: translateX(-50%);
@@ -31,22 +31,22 @@
 
  
 .card1 {
-  transform: translateX(-160px) rotate(-8deg) translateY(-5px);
+  transform: translateX(-85px) rotate(-8deg) translateY(-20px);
   z-index: 1;
   background: #ffffff;
 }
 .card2 {
-  transform: translateX(-35px) rotate(0deg) translateY(20px);
+  transform: translateX(-20px) rotate(0deg) translateY(20px);
   z-index: 3;
    background: #ffffff;
 }
 .card3 {
-  transform: translateX(100px) rotate(4deg) translateY(50px);
+  transform: translateX(120px) rotate(4deg) translateY(50px);
   z-index: 2;
   background: #ffffff;
 }
 .card4 {
-  transform: translateX(130px) rotate(10deg) translateY(-15px);
+  transform: translateX(150px) rotate(10deg) translateY(-40px);
   z-index: 1;
  background: #ffffff;
 }

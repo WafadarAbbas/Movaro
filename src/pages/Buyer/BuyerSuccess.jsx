@@ -10,6 +10,7 @@ import {
   Box,
   Typography,
   Button, Paper, Container, Grid
+  , RadioGroup, FormControlLabel, Radio
 } from "@mui/material";
 import { FaCar, FaMotorcycle, FaShip, FaTrailer, FaTruck, } from "react-icons/fa";
 import { MdElectricScooter } from "react-icons/md";
@@ -18,11 +19,21 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import GavelIcon from "@mui/icons-material/Gavel";
+import DescriptionIcon from "@mui/icons-material/Description";
+import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
+import HomeWorkIcon from "@mui/icons-material/HomeWork";
+import FormGroup from '@mui/material/FormGroup';
+import FormHelperText from '@mui/material/FormHelperText';
+import FormControl from '@mui/material/FormControl';
+import BuyerHeader from "./BuyerHeader.js";
+import { useTranslation } from "react-i18next";
 
 export default function BuyerSuccess() {
+  const { t, i18n } = useTranslation();
   const context = useContext(AppSettings);
-
+  const [value, setValue] = useState("");
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -33,19 +44,25 @@ export default function BuyerSuccess() {
   const [vehicleInfo, setVehicleInfo] = useState(null);
   const [contracId, setContractId] = useState(null);
   const [oldValuation, setOldValuation] = useState(null);
+
   const steps = ["Connect Deal", "Valuation", "Contract"];
 
+  useEffect(() => {
+    context.setAppHeaderNone(true);
 
+    return () => {
+      context.setAppHeaderNone(false);
+    };
+  }, []);
 
   useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass("p-0");
+    context.setAppHeaderNone(true);
+
 
     const fetchContract = async () => {
       try {
         const res = await ApiCall({
-          url: "https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=2272",
+          url: "https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=3295",
           method: "GET",
         });
 
@@ -61,9 +78,7 @@ export default function BuyerSuccess() {
     fetchContract();
 
     return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("");
+      context.setAppHeaderNone(false);
     };
   }, [context]);
 
@@ -216,150 +231,249 @@ export default function BuyerSuccess() {
   //   }
   // }, [activeStep, contractData?.id, valuationToastShown]);
 
-useEffect(() => {
-  if (activeStep === 1 && contractData?.id) {
-    let interval;
+  useEffect(() => {
+    if (activeStep === 1 && contractData?.id) {
+      let interval;
 
-    const checkValuation = async () => {
+      const checkValuation = async () => {
+        try {
+          const res = await ApiCall({
+            url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
+            method: "GET",
+          });
+
+          const latestData = res?.result || res?.data?.result;
+          setContractData(latestData);
+          setContractId(latestData.id);
+
+          const valuation = latestData.carValuationBySeller;
+
+          // ---- IF VALUATION NOT YET ADDED ----
+          if (!valuation || valuation === 0) {
+            setSellerValuation(null);
+          }
+
+          // ---- IF VALUATION IS FINALLY ADDED ----
+          else {
+            setSellerValuation(valuation);
+
+            // Show toast only once
+            if (!valuationToastShown) {
+              toast.success("💰 Seller has added car valuation!", {
+                position: "top-right",
+              });
+              setValuationToastShown(true);
+            }
+
+            // 🔥 STOP API CALLS WHEN VALUATION ARRIVES
+            if (interval) clearInterval(interval);
+          }
+        } catch (err) {
+          console.error("Error fetching latest contract:", err);
+        }
+      };
+
+      // First call
+      checkValuation();
+
+      // Start polling
+      interval = setInterval(checkValuation, 10000);
+
+      return () => clearInterval(interval);
+    }
+  }, [activeStep, contractData?.id, valuationToastShown]);
+
+
+
+  useEffect(() => {
+    if (activeStep !== 2 || !contracId) return;
+
+    const fetchVehicleInfo = async () => {
       try {
         const res = await ApiCall({
-          url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
+          url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
           method: "GET",
         });
 
-        const latestData = res?.result || res?.data?.result;
-        setContractData(latestData);
-        setContractId(latestData.id);
+        const latest = res?.result || res?.data?.result;
 
-        const valuation = latestData.carValuationBySeller;
 
-        // ---- IF VALUATION NOT YET ADDED ----
-        if (!valuation || valuation === 0) {
-          setSellerValuation(null);
+        const newValuation = latest?.carValuationBySeller;
+
+        if (oldValuation !== null && newValuation !== oldValuation) {
+          Swal.fire({
+            icon: "info",
+            title: "Valuation Updated",
+            text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
+          });
         }
 
-        // ---- IF VALUATION IS FINALLY ADDED ----
-        else {
-          setSellerValuation(valuation);
 
-          // Show toast only once
-          if (!valuationToastShown) {
-            toast.success("💰 Seller has added car valuation!", {
-              position: "top-right",
-            });
-            setValuationToastShown(true);
-          }
+        setOldValuation(newValuation);
 
-          // 🔥 STOP API CALLS WHEN VALUATION ARRIVES
-          if (interval) clearInterval(interval);
-        }
+
+        setVehicleInfo(latest);
+
       } catch (err) {
-        console.error("Error fetching latest contract:", err);
+        console.error("Error fetching vehicle info:", err);
       }
     };
 
-    // First call
-    checkValuation();
 
-    // Start polling
-    interval = setInterval(checkValuation, 10000);
-
-    return () => clearInterval(interval);
-  }
-}, [activeStep, contractData?.id, valuationToastShown]);
+    fetchVehicleInfo();
 
 
+    const intervalId = setInterval(fetchVehicleInfo, 10000);
 
-useEffect(() => {
-  if (activeStep !== 2 || !contracId) return;
+    return () => clearInterval(intervalId);
 
-  const fetchVehicleInfo = async () => {
-    try {
-      const res = await ApiCall({
-        url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
-        method: "GET",
-      });
-
-      const latest = res?.result || res?.data?.result;
-
-     
-      const newValuation = latest?.carValuationBySeller;
-
-      if (oldValuation !== null && newValuation !== oldValuation) {
-        Swal.fire({
-          icon: "info",
-          title: "Valuation Updated",
-          text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
-        });
-      }
-
- 
-      setOldValuation(newValuation);
-
-      
-      setVehicleInfo(latest);
-
-    } catch (err) {
-      console.error("Error fetching vehicle info:", err);
-    }
-  };
-
-   
-  fetchVehicleInfo();
-
- 
-  const intervalId = setInterval(fetchVehicleInfo, 30000);
-
-  return () => clearInterval(intervalId);
-
-}, [activeStep, contracId, oldValuation]);
+  }, [activeStep, contracId, oldValuation]);
 
 
 
 
 
   return (
-    <Box sx={{ width: "100%", p: 3 }}>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {steps.map((label, index) => (
-          <Step key={index}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <>
 
-      <Box sx={{ mt: 4 }}>
-        {activeStep === 0 && (
-          <Container maxWidth="md">
-            {loading ? (
-              <Typography>Loading contract...</Typography>
-            ) : contractData ? (
-              <Paper
-                elevation={3}
-                sx={{
-                  p: 4,
-                  textAlign: "center",
-                  borderRadius: 3,
-                }}
-              >
+      <BuyerHeader />
 
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-                  Connect with Seller
-                </Typography>
+      <Container>
+        <Paper sx={{ p: 1, mt: 1 }}>
 
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ mt: 1 }}>
+            {steps.map((label, index) => (
+              <Step key={index}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
+          <Box sx={{ mt: 4 }}>
+            {activeStep === 0 && (
+              <Container maxWidth="md">
+                {loading ? (
+                  <Typography>{t("buyerauth.step0.loading")}</Typography>
+                ) : contractData ? (
+                  <Paper elevation={3} sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
+
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+                      {t("buyerauth.step0.title")}
+                    </Typography>
+
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 3,
+                        borderRadius: 3,
+                        border: "1px solid #e0e0e0",
+                        textAlign: "left",
+                        mt: 3,
+                      }}
+                    >
+                      <Box sx={{ mb: 2, textAlign: "center", fontSize: "60px" }}>
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("car") && <FaCar />}
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("motorcycle") && <FaMotorcycle />}
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("truck") && <FaTruck />}
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("boat") && <FaShip />}
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("camper") && <FaTrailer />}
+                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("moped") && <MdElectricScooter />}
+                      </Box>
+
+                      <Grid container spacing={2}>
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.vehicleType")}</Typography>
+                          <Typography>{contractData.vahicleTypeOptionName || t("buyer.step0.na")}</Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.name")}</Typography>
+                          <Typography>{contractData.carInfoVehicleDesignation || t("buyerauth.step0.na")}</Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.registrationNo")}</Typography>
+                          <Typography>{contractData.carInfoRegistrationNo || t("buyerauth.step0.na")}</Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.firstInspectionDate")}</Typography>
+                          <Typography>
+                            {contractData.carInfoInspectionDate
+                              ? contractData.carInfoInspectionDate.split("T")[0]
+                              : t("buyerauth.step0.na")}
+                          </Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.registrationDate")}</Typography>
+                          <Typography>
+                            {contractData.carInfoRegistrationDate
+                              ? contractData.carInfoRegistrationDate.split("T")[0]
+                              : t("buyerauth.step0.na")}
+                          </Typography>
+                        </Grid>
+
+                        <Grid size={{ xs: 6 }}>
+                          <Typography fontWeight="bold">{t("buyerauth.step0.contractId")}</Typography>
+                          <Typography>{contractData.id || t("buyerauth.step0.na")}</Typography>
+                        </Grid>
+                      </Grid>
+                    </Paper>
+
+                    <Box sx={{ mt: 3 }}>
+                      <Button
+                        variant="contained"
+                        disabled={submitting || updated}
+                        onClick={handleBuyerSuccess}
+                        sx={{
+                          animation: !submitting && !updated ? "pulse 1.5s infinite" : "none",
+                          "@keyframes pulse": {
+                            "0%": { transform: "scale(1)", boxShadow: "0 0 0 0 rgba(0,123,255,0.7)" },
+                            "70%": { transform: "scale(1.15)", boxShadow: "0 0 0 10px rgba(0,123,255,0)" },
+                            "100%": { transform: "scale(1)", boxShadow: "0 0 0 0 rgba(0,123,255,0)" },
+                          },
+                        }}
+                      >
+                        {submitting
+                          ? t("buyerauth.step0.updating")
+                          : updated
+                            ? t("buyerauth.step0.connected")
+                            : t("buyerauth.step0.connect")}
+                      </Button>
+                    </Box>
+
+                    <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        disabled={!updated}
+                        onClick={() => setActiveStep(1)}
+                      >
+                        {t("buyerauth.step0.next")}
+                      </Button>
+                    </Box>
+                  </Paper>
+                ) : (
+                  <Typography>{t("buyerauth.step0.noData")}</Typography>
+                )}
+              </Container>
+            )}
+
+            {activeStep === 1 && (
+              <Container maxWidth="md">
                 <Paper
-                  elevation={0}
+                  elevation={3}
                   sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: "1px solid #e0e0e0",
-                    textAlign: "left",
-                    mt: 3,
+                    p: 4,
+
+
+                    textAlign: "center",
                   }}
                 >
-
-                  <Box sx={{ mb: 2, textAlign: "center", fontSize: "60px" }}>
+                  {/* Vehicle Icon (Same logic as step 0) */}
+                  <Box sx={{ mb: 3, fontSize: "48px", color: "#00d4c4" }}>
                     {contractData?.vahicleTypeOptionName?.toLowerCase().includes("car") && (
                       <FaCar />
                     )}
@@ -381,354 +495,156 @@ useEffect(() => {
                   </Box>
 
 
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        Vehicle Type
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.vahicleTypeOptionName || "N/A"}
-                      </Typography>
-                    </Grid>
+                  <Typography variant="h6" gutterBottom>
+                    {t("buyerauth.step1.title")}
+                  </Typography>
 
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        Name
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.carInfoVehicleDesignation || "N/A"}
-                      </Typography>
-                    </Grid>
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        Registration No
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.carInfoRegistrationNo || "N/A"}
-                      </Typography>
-                    </Grid>
+                  {sellerValuation ? (
+                    <Typography variant="body1" sx={{ mt: 2 }}>
+                     {t("buyerauth.step1.valuation", { value: sellerValuation })}
+                    </Typography>
+                  ) : (
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        mt: 2,
+                        color: "red",
+                        fontWeight: "bold",
+                        animation: "pulse 2.5s infinite", // 🔥 Animation apply
 
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        First Inspection Date
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.carInfoInspectionDate
-                          ? contractData.carInfoInspectionDate.split("T")[0]
-                          : "N/A"}
-                      </Typography>
-                    </Grid>
+                        "@keyframes pulse": {
+                          "0%": {
+                            transform: "scale(0.9)",
+                            boxShadow: "0 0 0 0 rgba(255, 0, 0, 0.7)",   // red glow
+                          },
+                          "70%": {
+                            transform: "scale(1.05)",
+                            boxShadow: "0 0 0 10px rgba(255, 0, 0, 0)",  // red fade out
+                          },
+                          "100%": {
+                            transform: "scale(0.9)",
+                            boxShadow: "0 0 0 0 rgba(255, 0, 0, 0)",
+                          },
+                        },
+                      }}
+                    >
+                       {t("buyerauth.step1.waiting")}
+                    </Typography>
 
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        Registration Date
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.carInfoRegistrationDate
-                          ? contractData.carInfoRegistrationDate.split("T")[0]
-                          : "N/A"}
-                      </Typography>
-                    </Grid>
-
-                    <Grid size={{ xs: 6 }}>
-                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                        Contract ID
-                      </Typography>
-                      <Typography variant="body2">
-                        {contractData.id || "N/A"}
-                      </Typography>
-                    </Grid>
+                  )}
 
 
-                  </Grid>
+                  <Button
+                    variant="contained"
+                    sx={{ mt: 4 }}
+                    onClick={() => setActiveStep(2)}
+                    disabled={!sellerValuation}
+                  >
+                {t("buyerauth.step1.next")}
+                  </Button>
                 </Paper>
-
-
-                <Box sx={{ mt: 3 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleBuyerSuccess}
-                    disabled={submitting || updated}
-                    sx={{
-                      animation: !submitting && !updated ? 'pulse 1.5s infinite' : 'none',
-                      '@keyframes pulse': {
-                        '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,123,255, 0.7)' },
-                        '70%': { transform: 'scale(1.15)', boxShadow: '0 0 0 10px rgba(0,123,255, 0)' },
-                        '100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,123,255, 0)' },
-                      },
-                    }}
-                  >
-                    {submitting
-                      ? "Updating..."
-                      : updated
-                        ? "Connected!"
-                        : "Connect with Seller"}
-                  </Button>
-                </Box>
-
-
-
-                <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => setActiveStep(1)}
-                    disabled={!updated}
-                    size="small"
-                  >
-                    Next
-                  </Button>
-                </Box>
-              </Paper>
-            ) : (
-              <Typography>No contract data found</Typography>
-            )}
-          </Container>
-
-
-        )}
-
-        {activeStep === 1 && (
-          <Container maxWidth="md">
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-               
-              
-              textAlign: "center",
-            }}
-          >
-            {/* Vehicle Icon (Same logic as step 0) */}
-            <Box sx={{ mb: 3, fontSize: "48px", color: "#00d4c4" }}>
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("car") && (
-                <FaCar />
-              )}
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("motorcycle") && (
-                <FaMotorcycle />
-              )}
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("truck") && (
-                <FaTruck />
-              )}
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("boat") && (
-                <FaShip />
-              )}
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("camper") && (
-                <FaTrailer />
-              )}
-              {contractData?.vahicleTypeOptionName?.toLowerCase().includes("moped") && (
-                <MdElectricScooter />
-              )}
-            </Box>
-
-
-            <Typography variant="h6" gutterBottom>
-              Buyer deal successfully connected! ✅
-            </Typography>
-
-            {sellerValuation ? (
-              <Typography variant="body1" sx={{ mt: 2 }}>
-                Car Valuation by Seller: {sellerValuation}
-              </Typography>
-            ) : (
-              <Typography
-                variant="body1"
-                sx={{
-                  mt: 2,
-                  color: "red",           
-                  fontWeight: "bold",
-                  animation: "pulse 2.5s infinite", // 🔥 Animation apply
-
-                  "@keyframes pulse": {
-                    "0%": {
-                      transform: "scale(0.9)",
-                      boxShadow: "0 0 0 0 rgba(255, 0, 0, 0.7)",   // red glow
-                    },
-                    "70%": {
-                      transform: "scale(1.05)",
-                      boxShadow: "0 0 0 10px rgba(255, 0, 0, 0)",  // red fade out
-                    },
-                    "100%": {
-                      transform: "scale(0.9)",
-                      boxShadow: "0 0 0 0 rgba(255, 0, 0, 0)",
-                    },
-                  },
-                }}
-              >
-                Waiting for seller to add valuation...
-              </Typography>
-
+              </Container>
             )}
 
 
-            <Button
-              variant="contained"
-              sx={{ mt: 4 }}
-              onClick={() => setActiveStep(2)}
-              disabled={!sellerValuation}
-            >
-              Next
-            </Button>
-          </Paper>
-             </Container>
-        )}
+           {activeStep === 2 && (
+  <Container maxWidth="md">
+    <Paper elevation={3} sx={{ p: 4, margin: "40px auto" }}>
+      <Typography variant="h6" sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}>
+        {t("buyerauth.step2.title")}
+      </Typography>
 
+      {!vehicleInfo ? (
+        <Typography>{t("buyerauth.step2.loading")}</Typography>
+      ) : (
+        <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2 }}>
+          <DataRow label="Registration No" value={vehicleInfo.carInfoRegistrationNo} />
+          <DataRow label="Vehicle Designation" value={vehicleInfo.carInfoVehicleDesignation} />
+          <DataRow label="Trade Name" value={vehicleInfo.carInfoTradeName} />
+          <DataRow label="Vehicle Years" value={vehicleInfo.carInfoVehicleYears} />
+          <DataRow label="Registration Date" value={vehicleInfo.carInfoRegistrationDate} />
+          <DataRow label="Number of Users" value={vehicleInfo.carInfoNumberOfUsers} />
+          <DataRow label="Waxelbarge" value={vehicleInfo.carInfoWaxelbarge} />
+          <DataRow label="4-Wheel Drive" value={vehicleInfo.carInfoFourWheelDrive ? "Yes" : "No"} />
+          <DataRow label="Fuel" value={vehicleInfo.carInfoFuel} />
+          <DataRow label="Inspection Date" value={vehicleInfo.carInfoInspectionDate} />
+          <DataRow label="Previous Inspection Date" value={vehicleInfo.carInfoPreviousInspectionDate} />
+          <DataRow label="Inspection Station" value={vehicleInfo.carInfoInspectionStation} />
+          <DataRow label="Inspection Group" value={vehicleInfo.carInfoInspectionGroup} />
+          <DataRow label="Feeding Stall" value={vehicleInfo.carInfoFeedingStall} />
+          <DataRow label="Tax" value={vehicleInfo.carInfoTax} />
+          <DataRow label="Malus" value={vehicleInfo.carInfoMalus || "-"} />
+          <DataRow label="Valuation" value={vehicleInfo.carValuationBySeller || "-"} />
+        </Box>
+      )}
 
-        {activeStep === 2 && (
-
-          <Container maxWidth="md">
-            <Paper
-              elevation={3}
-              sx={{
-                p: 4,
-                margin: "40px auto",
-
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}
-              >
-                Vehicle Information
-              </Typography>
-
-
-              {!vehicleInfo ? (
-                <Typography>Loading vehicle information...</Typography>
-              ) : (
-                <Box sx={{
-                  border: '1px solid #ccc',
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  p: 2
-                }}>
-                  <DataRow label="Registration No" value={vehicleInfo.carInfoRegistrationNo} />
-                  <DataRow label="Vehicle Designation" value={vehicleInfo.carInfoVehicleDesignation} />
-                  <DataRow label="Trade Name" value={vehicleInfo.carInfoTradeName} />
-
-                  <DataRow label="Vehicle Years" value={vehicleInfo.carInfoVehicleYears} />
-                  <DataRow label="Registration Date" value={vehicleInfo.carInfoRegistrationDate} />
-                  <DataRow label="Number of Users" value={vehicleInfo.carInfoNumberOfUsers} />
-                  <DataRow label="Waxelbarge" value={vehicleInfo.carInfoWaxelbarge} />
-                  <DataRow label="4-Wheel Drive" value={vehicleInfo.carInfoFourWheelDrive ? "Yes" : "No"} />
-                  <DataRow label="Fuel" value={vehicleInfo.carInfoFuel} />
-                  <DataRow label="Inspection Date" value={vehicleInfo.carInfoInspectionDate} />
-                  <DataRow label="Previous Inspection Date" value={vehicleInfo.carInfoPreviousInspectionDate} />
-                  <DataRow label="Inspection Station" value={vehicleInfo.carInfoInspectionStation} />
-                  <DataRow label="Inspection Group" value={vehicleInfo.carInfoInspectionGroup} />
-                  <DataRow label="Feeding Stall" value={vehicleInfo.carInfoFeedingStall} />
-                  <DataRow label="Tax" value={vehicleInfo.carInfoTax} />
-                  <DataRow label="Malus" value={vehicleInfo.carInfoMalus || "-"} />
-                   <DataRow label="Valuation" value={vehicleInfo.carValuationBySeller || "-"} />
-                </Box>
-
-              )}
-              <Box sx={{
-                border: '1px solid #ccc',
-                boxShadow: 3,
-                borderRadius: 2,
-                p: 2,
-                mt: 2
-              }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FaMoneyBillWave />
-                  Price and Payment
-                </Typography>
-                {/* <Typography variant="body1" sx={{ fontWeight: 'bold', mt: 1 }}>
-                  {sellerValuation}
-                </Typography> */}
-                <Box
-                  sx={{
-                    backgroundColor: '#f1efefff',
-                    borderRadius: 10,
-                    p: 1,
-                    mt: 1
-                  }}
-                >
-                  <Typography variant="body3" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <ReportGmailerrorredIcon sx={{ fontSize: 16 }} />
-                    Delivery will only take place when full payment is confirmed in the app.
-                  </Typography>
-                </Box>
-
-
-              </Box>
-
-              <Box sx={{
-                border: '1px solid #ccc',
-                boxShadow: 3,
-                borderRadius: 2,
-                p: 2,
-                mt: 2
-              }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AirportShuttleIcon />
-                  Delivery and risk
-                </Typography>
-                <Box
-                  sx={{
-                    backgroundColor: '#f1efefff',
-                    borderRadius: 3,
-                    p: 2,
-                    mt: 1
-                  }}
-                >
-                  <Typography variant="body3" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <ReportGmailerrorredIcon sx={{ fontSize: 16 }} />
-                    The risk passes to the buyer when the vehicle is taken into possession.
-                    <br />
-                    This means that the buyer is responsible for the vehicle from the time of handover.
-                  </Typography>
-
-                </Box>
-
-
-              </Box>
-
-
-              <Box sx={{
-                border: '1px solid #ccc',
-                boxShadow: 3,
-                borderRadius: 2,
-                p: 2,
-                mt: 2
-              }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AirportShuttleIcon />
-                  Condition and defects
-                </Typography>
-
-                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                  The vehicle is sold in its existing condition.
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
-                  Defects can also be claimed in its existing condition if the seller has provided incorrect information, omitted essential information, or if the vehicle is significantly worse than could reasonably be expected.
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
-                  Meddela fel utan onödigt dröjsmål och senast inom två år från leverans.
-                </Typography>
-              </Box>
-
-              <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setActiveStep(3)}
-                >
-                  Next
-                </Button>
-              </Box>
-            </Paper>
-          </Container>
-
-        )}
-
-
-
+       
+      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
+          <FaMoneyBillWave />
+          {t("buyerauth.step2.priceInfo")}
+        </Typography>
+        <Box sx={{ backgroundColor: "#f1efefff", borderRadius: 1, p: 1, mt: 1 }}>
+          <Typography variant="body2">{t("buyerauth.step2.priceDesc")}</Typography>
+        </Box>
       </Box>
-    </Box>
+
+       
+      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
+          <AirportShuttleIcon />
+          {t("buyerauth.step2.deliveryInfo")}
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.deliveryDesc")}</Typography>
+      </Box>
+
+       
+      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
+          <AirportShuttleIcon />
+          {t("buyerauth.step2.conditionInfo")}
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.conditionDesc1")}</Typography>
+        <Typography variant="body2" sx={{ mt: 0.5 }}>{t("buyerauth.step2.conditionDesc2")}</Typography>
+        <Typography variant="body2" sx={{ mt: 0.5 }}>{t("buyerauth.step2.conditionDesc3")}</Typography>
+      </Box>
+
+      
+      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
+          <DescriptionIcon />
+          {t("buyerauth.step2.ownership")}
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc1")}</Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc2")}</Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc3")}</Typography>
+      </Box>
+
+      
+      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
+        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
+          <DirectionsCarFilledIcon />
+          {t("buyerauth.step2.transportAgency")}
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.transportAgencyDesc1")}</Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.transportAgencyDesc2")}</Typography>
+      </Box>
+
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
+        <Button variant="contained" color="primary" size="small" onClick={() => setActiveStep(3)}>
+          {t("buyerauth.step2.next")}
+        </Button>
+      </Box>
+    </Paper>
+  </Container>
+)}
+
+
+
+          </Box>
+        </Paper>
+      </Container>
+    </>
   );
 }
 

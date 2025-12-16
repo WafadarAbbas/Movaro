@@ -1,13 +1,512 @@
 {
-  "vehicleSection": {
-    "title": "Stöd för flera fordonstyper",
-    "messages": {
-      "car": "Du valde: Bil – försäkring & skatt förklaras i guiden.",
-      "motorcycle": "Du valde: MC – försäkring & skatt förklaras i guiden.",
-      "scooter": "Du valde: Moped – försäkring & skatt förklaras i guiden.",
-      "ship": "Du valde: Husbil – försäkring & skatt förklaras i guiden.",
-      "trailer": "Du valde: Lätt lastbil – försäkring & skatt förklaras i guiden.",
-      "truck": "Du valde: Lastbil – försäkring & skatt förklaras i guiden."
+  "chooseAction": {
+    "title": "Vad vill du göra idag?",
+    "subtitle": "Köp och sälj fordon tryggt!",
+    "sellCardTitle": "Jag vill sälja",
+    "sellCardDesc": "Skapa en försäljning, sätt pris och villkor och få en kod för köparen.",
+    "buyCardTitle": "Jag vill köpa",
+    "buyCardDesc": "Ange registreringsnummer eller skanna säljarens QR-kod för att fortsätta."
+  },
+  "home": {
+    "heroTitle": "Trygg affär för fordon i ett flöde",
+    "heroSubtitle": "Kontrakt, betalning, ägarbyte och försäkring. Allt samlat och guidat mellan säljare och köpare.",
+    "startDeal": "Starta affären",
+    "seeHowItWorks": "Se hur det funkar",
+    "security": {
+      "bankId": "BankID",
+      "dataSecurity": "Datasäkerhet i Sverige",
+      "trustedSources": "Fordonsdata från betrodda källor",
+      "partners": "BankID · Zmarta · Bilvision · Klarna · Tink · Nordea"
+    },
+    "cards": {
+      "contract": {
+        "title": "Kontrakt",
+        "line1": "Juridiskt bindande avtal",
+        "line2": "Parter: verifierade med BankID",
+        "line3": "Fordon: OWN 457",
+        "line4": "Tid: 12:41 • Ref: •••9Q2F"
+      },
+      "payment": {
+        "title": "Betalning",
+        "line1": "Belopp: 349 000 kr",
+        "line2": "Metod: banköverföring",
+        "line3": "Partner: Trustly",
+        "line4": "Utbetalning: normalt 1–2 bankdagar"
+      },
+      "insurance": {
+        "title": "Prisförslag",
+        "line1": "Prisförslag klart",
+        "line2": "Start: vid köpet",
+        "line3": "Exempel:",
+        "line4": "Länsförsäkringar, Folksam, Trygg-Hansa, ICA"
+      },
+      "ownership": {
+        "title": "Ägarbyte",
+        "line1": "Transportstyrelsen",
+        "line2": "Öppnas automatiskt",
+        "line3": "Uppgifter ifyllda",
+        "line4": "Signera med BankID",
+        "line5": "Bekräftelse i Klargo"
+      }
+    },
+    "vehicles": {
+      "title": "Stöd för flera fordonstyper",
+      "car": {
+        "label": "Bil",
+        "message": "Du valde: Bil – försäkring & skatt förklaras i guiden."
+      },
+      "motorcycle": {
+        "label": "MC",
+        "message": "Du valde: MC – försäkring & skatt förklaras i guiden."
+      },
+      "scooter": {
+        "label": "Moped",
+        "message": "Du valde: Moped – försäkring & skatt förklaras i guiden."
+      },
+      "ship": {
+        "label": "Husbil",
+        "message": "Du valde: Husbil – försäkring & skatt förklaras i guiden."
+      },
+      "trailer": {
+        "label": "Lätt lastbil",
+        "message": "Du valde: Lätt lastbil – försäkring & skatt förklaras i guiden."
+      },
+      "truck": {
+        "label": "Lastbil",
+        "message": "Du valde: Lastbil – försäkring & skatt förklaras i guiden."
+      }
+    },
+    "dealCards": {
+      "dealCardsSectionTitle": "Välj hur du vill fortsätta",
+      "sell": {
+        "title": "Jag ska sälja",
+        "text": "Skapa affären, ange pris och villkor, signera. Betalning från köparen bekräftas i realtid i appen. Ägarbytet öppnas automatiskt hos Transportstyrelsen och bekräftelsen visas i Klargo.",
+        "list": [
+          "Pris & villkor",
+          "BankID-signering",
+          "Bekräftad betalning"
+        ],
+        "button": "Utforska säljflödet"
+      },
+      "buy": {
+        "title": "Jag ska köpa",
+        "text": "Anslut via regnummer eller QR. Betala säkert och få bekräftelse i realtid. Välj finansiering eller betala direkt med banköverföring. Försäkring och pris direkt i appen. Ägarbytet öppnas automatiskt hos Transportstyrelsen och bekräftelsen visas i Klargo.",
+        "list": [
+          "Regnr eller QR",
+          "Finansiering eller direkt",
+          "Försäkring i appen"
+        ],
+        "button": "Utforska köparflödet"
+      }
+    },
+    "confirmationText": "Bekräftelse i realtid betyder att betalningen registreras och kvitteras i appen. Utbetalning till bankkonto sker normalt inom 1–2 bankdagar.",
+    "serviceCardsSectionTitle": "Allt i ett, steg för steg",
+    "serviceCards": [
+      {
+        "icon": "ShieldOutlinedIcon",
+        "title": "Verifiera med BankID",
+        "text": "Säker identifiering för båda parter."
+      },
+      {
+        "icon": "DescriptionOutlinedIcon",
+        "title": "Skapa och signera kontrakt",
+        "text": "Gemensamma villkor och pris, digital signering."
+      },
+      {
+        "icon": "CreditCardOutlinedIcon",
+        "title": "Betala säkert",
+        "text": "Bekräftelse i realtid i appen. Utbetalning inom 1–2 bankdagar."
+      },
+      {
+        "icon": "CheckCircleOutlineOutlinedIcon",
+        "title": "Slutför ägarbyte",
+        "text": "Transportstyrelsen öppnas automatiskt. Signera med BankID."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Välj försäkring",
+        "text": "Flera alternativ med direkt bekräftelse i appen."
+      }
+    ],
+    "whyChooseKlargo": [
+      {
+        "icon": "PersonOutlineIcon",
+        "title": "Allt i ett flöde",
+        "text": "Säljare och köpare ser samma sak och följer samma process."
+      },
+      {
+        "icon": "LockOutlinedIcon",
+        "title": "Trygg betalning",
+        "text": "Pengar hanteras säkert tills affären är klar. Bekräftelse i realtid."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Rätt ordning",
+        "text": "Guidning som speglar processen för ägarbyte hos Transportstyrelsen."
+      },
+      {
+        "icon": "VerifiedUserOutlinedIcon",
+        "title": "Dokument på plats",
+        "text": "Kontrakt, kvitto och försäkringsbrev sparas."
+      }
+    ],
+    "whyKlargo": "Varför välja Klargo",
+    "pricingSectionTitle": "En enkel prislapp",
+    "pricingAmount": "149",
+    "pricingCurrency": "kr",
+    "pricingSubtitle": "per affär",
+    "pricingText": "Gäller alla fordonstyper i Klargo.",
+    "pricingFooter": "Inga procent | Inga dolda avgifter",
+    "faqSectionTitle": "Vanliga frågor",
+    "faqItems": [
+      {
+        "title": "Hur snabbt kommer pengarna?",
+        "content": "Du ser betalningen bekräftad i realtid i appen. Utbetalning till konto sker normalt inom 1 till 2 bankdagar."
+      },
+      {
+        "title": "Hur går ägarbytet till?",
+        "content": "Säljaren genomför ägarbytet hos Transportstyrelsen. Klargo öppnar tjänsten automatiskt och fyller i dina uppgifter. Du signerar med BankID och ser bekräftelsen i appen."
+      },
+      {
+        "title": "Kan jag välja finansiering som köpare?",
+        "content": "Ja. Du kan ansöka i appen och få besked snabbt via våra partners. Du kan också betala direkt med banköverföring."
+      },
+      {
+        "title": "Finns det lån på fordonet, kan vi genomföra köpet?",
+        "content": "Ja. Vi guidar hur det hanteras i affären och dokumenterar överenskommelsen."
+      },
+      {
+        "title": "Gäller försäkringen direkt?",
+        "content": "Ja. Du väljer försäkringsstart i flödet och får bekräftelse i appen."
+      },
+      {
+        "title": "Vad kostar det?",
+        "content": "Alltid 149 kr per affär oavsett fordonets pris."
+      }
+    ],
+    "guideSectionTitle": "Lär dig processen",
+    "stepCards": [
+      {
+        "title": "Ägarbyte av fordon steg för steg",
+        "description": "Rätt ordning och begrepp enligt Transportstyrelsens terminologi."
+      },
+      {
+        "title": "Köpa och sälja begagnat",
+        "description": "Bedrägeriskydd, mätarställning och dokument."
+      },
+      {
+        "title": "Finansiering och försäkring",
+        "description": "Så fungerar billån och försäkring i praktiken."
+      }
+    ],
+    "loanSectionTitle": "Om billån i Klargo",
+    "loanDescription": "Finansiering erbjuds via partners. Individuell prövning och villkor gäller. Effektiv ränta beror på kreditprofil och löptid.",
+    "loanExampleTitle": "Exempel",
+    "loanExampleList": [
+      "Effektiv ränta från 5,99%",
+      "Uppläggningsavgift från 0 kr",
+      "Exakta villkor visas i appen före ansökan"
+    ],
+    "loanLinks": "Vanliga frågor om finansiering",
+    "loanLinks2": "Integritet och kreditprövning",
+    "partnersSectionTitle": "Partners och trygghet",
+    "partnersSectionSubtitle": "Klargo använder etablerade betalnings-, data- och försäkringspartners. Exakta erbjudanden kan variera per affär.",
+    "partnersList": [
+      "BankID",
+      "Bilvision",
+      "Trustly",
+      "Klarna",
+      "Tink",
+      "Nordea",
+      "Zmarta"
+    ],
+    "navLinks": [
+      {
+        "key": "howItWorks",
+        "label": "Hur det funkar"
+      },
+      {
+        "key": "pricing",
+        "label": "Priser"
+      },
+      {
+        "key": "faq",
+        "label": "Frågor och svar"
+      },
+      {
+        "key": "guides",
+        "label": "Guider"
+      }
+    ],
+    "loginButton": "Logga in"
+  },
+  "auth": {
+    "signInTitle": "Logga in på Klargo",
+    "signInSubtitle": "Välj hur du vill logga in.",
+    "tabs": {
+      "bankId": "BANKID",
+      "emailPassword": "EMAIL & LÖSENORD"
+    },
+    "bankId": {
+      "secureLogin": "Säkra inloggning med ditt svenska BankID.",
+      "openBankId": "ÖPPNA BANKID",
+      "showQRCode": "VISA QR-KOD",
+      "needHelp": "Behöver du hjälp med inloggning?",
+      "agreementTextStart": "Genom att fortsätta godkänner du våra",
+      "agreementTextMiddle": "och",
+      "termsOfService": "Användarvillkor",
+      "privacyPolicy": "Integritetspolicy"
+    },
+    "email": "E-post",
+    "emailPlaceholder": "E-post",
+    "password": "Lösenord",
+    "passwordPlaceholder": "Minst 6 tecken",
+    "confirmPassword": "Bekräfta lösenord",
+    "confirmPasswordPlaceholder": "Minst 6 tecken",
+    "createAccount": "SKAPA KONTO",
+    "login": "LOGGA IN",
+    "alreadyHaveAccount": "Har du redan ett konto",
+    "forgotPassword": "Glömt ditt lösenord?",
+    "newToKlargo": "Ny på Klargo",
+    "agreementTextStart": "Genom att fortsätta godkänner du våra",
+    "agreementTextMiddle": "och",
+    "termsOfService": "Användarvillkor",
+    "privacyPolicy": "Integritetspolicy"
+  },
+  "seller": {
+    "headerTitle": "Vad vill du sälja idag?",
+    "headerTitle1": "Vad vill du göra idag?",
+    "headerSubtitle": "Köp och sälj fordon på ett säkert sätt!",
+    "startSaleTitle": "Börja din försäljning",
+    "startSaleSubtitle": "Ange registreringsnummer på den bil du vill sälja",
+    "SaleCreated": "Affären är nu skapad",
+    "askBuyer": "Be köparen skanna QR-koden eller skriva in registreringsnumret i sin app för att ansluta till affären.",
+    "available": "Tillgänglig för köparen: Ja",
+    "proceed": "Gå vidare till köpekontrakt.",
+    "sellCarForTitle": "Vad vill du sälja bilen för?",
+    "registrationNo": "Registreringsnummer",
+    "vehicle": "Fordon",
+    "vehicleYears": "Fordonsår",
+    "numberOfUsers": "Antal brukare",
+    "axleWeight": "Axelvikt",
+    "fuel": "Bränsle",
+    "fetchingCarDetails": "Hämtar fordonsuppgifter...",
+    "vehicleInformation": "Fordonsinformation",
+    "car": {
+      "steps": {
+        "registrationNo": "Registreringsnummer",
+        "vehicleDesignation": "Fordonstyp",
+        "tradeName": "Handelsnamn",
+        "yearModel": "Årsmodell",
+        "vehicleYears": "Fordonets ålder",
+        "registrationDate": "Registreringsdatum",
+        "numberOfUsers": "Antal brukare",
+        "axleWeight": "Axelbelastning",
+        "fourWheelDrive": "Fyrhjulsdrift",
+        "fuel": "Bränsle",
+        "evConfig": "Elfordonskonfiguration",
+        "inspectionDate": "Besiktningsdatum",
+        "prevInspectionDate": "Föregående besiktning",
+        "inspectionStation": "Besiktningsstation",
+        "inspectionGroup": "Besiktningsgrupp",
+        "feedingStall": "Matarställ",
+        "tax": "Skatt",
+        "malus": "Malus",
+        "valuation": "Värdering",
+        "yes": "Ja",
+        "no": "Nej"
+      }
+    },
+    "deliveryRisk": {
+      "title": "Leverans och risk",
+      "description": "Risken övergår till köparen när fordonet tas i besittning. Det innebär att köparen ansvarar för fordonet från överlämnandet."
+    },
+    "conditionDefects": {
+      "title": "Skick och fel",
+      "line1": "Fordonet säljs i befintligt skick.",
+      "line2": "Fel kan ändå åberopas om säljaren lämnat felaktiga uppgifter, underlåtit att lämna väsentlig information eller om fordonet är i väsentligt sämre skick än vad köparen med fog kunnat förutsätta.",
+      "line3": "Meddela fel utan onödigt dröjsmål och senast inom två år från leverans."
+    },
+    "debts": {
+      "title": "Skulder",
+      "subtitle": "Välj hur du vill hantera eventuella skulder.",
+      "options": {
+        "none": "Inga skulder",
+        "seller": "Skulder finns. Säljaren betalar innan leverans.",
+        "buyer": "Skulder finns. Köparen betalar och drar av från priset."
+      }
+    },
+    "loan": {
+      "title": "Lån eller pant",
+      "description": "Om ett lån eller pant inte regleras vid leverans kan köparen stoppa verkställigheten eller avbryta köpet.",
+      "options": {
+        "none": "Inget lån eller pant",
+        "seller": "Lån eller pant finns. Säljaren reglerar innan leverans.",
+        "buyer": "Lån finns, regleras vid leverans. Köparen betalar netto till banken och resten till säljaren."
+      }
+    },
+    "ownership": {
+      "title": "Äganderätt och dokument",
+      "description1": "Äganderätten kvarstår hos säljaren tills full betalning har mottagits.",
+      "description2": "Vid leverans lämnar säljaren över de dokument som kvarstår, såsom registreringsbevis del 2 och servicejournaler.",
+      "description3": "Säljaren intygar att fordonet inte är föremål för något körförbud vid leverans."
+    },
+    "transportAgency": {
+      "title": "Transportstyrelsen",
+      "description1": "Parterna åtar sig att genomföra ägarbytet utan dröjsmål i Transportstyrelsens app eller e-tjänst vid leverans.",
+      "description2": "Detta avtal utgör bevis för överenskommelsen. Registreringen sker hos Transportstyrelsen."
+    },
+    "noVehicleTypes": "Inga fordonstyper hittades"
+  },
+  "buyer": {
+    "headerTitle": "Vad vill du göra idag?",
+    "headerSubtitle": "Köp och sälj fordon tryggt!",
+    "subHeaderTitle": "Vad vill du köpa?",
+    "startPurchaseTitle": "Starta ditt bilköp",
+    "startPurchaseSubtitle": "Ange registreringsnumret på bilen du är intresserad av",
+    "connectSellerTitle": "Anslut till säljaren",
+    "connectSellerSubtitle": "Klicka på knappen nedan för att meddela säljaren.",
+    "dealConnected": "Köparaffären har anslutits! ✅",
+    "sellerValuation": "Bilvärdering av säljaren: {{valuation}}",
+    "waitingValuation": "Väntar på att säljaren ska lägga till värdering...",
+    "vehicleInformation": "Fordoninformation",
+    "registrationNo": "Registreringsnummer",
+    "vehicleDesignation": "Fordonstyp",
+    "tradeName": "Handelsnamn",
+    "vehicleYears": "Fordonsår",
+    "registrationDate": "Registreringsdatum",
+    "numberOfUsers": "Antal användare",
+    "waxelbarge": "Axelvikt",
+    "fourWheelDrive": "4-hjulsdrift",
+    "fuel": "Bränsle",
+    "inspectionDate": "Besiktningsdatum",
+    "previousInspectionDate": "Tidigare besiktningsdatum",
+    "inspectionStation": "Besiktningsstation",
+    "inspectionGroup": "Besiktningsgrupp",
+    "feedingStall": "Matningsplats",
+    "tax": "Skatt",
+    "malus": "Malus",
+    "valuation": "Värdering",
+    "pricePayment": "Pris och betalning",
+    "pricePaymentInfo": "Leverans sker endast när full betalning har bekräftats i appen.",
+    "deliveryRisk": "Leverans och risk",
+    "deliveryRiskInfo": "Risken övergår till köparen när fordonet tas i besittning. Detta innebär att köparen ansvarar för fordonet från överlämningstidpunkten.",
+    "conditionTitle": "Skick och fel",
+    "conditionInfo1": "Fordonet säljs i befintligt skick.",
+    "conditionInfo2": "Fel kan även göras gällande i befintligt skick om säljaren har lämnat felaktig information, utelämnat viktig information eller om fordonet är väsentligt sämre än vad som rimligen kan förväntas.",
+    "conditionInfo3": "Meddela fel utan onödigt dröjsmål och senast inom två år från leverans.",
+    "debtsTitle": "Skulder",
+    "debtsInfo": "Välj hur du vill hantera eventuella skulder.",
+    "debtsNone": "Inga skulder",
+    "debtsSeller": "Skulder finns. Säljaren betalar före leverans.",
+    "debtsBuyer": "Skulder finns. Köparen betalar och drar av priset.",
+    "loanTitle": "Lån eller pant",
+    "loanInfo": "Om ett pantbrev eller kredit inte regleras vid leverans kan köparen stoppa verkställighet eller häva köpet.",
+    "loanNone": "Inget lån eller pant",
+    "loanSeller": "Lån eller pant finns. Säljaren reglerar före leverans.",
+    "loanBuyer": "Lån finns, regleras vid leverans. Köparen betalar netto till banken och resterande till säljaren.",
+    "ownershipTitle": "Äganderätt och dokument",
+    "ownershipInfo1": "Äganderätten förblir hos säljaren tills full betalning har erhållits.",
+    "ownershipInfo2": "Vid leverans överlämnar säljaren de dokument som återstår, såsom registreringsbevis del 2 och servicehistorik.",
+    "ownershipInfo3": "Säljaren intygar att fordonet inte är föremål för körförbud vid leverans.",
+    "transportTitle": "Transportstyrelsen",
+    "transportInfo1": "Parterna åtar sig att genomföra ägarbytet utan dröjsmål i Transportstyrelsens app eller e-tjänst vid leverans.",
+    "transportInfo2": "Detta avtal bevisar överenskommelsen. Registreringen sker hos Transportstyrelsen.",
+    "updating": "Uppdaterar...",
+    "connected": "Ansluten!",
+    "connectWithSeller": "Anslut till säljaren"
+  },
+  "footer": {
+    "tagline": "Trygg affär för fordon i ett flöde",
+    "howItWorks": "Hur det funkar",
+    "pricing": "Priser",
+    "faq": "Frågor och svar",
+    "guides": "Guider",
+    "terms": "Villkor",
+    "privacy": "Integritet",
+    "cookies": "Cookies",
+    "support": "Support",
+    "press": "Press",
+    "about": "Om oss",
+    "copyright": "© 2024 Klargo. Alla rättigheter förbehållna."
+  },
+    "buyerauth": {
+    "signInTitle": "Logga in på Klargo",
+    "signInSubtitle": "Välj hur du vill logga in.",
+     "tabs": {
+      "bankId": "BankID",
+      "emailPassword": "E-post & lösenord"
+    },
+     "bankid": {
+      "secureText": "🔒 Säker inloggning med ditt svenska BankID.",
+      "loginButton": "Logga in med BankID",
+      "showQr": "Visa QR-kod",
+      "needHelp": "Behöver du hjälp med att logga in?"
+    },
+     "email": {
+      "emailLabel": "E-post",
+      "emailPlaceholder": "E-post",
+      "passwordLabel": "Lösenord",
+      "passwordPlaceholder": "Lösenord",
+      "loginButton": "Logga in",
+      "createAccountButton": "Skapa konto",
+      "newToKlargo": "Ny hos Klargo?",
+      "alreadyHaveAccount": "Har du redan ett konto?",
+      "createAccount": "Skapa ett konto",
+      "login": "Logga in"
+    },
+ "legal": {
+      "agreementText": "Genom att fortsätta godkänner du våra",
+      "terms": "Användarvillkor",
+      "and": "och",
+      "privacy": "Integritetspolicy"
+    },
+        "step0": {
+      "loading": "Laddar avtal...",
+      "title": "Anslut med säljaren",
+      "vehicleType": "Fordonstyp",
+      "name": "Namn",
+      "registrationNo": "Registreringsnummer",
+      "firstInspectionDate": "Första besiktningsdatum",
+      "registrationDate": "Registreringsdatum",
+      "contractId": "Avtals-ID",
+      "updating": "Uppdaterar...",
+      "connected": "Ansluten!",
+      "connect": "Anslut med säljaren",
+      "next": "Nästa",
+      "noData": "Inga avtalsuppgifter hittades",
+      "na": "Ej tillgänglig"
+    },
+     "step1": {
+      "title": "Köparens affär ansluten! ✅",
+      "valuation": "Bilvärdering av säljaren: {{value}}",
+      "waiting": "Väntar på att säljaren ska lägga till värdering...",
+      "next": "Nästa"
+    },
+     "step2": {
+      "title": "Fordonsinformation",
+      "loading": "Laddar fordonsinformation...",
+      "priceInfo": "Pris och betalning",
+      "priceDesc": "Leverans sker endast när full betalning är bekräftad i appen.",
+      "deliveryInfo": "Leverans och risk",
+      "deliveryDesc": "Risken övergår till köparen när fordonet tas i besittning. Detta innebär att köparen ansvarar för fordonet från överlämningstidpunkten.",
+      "conditionInfo": "Skick och fel",
+      "conditionDesc1": "Fordonet säljs i befintligt skick.",
+      "conditionDesc2": "Fel kan även göras gällande om säljaren lämnat felaktig information, utelämnat väsentlig information eller om fordonet är avsevärt sämre än rimligt att förvänta.",
+      "conditionDesc3": "Meddela fel utan onödigt dröjsmål och senast inom två år från leverans.",
+      "debts": "Skulder",
+      "debtsDesc": "Välj hur du vill hantera eventuella skulder.",
+      "loan": "Lån eller panträtt",
+      "loanDesc": "Om lån eller kredit inte regleras vid leverans kan köparen stoppa indrivning eller häva köpet.",
+      "ownership": "Äganderätt och dokument",
+      "ownershipDesc1": "Äganderätten kvarstår hos säljaren tills full betalning har mottagits.",
+      "ownershipDesc2": "Vid leverans överlämnar säljaren kvarvarande dokument, t.ex. registreringsbevis del 2 och servicehandlingar.",
+      "ownershipDesc3": "Säljaren intygar att fordonet inte är föremål för körförbud vid leverans.",
+      "transportAgency": "Transportstyrelsen",
+      "transportAgencyDesc1": "Parterna åtar sig att genomföra ägarbytet utan dröjsmål i Transportstyrelsens app eller e-tjänst vid leverans.",
+      "transportAgencyDesc2": "Detta avtal bevisar överenskommelsen. Registreringen sker hos Transportstyrelsen.",
+      "next": "Nästa"
     }
+
   }
 }

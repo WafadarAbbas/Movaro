@@ -46,16 +46,12 @@ export default function Seller() {
   const [isFocused, setIsFocused] = useState(false);  
 
   useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass("p-0");
-
-    return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("");
-    };
-  }, []);
+   context.setAppHeaderNone(true);   
+ 
+   return () => {
+     context.setAppHeaderNone(false);  
+   };
+ }, []);
 
   return (
     <Grid

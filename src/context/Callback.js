@@ -204,15 +204,23 @@ const Callback = () => {
   const [token, setToken] = useState("");
   const [claims, setClaims] = useState({});
 
-  useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass("p-0");
+  // useEffect(() => {
+  //   context.handleSetAppSidebarNone(true);
+  //   context.handleSetAppHeaderNone(true);
+  //   context.handleSetAppContentClass("p-0");
 
+  //   return () => {
+  //     context.handleSetAppSidebarNone(false);
+  //     context.handleSetAppHeaderNone(false);
+  //     context.handleSetAppContentClass("");
+  //   };
+  // }, []);
+
+   useEffect(() => {
+    context.setAppHeaderNone(true);   
+  
     return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("");
+      context.setAppHeaderNone(false);  
     };
   }, []);
 

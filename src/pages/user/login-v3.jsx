@@ -58,16 +58,12 @@ function LoginV3() {
 
 
   useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass("p-0");
-
-    return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass("");
-    };
-  }, [context]);
+   context.setAppHeaderNone(true);   
+ 
+   return () => {
+     context.setAppHeaderNone(false);  
+   };
+ }, []);
 
 
   // useEffect(() => {

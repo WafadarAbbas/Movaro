@@ -42,18 +42,13 @@ const [apiError, setApiError] = useState("");
   
   const [redirect, setRedirect] = useState(false);
 
-  useEffect(() => {
-    context.handleSetAppSidebarNone(true);
-    context.handleSetAppHeaderNone(true);
-    context.handleSetAppContentClass('p-0');
+ useEffect(() => {
+  context.setAppHeaderNone(true);   
 
-    return () => {
-      context.handleSetAppSidebarNone(false);
-      context.handleSetAppHeaderNone(false);
-      context.handleSetAppContentClass('');
-    };
-        // eslint-disable-next-line
-    }, []);
+  return () => {
+    context.setAppHeaderNone(false);  
+  };
+}, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
