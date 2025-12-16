@@ -393,57 +393,64 @@ function BuyerProfile() {
       checkValuation();
 
 
-      interval = setInterval(checkValuation, 10000);
+      interval = setInterval(checkValuation, 20000);
 
       return () => clearInterval(interval);
     }
   }, [activeStep, contractId, valuationToastShown]);
 
+const intervalRef = useRef(null);
+useEffect(() => {
+  if (activeStep !== 4 || !contractId) return;
 
-  useEffect(() => {
-    if (activeStep !== 4 || !contractId) return;
+  const fetchVehicleInfo = async () => {
+    try {
+      const res = await ApiCall({
+        url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractId}`,
+        method: "GET",
+      });
 
-    const fetchVehicleInfo = async () => {
-      try {
-        const res = await ApiCall({
-          url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractId}`,
-          method: "GET",
+      const latest = res?.result || res?.data?.result;
+      const newValuation = latest?.carValuationBySeller;
+
+      // 🔔 valuation changed
+      if (oldValuation !== null && newValuation !== oldValuation) {
+        Swal.fire({
+          icon: "info",
+          title: "Valuation Updated",
+          text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
         });
 
-        const latest = res?.result || res?.data?.result;
-
-
-        const newValuation = latest?.carValuationBySeller;
-
-        if (oldValuation !== null && newValuation !== oldValuation) {
-          Swal.fire({
-            icon: "info",
-            title: "Valuation Updated",
-            text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
-          });
+        // 🛑 STOP API polling after Swal
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-
-
-        setOldValuation(newValuation);
-
-
-
-        setContractMainData(latest);
-
-      } catch (err) {
-        console.error("Error fetching vehicle info:", err);
       }
-    };
 
+      setOldValuation(newValuation);
+      setContractMainData(latest);
 
-    fetchVehicleInfo();
+    } catch (err) {
+      console.error("Error fetching vehicle info:", err);
+    }
+  };
 
+  // first call
+  fetchVehicleInfo();
 
-    const intervalId = setInterval(fetchVehicleInfo, 10000);
+  // start polling
+  intervalRef.current = setInterval(fetchVehicleInfo, 20000);
 
-    return () => clearInterval(intervalId);
+  // cleanup on step change / unmount
+  return () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
-  }, [activeStep, contractId, oldValuation]);
+}, [activeStep, contractId]); 
 
   return (
     <Container maxWidth="md">
