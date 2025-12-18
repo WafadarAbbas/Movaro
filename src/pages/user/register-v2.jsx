@@ -23,7 +23,7 @@ import {
 import { useAuth } from "../../context/AuthContext.js";
 import { Formik, Form } from "formik";
 import Grid from "@mui/material/Grid";
-import myImage2 from "./c3.jpg";
+import myImage2 from "../../assets/c3.jpg";
 import ApiCall from '../../Apicall/ApiCall.js';
 import axios from 'axios';
 import * as Yup from "yup";

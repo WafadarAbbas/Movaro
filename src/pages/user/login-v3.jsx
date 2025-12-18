@@ -4,15 +4,11 @@ import React, { useEffect, useContext, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { AppSettings } from "../../config/app-settings.js";
 
-import myImage from "./c2.jpg";
-import myImage2 from "./c3.jpg";
-import myImage3 from "./c1.jpg";
-import myImage4 from "./ferrari.jpg";
-import myImage5 from "./lambo.jpg";
-import { styled } from "@mui/system";
-
-
-import { Box, Container, Tab, Tabs, Paper } from '@mui/material'
+import myImage from "../../assets/c2.jpg";
+import myImage2 from "../../assets/c3.jpg";
+import myImage4 from "../../assets/ferrari.jpg";
+import myImage5 from "../../assets/lambo.jpg";
+import { Box, Container } from '@mui/material'
 import LoginBox from "./logincompo/loginbox.js";
 import ForgotPasswordBox from "./logincompo/ForgotPasswordBox.js";
  
@@ -24,9 +20,6 @@ function LoginV3() {
 
   const context = useContext(AppSettings);
   const [redirect, setRedirect] = useState(false);
-  const [tab, setTab] = useState(0);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const shadows = [
     "0 10px 32px 0 rgba(31, 38, 135, 0.65)",
