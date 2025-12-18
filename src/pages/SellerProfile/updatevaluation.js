@@ -28,7 +28,7 @@ const UpadteValuation = (props) => {
           },
         });
 
-        Swal.fire("Success", "Car valuation added!", "success");
+        Swal.fire("Success", "Car valuation Updated!", "success");
 
         // close modal
         props.close.current.click();
@@ -102,15 +102,12 @@ const UpadteValuation = (props) => {
                 )}
 
                 <button type="submit" className="btn btn-primary mt-3">
-                  Save
+                  Update
                 </button>
               </form>
 
               <hr />
-
-              <p><b>Contract ID:</b> {props.contractId}</p>
-              <p><b>Car ID:</b> {props.carId}</p>
-              <p><b>Old Valuation:</b> {props.carvaluation}</p>
+ 
             </div>
           </div>
         </div>

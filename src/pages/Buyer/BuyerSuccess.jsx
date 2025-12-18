@@ -1,5 +1,5 @@
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useRef,  useContext, useEffect, useState } from "react";
 import ApiCall from "../../Apicall/ApiCall";
 import { AppSettings } from "./../../config/app-settings.js";
 import Swal from "sweetalert2";
@@ -180,57 +180,7 @@ export default function BuyerSuccess() {
     }
   };
 
-
-
-
-  // useEffect(() => {
-  //   if (activeStep === 1 && contractData?.id) {
-  //     let interval;
-
-  //     const checkValuation = async () => {
-  //       try {
-  //         const res = await ApiCall({
-  //           url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
-  //           method: "GET",
-  //         });
-
-  //         const latestData = res?.result || res?.data?.result;
-  //         setContractData(latestData);
-  //         setContractId(latestData.id);
-
-  //         const valuation = latestData.carValuationBySeller;
-
-  //         if (!valuation || valuation === 0) {
-  //           // Swal.fire({
-  //           //   icon: "warning",
-  //           //   title: "Wait!",
-  //           //   text: "Seller has not added car valuation yet.",
-  //           //   confirmButtonText: "OK",
-  //           // });
-  //           setSellerValuation(null);
-  //         } else {
-  //           setSellerValuation(valuation);
-
-
-  //           if (!valuationToastShown) {
-  //             toast.success("💰 Seller has added car valuation!", {
-  //               position: "top-right",
-  //             });
-  //             setValuationToastShown(true);
-  //           }
-  //         }
-  //       } catch (err) {
-  //         console.error("Error fetching latest contract:", err);
-  //       }
-  //     };
-
-  //     checkValuation();
-  //     interval = setInterval(checkValuation, 10000);
-
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [activeStep, contractData?.id, valuationToastShown]);
-
+ 
   useEffect(() => {
     if (activeStep === 1 && contractData?.id) {
       let interval;
@@ -285,51 +235,102 @@ export default function BuyerSuccess() {
 
 
 
-  useEffect(() => {
-    if (activeStep !== 2 || !contracId) return;
+  // useEffect(() => {
+  //   if (activeStep !== 2 || !contracId) return;
 
-    const fetchVehicleInfo = async () => {
-      try {
-        const res = await ApiCall({
-          url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
-          method: "GET",
+  //   const fetchVehicleInfo = async () => {
+  //     try {
+  //       const res = await ApiCall({
+  //         url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
+  //         method: "GET",
+  //       });
+
+  //       const latest = res?.result || res?.data?.result;
+
+
+  //       const newValuation = latest?.carValuationBySeller;
+
+  //       if (oldValuation !== null && newValuation !== oldValuation) {
+  //         Swal.fire({
+  //           icon: "info",
+  //           title: "Valuation Updated",
+  //           text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
+  //         });
+  //       }
+
+
+  //       setOldValuation(newValuation);
+
+
+  //       setVehicleInfo(latest);
+
+  //     } catch (err) {
+  //       console.error("Error fetching vehicle info:", err);
+  //     }
+  //   };
+
+
+  //   fetchVehicleInfo();
+
+
+  //   const intervalId = setInterval(fetchVehicleInfo, 10000);
+
+  //   return () => clearInterval(intervalId);
+
+  // }, [activeStep, contracId, oldValuation]);
+
+const intervalRef = useRef(null);
+useEffect(() => {
+  if (activeStep !== 2 || !contracId) return;
+
+  const fetchVehicleInfo = async () => {
+    try {
+      const res = await ApiCall({
+        url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
+        method: "GET",
+      });
+
+      const latest = res?.result || res?.data?.result;
+      const newValuation = latest?.carValuationBySeller;
+
+       
+      if (oldValuation !== null && newValuation !== oldValuation) {
+        Swal.fire({
+          icon: "info",
+          title: "Valuation Updated",
+          text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
         });
 
-        const latest = res?.result || res?.data?.result;
-
-
-        const newValuation = latest?.carValuationBySeller;
-
-        if (oldValuation !== null && newValuation !== oldValuation) {
-          Swal.fire({
-            icon: "info",
-            title: "Valuation Updated",
-            text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
-          });
+         
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-
-
-        setOldValuation(newValuation);
-
-
-        setVehicleInfo(latest);
-
-      } catch (err) {
-        console.error("Error fetching vehicle info:", err);
       }
-    };
 
+      setOldValuation(newValuation);
+      setContractId(latest);
 
-    fetchVehicleInfo();
+    } catch (err) {
+      console.error("Error fetching vehicle info:", err);
+    }
+  };
 
+  
+  fetchVehicleInfo();
 
-    const intervalId = setInterval(fetchVehicleInfo, 10000);
+  
+  intervalRef.current = setInterval(fetchVehicleInfo, 10000);
 
-    return () => clearInterval(intervalId);
+   
+  return () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
-  }, [activeStep, contracId, oldValuation]);
-
-
+}, [activeStep, contracId]); 
 
 
 

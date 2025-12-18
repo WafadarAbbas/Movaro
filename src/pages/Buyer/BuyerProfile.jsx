@@ -65,46 +65,7 @@ function BuyerProfile() {
       setStoredId(parseInt(id));
     }
   }, []);
-
-  // useEffect(() => {
-  //   const fetchContractMain = async () => {
-  //     if (activeStep === 2 && contractId) {
-  //       setLoading(true);
-  //       setError("");
-
-  //       try {
-  //         const response = await ApiCall({
-  //           url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractId}`,
-  //           method: "GET",
-  //         });
-
-  //         if (response.data?.result) {
-  //           setContractMainData(response.data.result);
-  //         } else if (response?.error) {
-  //           const backendError =
-  //             response.error.details ||
-  //             response.error.message ||
-  //             "⚠ Internal server error occurred.";
-
-  //           setError(backendError);
-  //         } else {
-  //           setError("❌ Contract not found.");
-  //         }
-
-  //       } catch (err) {
-  //         console.error("Error fetching contract:", err);
-  //         setError("⚠ Something went wrong while fetching contract data.");
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
-
-  //   fetchContractMain();
-  // }, [activeStep, contractId]);
-
-
-
+ 
   useEffect(() => {
     const fetchContractMain = async () => {
       if ((activeStep === 2 || activeStep === 4) && contractId) {
@@ -180,19 +141,6 @@ function BuyerProfile() {
         toast.success("Car found successfully!", {
           position: "bottom-right",
         });
-        console.log("SellerUserId:", raw.sellerUserId);
-        console.log("ContractId:", raw.contractId);
-
-        //     Swal.fire({
-        //       icon: "success",
-        //       title: "Car Found!",
-        //       html: `
-        //   <b>Seller User ID:</b> ${raw.sellerUserId}<br/>
-        //   <b>Contract ID:</b> ${raw.contractId}
-        // `,
-        //       confirmButtonColor: "#ff9f43",
-        //     });
-
       } else if (response?.error) {
 
         const backendError =
@@ -393,7 +341,7 @@ function BuyerProfile() {
       checkValuation();
 
 
-      interval = setInterval(checkValuation, 20000);
+      interval = setInterval(checkValuation, 10000);
 
       return () => clearInterval(interval);
     }
@@ -413,7 +361,7 @@ useEffect(() => {
       const latest = res?.result || res?.data?.result;
       const newValuation = latest?.carValuationBySeller;
 
-      // 🔔 valuation changed
+       
       if (oldValuation !== null && newValuation !== oldValuation) {
         Swal.fire({
           icon: "info",
@@ -421,7 +369,7 @@ useEffect(() => {
           text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
         });
 
-        // 🛑 STOP API polling after Swal
+         
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
@@ -436,13 +384,13 @@ useEffect(() => {
     }
   };
 
-  // first call
+  
   fetchVehicleInfo();
 
-  // start polling
-  intervalRef.current = setInterval(fetchVehicleInfo, 20000);
+  
+  intervalRef.current = setInterval(fetchVehicleInfo, 10000);
 
-  // cleanup on step change / unmount
+   
   return () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -507,88 +455,7 @@ useEffect(() => {
         <Divider sx={{ height: 1, backgroundColor: "#a1a0a0ff" }} />
 
         {/*----------------------- Step 0 ---------------------- */}
-        {/* {activeStep === 0 && (
-          <Container maxWidth="md">
-            <Typography variant="h6" align="center" fontWeight="bold" mb={1}>
-              What do you want to do today?
-            </Typography>
-            <Typography variant="subtitle1" align="center" color="text.secondary" mb={2}>
-              Buy and sell vehicles safely!
-            </Typography>
-            <Typography variant="subtitle2" align="center" color="text.secondary" mb={1}>
-              What do you want to buy?
-            </Typography>
-
-            <Container maxWidth="sm">
-              {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" py={6}>
-                  <div className="loader"></div>
-                </Box>
-              ) : error ? (
-                <Typography color="error" align="center" fontWeight="bold" py={3}>
-                  {error}
-                </Typography>
-              ) : vehicleData.length === 0 ? (
-                <Typography align="center" fontWeight="bold" py={3}>
-                  No Vehicle Types Found
-                </Typography>
-              ) : (
-                <Grid container spacing={3} mb={3}>
-                  {vehicleData.map((veh) => (
-                    <Grid size={{ xs: 6, sm: 6, md: 4 }} key={veh.id}>
-                      <Paper
-                        elevation={3}
-                        onClick={() => setActiveStep(1)}     // ⬅ click → go to next step
-                        sx={{
-                          borderRadius: 2,
-                          textAlign: "center",
-                          cursor: "pointer",
-                          border: "1px solid #ccc",
-                          backgroundColor: "white",
-                          transition: "0.2s",
-                          "&:hover": {
-                            border: "1px solid #ff9f43",
-                            transform: "scale(1.05)"
-                          }
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 55,
-                            height: 55,
-                            borderRadius: "50%",
-                            backgroundColor: "#fbe7d4ff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 24,
-                            margin: "8px auto"
-                          }}
-                        >
-                          {veh.vahicleTypeName.toLowerCase().includes("car") && <FaCar color="#ff9f43" />}
-                          {veh.vahicleTypeName.toLowerCase().includes("motorcycle") && <FaMotorcycle color="#ff9f43" />}
-                          {veh.vahicleTypeName.toLowerCase().includes("truck") && <FaTruck color="#ff9f43" />}
-                          {veh.vahicleTypeName.toLowerCase().includes("boat") && <FaShip color="#ff9f43" />}
-                          {veh.vahicleTypeName.toLowerCase().includes("camper") && <FaTrailer color="#ff9f43" />}
-                          {veh.vahicleTypeName.toLowerCase().includes("moped") && <MdElectricScooter color="#ff9f43" />}
-                        </Box>
-
-                        <Typography fontWeight="bold" py={1}>
-                          {veh.vahicleTypeName}
-                        </Typography>
-
-
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
-
-              )}
-
-
-            </Container>
-          </Container>
-        )} */}
+     
 
         {activeStep === 0 && (
           <Container maxWidth="md">
@@ -717,7 +584,7 @@ useEffect(() => {
           <Box textAlign="center" py={1}>
 
             <Typography variant="h6" fontWeight="bold" mb={1}>
-              {t('buyer.startPurchaseTitle')}  {/* English & Swedish handled via i18n */}
+              {t('buyer.startPurchaseTitle')}  
             </Typography>
 
             <Typography mb={3} color="gray">
@@ -965,27 +832,11 @@ useEffect(() => {
           <Box py={2}>
 
             <Container maxWidth="md">
-              <Paper
-                elevation={3}
-                sx={{
-                  p: 4,
-                  margin: "40px auto",
-
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ mb: 3, textAlign: 'center', fontWeight: 'bold' }}
-                >
-                  {t("buyer.vehicleInformation")}
-
-                </Typography>
-
-
+            
                 {!contractMainData ? (
                   <Typography>Loading vehicle information...</Typography>
                 ) : (
-                  <Box sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, p: 2 }}>
+                  <Box sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, p: 1 }}>
                     <Typography variant="h6" fontWeight="bold" mb={1}>
                       {t("buyer.vehicleInformation")}
                     </Typography>
@@ -1171,17 +1022,8 @@ useEffect(() => {
                     {t("buyer.transportInfo2")}
                   </Typography>
                 </Box>
-                {/* <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setActiveStep(3)}
-                >
-                  Next
-                </Button>
-              </Box> */}
-              </Paper>
+               
+             
             </Container>
           </Box>
         )}

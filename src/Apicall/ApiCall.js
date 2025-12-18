@@ -6,7 +6,7 @@ import { getToken } from "../Compo/utilis/getToken";
 
 const ApiCall = async ({ url, method, data }) => {
   const token = getToken();
-  // console.log("api calling", url, method, data);
+  console.log("api calling", url, method, data);
 
   try {
     const response = await axios({
@@ -20,7 +20,7 @@ const ApiCall = async ({ url, method, data }) => {
     });
 
     if (response?.status === 200 || response?.status === 204) {
-      // console.log("api response", response.status, response);
+      console.log("api response", response.status, response);
       return response;
     }
   } catch (error) {
