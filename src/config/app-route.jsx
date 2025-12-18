@@ -30,7 +30,7 @@ const AppRoute = [
     children: [
       {
         path: '',
-        element: <Navigate to='/dashboard' />
+        element: <Navigate to='/Home' />
       },
 
       {

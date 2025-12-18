@@ -170,13 +170,11 @@ const LoginModal = (props) => {
         );
 
         console.log("✅ API Response:", response.data);
-        //  console.log( response.data?.result?.accessToken);
-        // localStorage.setItem("authTokenn",  response.data?.result?.accessToken);
 
         if (response.data?.result?.accessToken) {
 
           const token = response.data.result.accessToken;
-          //  localStorage.setItem("authToken2", token);
+
           const secretKey = "my-super-secret-key";
           const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
           localStorage.setItem("authToken", encryptedToken);
@@ -187,7 +185,11 @@ const LoginModal = (props) => {
             props.close.current.click();
           }
 
-          navigate("/user/ChooseAction");
+          navigate("/user/ChooseAction", { replace: true });
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 10);
 
         } else {
           const backendError =

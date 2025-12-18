@@ -16,15 +16,14 @@ import {
 
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Formik, Form } from "formik";
-import { AppSettings } from "./../../config/app-settings.js";
 import ApiCall from "../../Apicall/ApiCall.js";
 import Swal from "sweetalert2";
 import LoadingSpinner from "../../Compo/spinner.jsx";
 const ChooseAction = () => {
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const context = useContext(AppSettings);
+ 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,13 +43,7 @@ const ChooseAction = () => {
     fetchUserId();
   }, []);
 
-  //  useEffect(() => {
-  //   context.setAppHeaderNone(true);   
 
-  //   return () => {
-  //     context.setAppHeaderNone(false);  
-  //   };
-  // }, []);
 
   const { refreshUserInfo } = useUser();
   return (
@@ -116,18 +109,18 @@ const ChooseAction = () => {
                 px: { xs: 2, md: 15 },
                 py: { xs: 5, md: 5 },
                 borderRadius: "12px",
-                transition: "0.4s ease",             
-                filter: loading ? "blur(8px)" : "none",    
-                pointerEvents: loading ? "none" : "auto", 
+                transition: "0.4s ease",
+                filter: loading ? "blur(8px)" : "none",
+                pointerEvents: loading ? "none" : "auto",
                 opacity: loading ? 0.5 : 1,
               }}
             >
               <Typography variant="h5" fontWeight="bold" mb={1}>
-                 {t("chooseAction.title")}
+                {t("chooseAction.title")}
               </Typography>
 
               <Typography variant="body1" color="text.secondary" mb={4}>
-                 {t("chooseAction.subtitle")}
+                {t("chooseAction.subtitle")}
               </Typography>
 
               <Grid container spacing={2}>
@@ -170,69 +163,69 @@ const ChooseAction = () => {
                         <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
                       </Box>
                       <Typography variant="subtitle1" fontWeight="bold">
-                       {t("chooseAction.sellCardTitle")}
+                        {t("chooseAction.sellCardTitle")}
                       </Typography>
                       <Typography
                         variant="body2"
                         color="text.secondary"
                         sx={{ mt: 1, mb: 2 }}
                       >
-                      {t("chooseAction.sellCardDesc")}
+                        {t("chooseAction.sellCardDesc")}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
 
 
-               <Grid size={{ xs: 6, sm: 6 }}>
-  <Card
-    onClick={() => {
-      navigate("/BuyerProfile");  
-    }}
-    sx={{
-      borderRadius: 3,
-      textAlign: "center",
-      p:1,
-      boxShadow: 3,
-      cursor: "pointer",
-      border: "2px solid transparent",
-      transition: "0.3s",
-      "&:hover": {
-        transform: "translateY(-6px)",
-        borderColor: "#ff9f43",
-        boxShadow: "0px 8px 22px rgba(255, 159, 67, 0.4)",
-      },
-    }}
-  >
-    <CardContent sx={{ p: 1 }}>
-      <Box
-        sx={{
-          backgroundColor: "#fcebdaff",
-          width: 60,
-          height: 60,
-          borderRadius: "50%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          mx: "auto",
-          mb: 2,
-        }}
-      >
-        <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
-      </Box>
-      <Typography variant="subtitle1" fontWeight="bold">
-        {t("chooseAction.buyCardTitle")}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mt: 2, mb: 2 }}
-      >
-      {t("chooseAction.buyCardDesc")}
-      </Typography>
-    </CardContent>
-  </Card>
-</Grid>
+                <Grid size={{ xs: 6, sm: 6 }}>
+                  <Card
+                    onClick={() => {
+                      navigate("/BuyerProfile");
+                    }}
+                    sx={{
+                      borderRadius: 3,
+                      textAlign: "center",
+                      p: 1,
+                      boxShadow: 3,
+                      cursor: "pointer",
+                      border: "2px solid transparent",
+                      transition: "0.3s",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        borderColor: "#ff9f43",
+                        boxShadow: "0px 8px 22px rgba(255, 159, 67, 0.4)",
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ p: 1 }}>
+                      <Box
+                        sx={{
+                          backgroundColor: "#fcebdaff",
+                          width: 60,
+                          height: 60,
+                          borderRadius: "50%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          mx: "auto",
+                          mb: 2,
+                        }}
+                      >
+                        <DirectionsCarIcon sx={{ color: "#ff9f43", fontSize: 30 }} />
+                      </Box>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        {t("chooseAction.buyCardTitle")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 2, mb: 2 }}
+                      >
+                        {t("chooseAction.buyCardDesc")}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
 
               </Grid>
             </Paper>
