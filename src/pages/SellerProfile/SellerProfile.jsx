@@ -1009,23 +1009,30 @@ function SellerProfile() {
 
             <Box display="flex" justifyContent="center" alignItems="center" mt={2} mb={3} gap={1}>
               <TextField
-                placeholder="Enter registration number"
+                placeholder="Registration number"
                 variant="outlined"
                 size="small"
                 value={registration}
                 onChange={(e) => setRegistration(e.target.value)}
+                autoComplete="off"
                 sx={{
-                  width: "300px",
-                  backgroundColor: "#fff",
+                  width: 300,  
+                  "@media (max-width:600px)": {  
+                    width: 200,                
+                  },
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: "18px", // yahan apni rounded value de sakte ho
+                    borderRadius: "18px",  
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#ff9f63",  
+
+                    },
                   },
                 }}
               />
               <Button
                 variant="contained"
                 onClick={handleSearch}
-                disabled={loading}
+                disabled={loading || !registration}
                 sx={{
                   backgroundColor: "#ff9f43",
                   "&:hover": { backgroundColor: "#e68a33" },
