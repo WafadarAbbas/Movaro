@@ -5,10 +5,9 @@ import * as Yup from 'yup'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import CryptoJS from 'crypto-js';  
-import ApiCall from '../../Apicall/ApiCall'
+import AuthApiCall from "../../Apicall/AuthApiCall";
 import { Navigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
-import axios from "axios";
+ 
 
 
 function LoginForm() {
@@ -34,15 +33,16 @@ const handleSubmit = async (values) => {
       rememberClient: values.rememberClient,
     };
 
- const response = await axios.post('https://localhost:44311/api/TokenAuth/Authenticate', requestBody, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+
+const response = await AuthApiCall({
+  url: "/TokenAuth/Authenticate",
+  method: "POST",
+  data: requestBody,
+});
  
      if (response.status === 200 && response.data.success) {
       const token = response.data.result.accessToken;
-      const secretKey = "my-super-secret-key";
+      const secretKey = "klargo-secret-key";
       const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
       localStorage.setItem("authToken", encryptedToken);
      setTimeout(() => {

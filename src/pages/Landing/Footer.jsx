@@ -39,7 +39,7 @@ const Footer = ({
             </Box>
           </Grid>
 
-         
+        
          <Grid size={{ xs: 4, md: 3 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               {[

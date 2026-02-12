@@ -1,56 +1,26 @@
-import axios from "axios";
+// Apicall/AuthApiCall.js
 import Swal from "sweetalert2";
-import { getToken } from "../Compo/utilis/getToken";
+import { apiWithoutAuth } from "./api";
 
-const ApiCall = async ({ url, method, data }) => {
-  const token = getToken();
-  console.log("api calling", url, method, data);
-
+const AuthApiCall = async ({ url, method = "POST", data = null, params = null }) => {
   try {
-    const response = await axios({
-      method,
+    const response = await apiWithoutAuth({
       url,
+      method,
       data,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-      },
+      params,
     });
 
-    if (response?.status === 200 || response?.status === 204) {
-      console.log("api response", response.status, response);
-      return response;
-    }
+    return response;
   } catch (error) {
-    console.error("api call catch", error);
+    Swal.fire(
+      "Error",
+      error?.response?.data?.error?.message || "Something went wrong",
+      "error"
+    );
 
-    const status = error?.response?.status;
-
-    if (status === 401) {
-      Swal.fire({
-        icon: "warning",
-        title: "Unauthorized (401)",
-        text: "Your session has expired. Please log in again.",
-      })
-      .then(() => {
- 
-        window.location.reload();
-      });
-    } else if (status === 403) {
-      Swal.fire({
-        icon: "error",
-        title: "Access Denied (403)",
-        text: "You do not have permission to access this resource.",
-      })
-      .then(() => {
-        
-        window.location.reload();
-      });
-    }
-
-     
-    return error.response ? error.response.data : error;
+    throw error;
   }
 };
 
-export default ApiCall;
+export default AuthApiCall;

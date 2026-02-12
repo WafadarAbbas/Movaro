@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Box, Tabs, Tab, Button, Divider } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from 'crypto-js';
 import { useCriiptoVerify } from "@criipto/verify-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useTranslation } from "react-i18next";
+import AuthApiCall from "../../Apicall/AuthApiCall";
+import { useUser } from "../../context/UserContext";
+
+
 const LoginModal = (props) => {
   const { loginWithRedirect } = useCriiptoVerify();
   const [tabValue, setTabValue] = useState(0);
@@ -18,6 +21,10 @@ const LoginModal = (props) => {
   const [apiError, setApiError] = useState("");
   const [apiError2, setApiError2] = useState("");
   const { t } = useTranslation();
+  const { refreshUserInfo } = useUser();
+
+
+ 
   const handleLoginBankID = async () => {
 
     await loginWithRedirect({
@@ -25,9 +32,26 @@ const LoginModal = (props) => {
     });
   };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+ const handleTabChange = (event, newValue) => {
+  setTabValue(newValue);
+};
+useEffect(() => {
+  const handleOnline = () => setApiError("");
+  const handleOffline = () =>
+    setApiError("No internet connection. Please check your network.");
+
+  window.addEventListener("online", handleOnline);
+  window.addEventListener("offline", handleOffline);
+
+  if (!navigator.onLine) {
+    setApiError("No internet connection. Please check your network.");
+  }
+
+  return () => {
+    window.removeEventListener("online", handleOnline);
+    window.removeEventListener("offline", handleOffline);
   };
+}, []);
 
   // ======================
   // ✅ Signup Formik
@@ -38,9 +62,7 @@ const LoginModal = (props) => {
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
+     
       password: Yup.string()
         .min(6, "Password must be at least 6 characters")
         .required("Password is required"),
@@ -60,7 +82,6 @@ const LoginModal = (props) => {
         profileImagePath: "",
         isSeller: false,
         isBuyer: false,
-
         bankIdSSN: "string",
         surname: "string",
         name: "string",
@@ -92,17 +113,15 @@ const LoginModal = (props) => {
         },
       };
 
-      console.log("Final payload to send:", payload);
+      
 
       try {
         setLoading(true);
-        const response = await axios.post(
-          "https://localhost:44311/api/services/app/User/RegisterExternalUser",
-          payload,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const response = await AuthApiCall({
+          url: "/services/app/User/RegisterExternalUser",
+          method: "POST",
+          data: payload,
+        });
 
         if (response.data?.success) {
           Swal.fire({
@@ -114,8 +133,6 @@ const LoginModal = (props) => {
           if (props.close && props.close.current) {
             props.close.current.click();
           }
-
-          // setShowLoginButton(true);
         } else {
           const backendError =
             response.data?.error?.details ||
@@ -161,21 +178,15 @@ const LoginModal = (props) => {
           password: values.password,
         };
 
-        const response = await axios.post(
-          "https://localhost:44311/api/TokenAuth/Authenticate",
-          payload,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        console.log("✅ API Response:", response.data);
-
+        const response = await AuthApiCall({
+          url: "/TokenAuth/Authenticate",
+          method: "POST",
+          data: payload,
+          
+        });
         if (response.data?.result?.accessToken) {
-
           const token = response.data.result.accessToken;
-
-          const secretKey = "my-super-secret-key";
+          const secretKey = "klargo-secret-key";
           const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
           localStorage.setItem("authToken", encryptedToken);
 
@@ -185,11 +196,9 @@ const LoginModal = (props) => {
             props.close.current.click();
           }
 
-          navigate("/user/ChooseAction", { replace: true });
+       await refreshUserInfo();  
 
-          setTimeout(() => {
-            window.location.reload();
-          }, 10);
+navigate("/user/ChooseAction", { replace: true });
 
         } else {
           const backendError =

@@ -4,9 +4,6 @@ const Menu = [
  
   },
 
- 
-
-
   { path: '/Testing', icon: 'fa fa-key', title: 'Testing',
     children: [
       { path: '/Testing/Testing', title: 'Testing' },

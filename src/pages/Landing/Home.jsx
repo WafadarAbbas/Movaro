@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useLayoutEffect } from "react";
 import {
   Box, Container, Grid, Typography, Stack, Button, LinearProgress, Paper, List, Card, CardContent,
   ListItem,
@@ -17,7 +18,6 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -29,18 +29,11 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import {
-  FaCar,
-  FaMotorcycle,
-  FaTruck,
-  FaShip,
-  FaTrailer,
-} from "react-icons/fa";
+import {FaCar,FaMotorcycle,FaTruck,FaShip,FaTrailer} from "react-icons/fa";
 import { MdElectricScooter } from "react-icons/md";
 import logo from "../../assets/Klargo1.png";
-import { Link } from "react-router-dom";
+ 
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -65,13 +58,13 @@ const Home = () => {
     handleLangClose();
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     context.setAppHeaderNone(true);
 
     return () => {
       context.setAppHeaderNone(false);
     };
-  }, []);
+  }, [context]);
 
   const scrollToServices = () => {
     servicesSectionRef.current.scrollIntoView({ behavior: "smooth" });
@@ -157,12 +150,7 @@ const Home = () => {
       message: t("home.vehicles.car.message"),
       Icon: FaCar,
     },
-    {
-      key: "motorcycle",
-      label: t("home.vehicles.motorcycle.label"),
-      message: t("home.vehicles.motorcycle.message"),
-      Icon: FaMotorcycle,
-    },
+  
     {
       key: "scooter",
       label: t("home.vehicles.scooter.label"),
@@ -398,27 +386,27 @@ const Home = () => {
                   )}
 
                   <MenuItem>
-                     <Typography
-                  onClick={handleLangClick}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                    px: 1.5,
-                    py: 0.5,
-                    marginRight: 1,
-                    border: "1px solid #c1c1c1",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontWeight: 500,
-                    fontSize: 12,
-                    color: "gray",
-                    "&:hover": { borderColor: "#ff6f00" },
-                  }}
-                >
-                  {i18n.language === "sv" ? "Svenska" : "English"}
-                  <ArrowDropDownIcon fontSize="small" />
-                </Typography>
+                    <Typography
+                      onClick={handleLangClick}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        px: 1.5,
+                        py: 0.5,
+                        marginRight: 1,
+                        border: "1px solid #c1c1c1",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                        fontWeight: 500,
+                        fontSize: 12,
+                        color: "gray",
+                        "&:hover": { borderColor: "#ff6f00" },
+                      }}
+                    >
+                      {i18n.language === "sv" ? "Svenska" : "English"}
+                      <ArrowDropDownIcon fontSize="small" />
+                    </Typography>
                   </MenuItem>
                   <MenuItem>
                     <Button
@@ -468,12 +456,43 @@ const Home = () => {
 
             <Grid size={{ xs: 12, md: 5 }}>
               <Box sx={{ p: 4 }}>
-                <Typography variant="h2" fontWeight={600} gutterBottom>
+                <Typography
+                  variant="h2"
+                  fontWeight={600}
+                  gutterBottom
+                  sx={{
+                    fontSize: {
+                      xs: "1.8rem",
+                      sm: "2.4rem",
+                      md: "3.75rem",
+                    },
+                    lineHeight: {
+                      xs: 1.2,
+                      md: 1.3,
+                    },
+                  }}
+                >
                   {t("home.heroTitle")}
                 </Typography>
-                <Typography variant="h5" >
+
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: {
+                      xs: "1rem",
+                      sm: "1.25rem",
+                      md: "1.5rem",
+                    },
+                    lineHeight: {
+                      xs: 1.5,
+                      md: 1.6,
+                    },
+                    color: "text.secondary",
+                  }}
+                >
                   {t("home.heroSubtitle")}
                 </Typography>
+
 
                 <Box mt={2} >
 
@@ -554,10 +573,10 @@ const Home = () => {
             </Grid>
 
 
-            <Grid size={{ xs: 5, md: 7 }}>
+            <Grid size={{ xs: 6, md: 6 }}>
               <Box className="card-stack">
                 {cards.map((card, index) => (
-
+ 
 
                   <Box
                     key={card.id}
@@ -602,81 +621,33 @@ const Home = () => {
 
 
       {/* ----------------------------------------------------------- */}
-      {/* <Box sx={{ bgcolor: "#ffffff", }}>
-
-        <Container  >
-          <Typography variant="h4" fontWeight={600} mb={4} pt={10} textAlign="center">
-            Stöd för flera fordonstyper
-          </Typography>
-
-          {selected && (
-
-            <Typography variant="subtitle1" color="text.secondary" mt={5} textAlign="center">
-              {
-                vehicles.find((v) => v.key === selected)?.message
-              }
-            </Typography>
-
-          )}
-
-          <Box textAlign="center" mt={6} pb={10}>
-
-            <Grid
-              container
-              spacing={2}
-              justifyContent="center"
-              alignItems="center"
-              mb={3}
-            >
-              {vehicles.map(({ key, label, Icon }) => (
-                <Grid
-                  size={{ xs: 4, md: 2 }}
-                  key={key}
-                  display="flex"
-                  justifyContent="center"
-                >
-                  <Button
-                    variant="outlined"
-                    onClick={() => setSelected(key)}
-                    startIcon={<Icon />}
-                    sx={{
-                      textTransform: "none",
-                      borderRadius: "10px",
-                      padding: "10px 20px",
-                      borderColor:
-                        selected === key ? "#ff9f63" : "rgba(0,0,0,0.12)",
-                      color: selected === key ? "#ff9f63" : "inherit",
-                      backgroundColor:
-                        selected === key ? "rgba(255,159,99,0.06)" : "transparent",
-                      "&:hover": {
-                        borderColor: "#ff9f63",
-                        color: "#ff9f63",
-                        backgroundColor: "rgba(255,159,99,0.08)",
-                      },
-                      svg: {
-                        fontSize: 20,
-                      },
-                    }}
-                  >
-                    {label}
-                  </Button>
-                </Grid>
-              ))}
-            </Grid>
-
-
-
-          </Box>
-
-
-        </Container>
-      </Box> */}
 
       <Box sx={{ bgcolor: "#ffffff" }}>
         <Container>
-          <Typography variant="h4" fontWeight={600} mb={4} pt={10} textAlign="center">
+           
+          <Typography
+            variant="h4"
+            fontWeight={600}
+            textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "1.8rem",
+                md: "2.125rem",
+              },
+              pt: {
+                xs: 6,
+                md: 10,
+              },
+              mb: {
+                xs: 3,
+                md: 4,
+              },
+            }}
+          >
             {t("home.vehicles.title")}
           </Typography>
+
 
           {selected && (
             <Typography variant="subtitle1" color="text.secondary" mt={5} textAlign="center">
@@ -694,7 +665,7 @@ const Home = () => {
                     startIcon={<Icon />}
                     sx={{
                       textTransform: "none",
-                      borderRadius: "10px",
+                      borderRadius: "22px",
                       padding: "10px 20px",
                       borderColor: selected === key ? "#ff9f63" : "rgba(0,0,0,0.12)",
                       color: selected === key ? "#ff9f63" : "inherit",
@@ -729,15 +700,26 @@ const Home = () => {
           <Typography
             variant="h4"
             fontWeight={600}
-            mb={6}
             textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "1.8rem",
+                md: "2.125rem",  
+              },
+              mb: {
+                xs: 3,
+                md: 6,
+              },
+            }}
           >
             {t("home.dealCards.dealCardsSectionTitle")}
           </Typography>
 
+
           <Grid container spacing={2} justifyContent="center">
             {cardsss.map((card, index) => (
-              <Grid size={{ xs: 12, md: 6 }} key={index}>
+              <Grid size={{ xs: 10, md: 6 }} key={index}>
                 <Box
                   sx={{
                     bgcolor: "#fff",
@@ -773,9 +755,24 @@ const Home = () => {
                     >
                       {card.icon}
                     </Box>
-                    <Typography variant="h6" fontWeight={600}>
+                    <Typography
+                      variant="h6"
+                      fontWeight={600}
+                      sx={{
+                        fontSize: {
+                          xs: "1rem",
+                          sm: "1.1rem",
+                          md: "1.25rem",  
+                        },
+                        lineHeight: {
+                          xs: 1.3,
+                          md: 1.4,
+                        },
+                      }}
+                    >
                       {card.title}
                     </Typography>
+
                   </Box>
 
                   <Typography variant="body2" color="text.secondary" mb={2}>
@@ -836,12 +833,26 @@ const Home = () => {
           <Typography
             variant="h4"
             fontWeight={600}
-            mb={4}
-            pt={8}
             textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "1.8rem",
+                md: "2.125rem",
+              },
+              pt: {
+                xs: 5,
+                md: 8,
+              },
+              mb: {
+                xs: 3,
+                md: 4,
+              },
+            }}
           >
             {t("home.serviceCardsSectionTitle")}
           </Typography>
+
 
           <LinearProgress
             variant="determinate"
@@ -867,7 +878,7 @@ const Home = () => {
                     p: 1,
                     borderRadius: 3,
                     boxShadow: 3,
-                    minHeight: 300,
+                    minHeight: 250,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -894,12 +905,48 @@ const Home = () => {
                     {iconsMap[card.icon]}
 
                   </Box>
-                  <Typography variant="h6" fontWeight={600} mb={1} textAlign="center">
+                  <Typography
+                    variant="h6"
+                    fontWeight={600}
+                    textAlign="center"
+                    sx={{
+                      fontSize: {
+                        xs: "1rem",
+                        sm: "1.1rem",
+                        md: "1.25rem", // h6 default
+                      },
+                      mb: {
+                        xs: 0.5,
+                        md: 1,
+                      },
+                    }}
+                  >
                     {card.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" p={1} textAlign="center">
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    textAlign="center"
+                    sx={{
+                      fontSize: {
+                        xs: "0.85rem",
+                        sm: "0.9rem",
+                        md: "0.95rem",
+                      },
+                      px: {
+                        xs: 0.5,
+                        md: 1,
+                      },
+                      lineHeight: {
+                        xs: 1.5,
+                        md: 1.6,
+                      },
+                    }}
+                  >
                     {card.text}
                   </Typography>
+
                 </Box>
               </Grid>
             ))}
@@ -911,20 +958,36 @@ const Home = () => {
 
       <Box sx={{ py: 6, backgroundColor: "#ffff" }}>
         <Container>
-          <Typography variant="h4" fontWeight={600} mb={6} textAlign="center">
+          <Typography
+            variant="h4"
+            fontWeight={600}
+            textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "1.8rem",
+                md: "2.125rem",
+              },
+              mb: {
+                xs: 3,
+                md: 6,
+              },
+            }}
+          >
             {t("home.whyKlargo")}
           </Typography>
 
+
           <Grid container spacing={3} justifyContent="center">
             {t("home.whyChooseKlargo", { returnObjects: true }).map((card, index) => (
-              <Grid size={{ xs: 6, md: 3 }} key={index}>
+              <Grid size={{ xs: 12, md: 3 }} key={index}>
                 <Box
                   sx={{
                     bgcolor: "#ffffffff",
-                    p: 1,
+                  pt: 2, px: 2, pb: 10 ,
                     borderRadius: 3,
                     boxShadow: 3,
-                    minHeight: 300,
+                
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -950,12 +1013,48 @@ const Home = () => {
                   >
                     {iconsMap2[card.icon]}
                   </Box>
-                  <Typography variant="h6" fontWeight={600} mb={1} textAlign={"center"}>
+                  <Typography
+                    variant="h6"
+                    fontWeight={600}
+                    textAlign="center"
+                    sx={{
+                      fontSize: {
+                        xs: "1rem",
+                        sm: "1.1rem",
+                        md: "1.25rem",   
+                      },
+                      mb: {
+                        xs: 0.5,
+                        md: 1,
+                      },
+                    }}
+                  >
                     {card.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" textAlign={"center"} p={1}>
+
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    textAlign="center"
+                    sx={{
+                      fontSize: {
+                        xs: "0.85rem",
+                        sm: "0.9rem",
+                        md: "0.95rem",
+                      },
+                      px: {
+                        xs: 0.5,
+                        md: 1,
+                      },
+                      lineHeight: {
+                        xs: 1.4,
+                        md: 1.6,
+                      },
+                    }}
+                  >
                     {card.text}
                   </Typography>
+
                 </Box>
               </Grid>
             ))}
@@ -975,24 +1074,64 @@ const Home = () => {
           ref={PriserSectionRef}
 
         >
-          <Typography variant="h3" fontWeight={600} mb={4} pt={10} textAlign="center">
+          <Typography
+            variant="h3"
+            fontWeight={600}
+            textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "2.4rem",
+                md: "3rem",
+              },
+              pt: {
+                xs: 6,
+                md: 10,
+              },
+              mb: {
+                xs: 3,
+                md: 4,
+              },
+            }}
+          >
             {t("home.pricingSectionTitle")}
           </Typography>
 
+
           <Box
             sx={{
-              bgcolor: "#fff4ed",   // soft background
+              bgcolor: "#fff4ed",
               borderRadius: 3,
               p: 4,
               textAlign: "center",
               boxShadow: "0px 8px 30px rgba(255, 159, 99, 0.5)",
-              maxWidth: 500,
+              maxWidth: {
+                xs: 350,
+                sm: 400,
+                md: 500,
+              },
               mx: "auto",
             }}
           >
-            <Typography variant="h2" fontWeight={700} mb={1}>
+            <Typography
+              variant="h2"
+              fontWeight={700}
+              mb={1}
+              sx={{
+                fontSize: {
+                  xs: "2rem",    
+                  sm: "2.8rem",  
+                  md: "3.75rem",  
+                },
+                lineHeight: {
+                  xs: 1.2,
+                  md: 1.3,
+                },
+              }}
+            >
               {t("home.pricingAmount")} {t("home.pricingCurrency")}
             </Typography>
+
             <Typography variant="subtitle1" fontWeight={600} mb={1}>
               {t("home.pricingSubtitle")}
             </Typography>
@@ -1024,11 +1163,22 @@ const Home = () => {
           <Typography
             variant="h4"
             fontWeight={600}
-            mb={6}
             textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",
+                sm: "1.8rem",
+                md: "2.125rem",
+              },
+              mb: {
+                xs: 3,
+                md: 6,
+              },
+            }}
           >
             {t("home.faqSectionTitle")}
           </Typography>
+
 
 
           <Grid container spacing={3} justifyContent="center">
@@ -1090,11 +1240,22 @@ const Home = () => {
           <Typography
             variant="h4"
             fontWeight={600}
-            mb={6}
             textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",  
+                sm: "1.8rem",  
+                md: "2.125rem",  
+              },
+              mb: {
+                xs: 3,
+                md: 6,
+              },
+            }}
           >
             {t("home.guideSectionTitle")}
           </Typography>
+
 
 
           <Grid container spacing={4} justifyContent="center">
@@ -1114,12 +1275,43 @@ const Home = () => {
                   }}
                 >
                   <CardContent sx={{ p: 6, textAlign: "center" }}>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
+                    <Typography
+                      variant="h6"
+                      fontWeight={600}
+                      gutterBottom
+                      sx={{
+                        fontSize: {
+                          xs: "0.95rem",    
+                          sm: "1.1rem",  
+                          md: "1.25rem",  
+                        },
+                        lineHeight: {
+                          xs: 1.3,
+                          md: 1.4,
+                        },
+                      }}
+                    >
                       {card.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: {
+                          xs: "0.85rem",
+                          sm: "0.9rem",
+                          md: "0.95rem",
+                        },
+                        lineHeight: {
+                          xs: 1.4,
+                          md: 1.6,
+                        },
+                      }}
+                    >
                       {card.description}
                     </Typography>
+
                   </CardContent>
                 </Card>
               </Grid>
@@ -1139,16 +1331,46 @@ const Home = () => {
             }}
           >
 
-            <Typography variant="h5" fontWeight={600} mb={2}>
+            <Typography
+              variant="h5"
+              fontWeight={600}
+              mb={2}
+              sx={{
+                fontSize: {
+                  xs: "1.2rem",   
+                  sm: "1.5rem",   
+                  md: "1.75rem",   
+                },
+                lineHeight: {
+                  xs: 1.3,
+                  md: 1.4,
+                },
+              }}
+            >
               {t("home.loanSectionTitle")}
             </Typography>
 
-            {/* === Description === */}
-            <Typography variant="body1" color="text.secondary" mb={3}>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              mb={3}
+              sx={{
+                fontSize: {
+                  xs: "0.9rem",   
+                  sm: "1rem",     
+                  md: "1.05rem",   
+                },
+                lineHeight: {
+                  xs: 1.4,
+                  md: 1.6,
+                },
+              }}
+            >
               {t("home.loanDescription")}
             </Typography>
 
-            {/* === Example Box === */}
+
+
             <Paper
               elevation={0}
               sx={{
@@ -1170,25 +1392,26 @@ const Home = () => {
               </List>
             </Paper>
 
-
             <Grid container spacing={3}>
-              <Grid item>
-                <p href="#" underline="hover" sx={{ color: "#00bfa5", fontWeight: 500 }}>
+              <Grid>
+                <Typography sx={{ color: "#00bfa5", fontWeight: 500 }}>
                   {t("home.loanLinks")}
-
-                </p>
+                </Typography>
               </Grid>
-              <Grid item>
+
+              <Grid>
                 <Typography component="span" color="text.disabled">
                   •
                 </Typography>
               </Grid>
-              <Grid item>
-                <p href="#" underline="hover" sx={{ color: "#00bfa5", fontWeight: 500 }}>
+
+              <Grid>
+                <Typography sx={{ color: "#00bfa5", fontWeight: 500 }}>
                   {t("home.loanLinks2")}
-                </p>
+                </Typography>
               </Grid>
             </Grid>
+
           </Paper>
         </Container>
       </Box>
@@ -1204,17 +1427,28 @@ const Home = () => {
         }}
       >
         <Container>
-          {/* Section title */}
+
           <Typography
             variant="h4"
             fontWeight={600}
-            mb={4}
             textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "1.4rem",   
+                sm: "1.8rem",   
+                md: "2.125rem", // desktop (h4 default)
+              },
+              mb: {
+                xs: 3,
+                md: 4,
+              },
+            }}
           >
             {t("home.partnersSectionTitle")}
           </Typography>
 
-          {/* Section subtitle */}
+
+
           <Typography
             variant="subtitle1"
             color="text.secondary"
@@ -1224,7 +1458,7 @@ const Home = () => {
             {t("home.partnersSectionSubtitle")}
           </Typography>
 
-          {/* Partners list */}
+
           <Grid container spacing={3} justifyContent="center">
             {t("home.partnersList", { returnObjects: true }).map((partner, index) => (
               <Grid size={{ xs: 3, md: 1.2 }} key={index} textAlign="center">

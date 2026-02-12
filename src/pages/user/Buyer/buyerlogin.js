@@ -1,4 +1,4 @@
- 
+
 import React, { useState } from "react";
 import {
   Box,
@@ -6,7 +6,7 @@ import {
   Typography,
   Paper,
   Divider,
-  Container,
+   
   CircularProgress,
   TextField,
   InputAdornment,
@@ -15,26 +15,27 @@ import {
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import LockIcon from "@mui/icons-material/Lock";
-import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
-import axios from "axios";
 import CryptoJS from "crypto-js";
 import logo from "../../../assets/logoBankIdwhite.png";
 import { useCriiptoVerify } from "@criipto/verify-react";
-import { useAuth } from "../../../context/AuthContext.js";
+ import { useUser } from "../../../context/UserContext.js";
 import { useTranslation } from "react-i18next";
+import AuthApiCall from "../../../Apicall/AuthApiCall.js";
 function BuyerLogin() {
-  const { t, i18n } = useTranslation();
+
+ 
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [tabValue, setTabValue] = useState(0);
   const { loginWithRedirect } = useCriiptoVerify();
-  const { authData } = useAuth();
+    const { refreshUserInfo } = useUser();
   const handleLoginBankID = async () => {
     localStorage.setItem("role", "buyer");
     await loginWithRedirect({
@@ -64,11 +65,13 @@ function BuyerLogin() {
           userNameOrEmailAddress: values.emailAddress,
           password: values.password,
         };
-        const response = await axios.post(
-          "https://localhost:44311/api/TokenAuth/Authenticate",
-          payload,
-          { headers: { "Content-Type": "application/json" } }
-        );
+
+
+        const response = await AuthApiCall({
+          url: "/TokenAuth/Authenticate",
+          method: "POST",
+          data: payload,
+        });
 
         if (response.data?.result?.accessToken) {
           Swal.fire({
@@ -80,11 +83,14 @@ function BuyerLogin() {
           });
 
           const token = response.data.result.accessToken;
-          const secretKey = "my-super-secret-key";
+          const secretKey = "klargo-secret-key";
           const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
           localStorage.setItem("authToken", encryptedToken);
 
-          resetForm();
+      await refreshUserInfo();
+   resetForm();
+
+         
           navigate("/BuyerSuccess");
         } else {
           const backendError =
@@ -165,15 +171,12 @@ function BuyerLogin() {
             userId: 0,
           },
         };
-
-        console.log(payload);
-
-
-        const response = await axios.post(
-          "https://localhost:44311/api/services/app/User/RegisterExternalUser",
-          payload,
-          { headers: { "Content-Type": "application/json" } }
-        );
+ 
+        const response = await AuthApiCall({
+          url: "/services/app/User/RegisterExternalUser",
+          method: "POST",
+          data: payload,
+        });
 
         if (response.data?.success) {
           Swal.fire({

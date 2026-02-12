@@ -1,11 +1,8 @@
- 
-
 import React, { useEffect, useState } from 'react';
 import { AppSettings } from './config/app-settings.js';
-
 import Header from './components/header/header.jsx';
 import Content from './components/content/content.jsx';
-
+import { SignalRProvider } from "./context/SignalRContext.js";
 import { UserProvider } from "./context/UserContext.js";
 import { CriiptoVerifyProvider } from "@criipto/verify-react";
 import { AuthProvider } from './context/AuthContext.js';
@@ -81,6 +78,7 @@ function App() {
 	}, [appTheme, appDarkMode]);
 
 	return (
+		<SignalRProvider>
 <CriiptoVerifyProvider
       domain="jinnah-test.criipto.id"
       clientID="urn:my:application:identifier:42807"
@@ -92,24 +90,7 @@ function App() {
 <UserProvider>
 
 <AppSettings.Provider
-	value={{
-		appTheme,
-		appDarkMode,
-		appGradientEnabled,
-		appHeaderNone,
-		appHeaderFixed,
-		appHeaderInverse,
-		appHeaderMegaMenu,
-		appHeaderLanguageBar,
-		hasScroll,
-		appSidebarNone,  
-		appContentNone,
-		appContentClass,
-		appContentFullHeight,
-		handleSetAppDarkMode,
-		handleSetAppTheme,
-		 setAppHeaderNone,
-	}}
+	value={{appTheme,appDarkMode,appGradientEnabled,appHeaderNone,appHeaderFixed,appHeaderInverse,appHeaderMegaMenu,appHeaderLanguageBar,hasScroll,appSidebarNone,appContentNone,appContentClass,appContentFullHeight,handleSetAppDarkMode,handleSetAppTheme,setAppHeaderNone}}
 >
 <div
 	className={
@@ -128,6 +109,7 @@ function App() {
 </UserProvider>
 </AuthProvider>
 </CriiptoVerifyProvider>
+</SignalRProvider>
 	);
 }
 

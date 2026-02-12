@@ -117,120 +117,103 @@
 // }
 
 // export default Testing3;
-
-
-import { Box, Paper, Typography, Grid, Container } from "@mui/material";
-import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import BusinessIcon from "@mui/icons-material/Business";
-import NumbersIcon from "@mui/icons-material/Numbers";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import LocalGasStationIcon from "@mui/icons-material/LocalGasStation";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import React from "react";
+import React, { useState } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
+  Container,
+  TextField,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import Swal from "sweetalert2";
+import ApiCall from "../../Apicall/ApiCall";
 
 function Testing3() {
-  const carData = {
-    registrationNo: "ZZR108",
-    registreringsnummer: "ABC123",
-    fordonsuppgifter: {
-      fordonsbenamning: "XC60",
-      handelsbeteckning: "Volvo XC60",
-      fordonsar: 2020,
-      arsmodell: 2021,
-      registreringsdatum: "2020-06-15",
-    },
-    tekniskData: {
-      drivmedel: [{ drivmedel: "Gasoline" }],
-      vaxellada: "Automatic",
-      fyrhjulsdrift: true,
-    },
-  };
+  const [registration, setRegistration] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [carData, setCarData] = useState(null);
 
-  const InfoRow = ({ icon, label, value }) => (
-    <Box display="flex" alignItems="center" gap={1.5} mb={1}>
-      <Box
-        sx={{
-          backgroundColor: "#fdf6f0ff",
-          p: 0.8,
-          borderRadius: "8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        {icon}
-      </Box>
-      <Box>
-        <Typography fontSize="12px" color="gray">
-          {label}
-        </Typography>
-        <Typography fontWeight="bold">
-          {value}
-        </Typography>
-      </Box>
-    </Box>
-  );
+  const handleCheckCar = async () => {
+    if (!registration) {
+      Swal.fire("Missing", "Please enter registration number", "warning");
+      return;
+    }
+
+    setLoading(true);
+    setCarData(null);
+
+    try {
+      const res = await ApiCall({
+        url: "/CarInfo/GetVehicleInfo",
+        method: "GET",
+        params: { Id: registration },
+      });
+
+      console.log("API SUCCESS RESPONSE 👉", res);
+
+      const result = res?.data?.result;
+
+      if (!result || result.length === 0) {
+        Swal.fire("Not Found", "Car not found", "info");
+        return;
+      }
+
+      setCarData(result[0]);
+      Swal.fire("Success", "Car data fetched successfully", "success");
+
+    } catch (err) {
+      console.error("API ERROR 👉", err);
+
+      const backendError = err?.response?.data?.error;
+
+      if (backendError) {
+        Swal.fire(
+          backendError.message || "Error",
+          backendError.details || "Backend error occurred",
+          "error"
+        );
+      } else {
+        Swal.fire("Error", err.message || "Unexpected error", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container maxWidth="sm">
-      <Paper
-        elevation={3}
-        sx={{
-          mt: 4,
-          p: 3,
-          borderRadius: "16px",
-          backgroundColor: "#ffffff",
-        }}
-      >
-        {/* HEADER */}
-        <Typography
-          fontWeight="bold"
-          sx={{ fontSize: "16px", mb: 2 }}
-        >
-          {carData.fordonsuppgifter.handelsbeteckning}, {carData.fordonsuppgifter.arsmodell}
+      <Paper sx={{ p: 3, mt: 5 }}>
+        <Typography variant="h6" mb={2}>
+          Car API Test
         </Typography>
 
-        <Grid container spacing={2}>
-          {/* LEFT */}
-             <Grid size={{xs:12,md:6}}>
-            <InfoRow
-              icon={<ConfirmationNumberIcon sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Registreringsnummer"
-              value={carData.registreringsnummer}
-            />
-            <InfoRow
-              icon={<LocalGasStationIcon  sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Bränsle"
-              value={carData.tekniskData.drivmedel.map(d => d.drivmedel).join(", ")}
-            />
-            <InfoRow
-              icon={<SettingsSuggestIcon  sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Drivning"
-              value={carData.tekniskData.fyrhjulsdrift ? "Fyrhjulsdrift" : "Tvåhjulsdrift"}
-            />
-          </Grid>
+        <TextField
+          fullWidth
+          label="Registration Number"
+          value={registration}
+          onChange={(e) => setRegistration(e.target.value)}
+        />
 
-          {/* RIGHT */}
-            <Grid size={{xs:12,md:6}}>
-            <InfoRow
-              icon={<BusinessIcon  sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Mätarställning"
-              value="13 605 mil"
-            />
-            <InfoRow
-              icon={<SettingsIcon  sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Växellåda"
-              value={carData.tekniskData.vaxellada}
-            />
-            <InfoRow
-              icon={<NumbersIcon  sx={{color:"#ff9f43"}}  fontSize="small" />}
-              label="Motor"
-              value="3604 cc, 421 hk"
-            />
-          </Grid>
-        </Grid>
+        <Button
+          fullWidth
+          sx={{ mt: 2 }}
+          variant="contained"
+          onClick={handleCheckCar}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : "Check Car"}
+        </Button>
+
+        {carData && (
+          <Box mt={3}>
+            <Typography variant="subtitle2">Result:</Typography>
+            <pre style={{ fontSize: 12 }}>
+              {JSON.stringify(carData, null, 2)}
+            </pre>
+          </Box>
+        )}
       </Paper>
     </Container>
   );

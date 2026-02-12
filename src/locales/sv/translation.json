@@ -7,6 +7,15 @@
     "buyCardTitle": "Jag vill köpa",
     "buyCardDesc": "Ange registreringsnummer eller skanna säljarens QR-kod för att fortsätta."
   },
+   "document": {
+    "title": "Klargo Dokument",
+    "subtitle": "Välj ett dokument för att förhandsgranska",
+    "contractTitle": "Köpekontrakt",
+    "contractDesc": "Köpeavtal för begagnade fordon",
+    "vehicleTitle": "Fordonrapport",
+    "vehicleDesc": "Detaljerad rapport om fordonets skick",
+    "previewBtn": "Visa förhandsgranskning"
+  },
   "home": {
     "heroTitle": "Trygg affär för fordon i ett flöde",
     "heroSubtitle": "Kontrakt, betalning, ägarbyte och försäkring. Allt samlat och guidat mellan säljare och köpare.",
@@ -367,7 +376,7 @@
     "connectSellerTitle": "Anslut till säljaren",
     "connectSellerSubtitle": "Klicka på knappen nedan för att meddela säljaren.",
     "dealConnected": "Köparaffären har anslutits! ✅",
-    "sellerValuation": "Bilvärdering av säljaren: {{valuation}}",
+    "sellerValue": "Bilvärdering tillagd av säljaren ",
     "waitingValuation": "Väntar på att säljaren ska lägga till värdering...",
     "vehicleInformation": "Fordoninformation",
     "registrationNo": "Registreringsnummer",

@@ -16,11 +16,10 @@ import { TextField, InputAdornment } from "@mui/material";
  import { useNavigate } from "react-router-dom";
 import LockIcon from "@mui/icons-material/Lock";
 import logo from "../../../assets/logoBankIdwhite.png"
-import EmailIcon from "@mui/icons-material/Email";
+ 
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
-import Swal from "sweetalert2";
+ import AuthApiCall from "../../../Apicall/AuthApiCall";
 import CryptoJS from 'crypto-js'; 
 
 function LoginBox({ onForgotPassword }) {
@@ -54,20 +53,20 @@ const formik = useFormik({
           password: values.password,
         };
 
-        const response = await axios.post(
-          "https://localhost:44311/api/TokenAuth/Authenticate",
-          payload,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+       // path adjust karo
+
+const response = await AuthApiCall({
+  url: "/TokenAuth/Authenticate",
+  method: "POST",
+  data: payload,
+});
 
         console.log("✅ API Response:", response.data);
 
         if (response.data?.result?.accessToken) {
  
            const token = response.data.result.accessToken;
-                const secretKey = "my-super-secret-key";
+                const secretKey = "klargo-secret-key";
                 const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
                 localStorage.setItem("authToken", encryptedToken);
          

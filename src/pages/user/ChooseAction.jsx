@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useUser } from "../../context/UserContext.js";
@@ -6,11 +6,9 @@ import {
   Box,
   Card,
   CardContent,
-  Button,
   Typography,
   Grid,
   Container,
-  CircularProgress,
   Paper,
 } from "@mui/material";
 
@@ -18,19 +16,19 @@ import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Formik, Form } from "formik";
 import ApiCall from "../../Apicall/ApiCall.js";
 import Swal from "sweetalert2";
- 
+
 const ChooseAction = () => {
   const { t } = useTranslation();
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
- 
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserId = async () => {
       try {
         const response = await ApiCall({
-          url: "https://localhost:44311/api/services/app/Session/GetCurrentLoginInformations",
+          url: "/Session/GetCurrentLoginInformations",
           method: "GET",
         });
         const id = response.data?.result?.user?.id;
@@ -72,9 +70,9 @@ const ChooseAction = () => {
           setLoading(true);
           try {
             const response = await ApiCall({
-              url: "https://localhost:44311/api/services/app/ContractMain/Create",
+              url: "/ContractMain/Create", // relative to baseURL
               method: "POST",
-              data: values,
+              data: values, // body data
             });
 
             if (response && response.status === 200) {

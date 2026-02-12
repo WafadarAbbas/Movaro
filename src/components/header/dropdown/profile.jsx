@@ -1,7 +1,7 @@
 
 
 import React, { useState } from "react";
-import { Menu, MenuItem, Typography, Avatar, Box } from "@mui/material";
+import { Menu, MenuItem, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { FaUserEdit, FaSignOutAlt } from "react-icons/fa";
 import PersonIcon from "@mui/icons-material/Person";
@@ -10,8 +10,8 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useTranslation } from "react-i18next";
 function DropdownProfile() {
   const navigate = useNavigate();
-  const { profileImage, userName } = useUser();
-  const { t, i18n } = useTranslation();
+  const { userName,loading } = useUser();
+  const {   i18n } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -21,9 +21,10 @@ function DropdownProfile() {
 
   const [langAnchorEl, setLangAnchorEl] = useState(null);
   const langOpen = Boolean(langAnchorEl);
-  const [language, setLanguage] = useState(
-    localStorage.getItem("appLanguage") === "sv" ? "Svenska" : "English"
-  );
+const [language, setLanguage] = useState(
+  localStorage.getItem("appLanguage") === "sv" ? "Svenska" : "English"
+);
+
 
   const handleLangClick = (event) => setLangAnchorEl(event.currentTarget);
   const handleLangClose = () => setLangAnchorEl(null);
@@ -93,7 +94,7 @@ function DropdownProfile() {
           }}
         >
           <PersonIcon sx={{ fontSize: { xs: 12, sm: 16, md: 18 } }} />
-          {userName || "Guest"}
+          {loading ? "..." : userName || "Guest"}
         </Typography>
       </Box>
 
@@ -175,7 +176,7 @@ function DropdownProfile() {
           onClick={handleLogout}
           sx={{
             fontSize: "14px",
-            backgroundColor: "transparent !important",  // force remove background
+            backgroundColor: "transparent !important",   
             "&.Mui-focusVisible": {
               backgroundColor: "transparent !important",
             },

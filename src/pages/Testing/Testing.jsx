@@ -1,42 +1,85 @@
-import React, { useRef, useEffect, useState } from "react";
  
-import { TextField, Box , Container} from "@mui/material";
-import p1 from "./p1.jpg"
+import React, { useState } from "react";
+ 
+import { Container, Button, TextField, Typography } from "@mui/material";
+
 function Testing1() {
- 
- 
+  
 
   return (
- <Container>
-  <Box
-    sx={{
-      width: 420,
-      backgroundColor: "#fff",
-      borderRadius: "8px",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-    }}
-  >
-    <TextField
-      fullWidth
-      placeholder="Type here to search"
-      variant="standard"
-      InputProps={{
-        disableUnderline: true,
-        sx: {
-          padding: "10px 12px",
-          paddingRight: "70px", // space for image
-          backgroundImage: `url(${p1})`,
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "right 10px center",
-          backgroundSize: "45px",
-        },
-      }}
-    />
-  </Box>
-</Container>
-   
+    <Container sx={{ mt: 3 }}>
+      <Typography variant="h3" textAlign={"center"} > mai jini waree taire tasverr waikhe hoaee one waree yara ranjhay nay na heer waikhee hoeee
+        
+         </Typography>
+       
+    </Container>
   );
 }
 
 export default Testing1;
 
+
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { Container, Typography } from "@mui/material";
+// import { getToken } from "../Compo/utilis/getToken";
+
+// function Testing1() {
+//   const [users, setUsers] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
+
+//   const token = getToken();
+
+//   useEffect(() => {
+//     const fetchUsers = async () => {
+//       setLoading(true);
+//       try {
+//         const response = await axios.get(
+//           "http://klargo.jinnahtechnologies.com/api/services/app/User/GetAll",
+//           {
+//             headers: {
+//               Authorization: token ? `Bearer ${token}` : "",
+//             },
+//           }
+//         );
+
+//         // ABP response structure
+//         setUsers(response?.data?.result?.items || []);
+//       } catch (err) {
+//         console.error(err);
+//         setError("API call failed");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchUsers();
+//   }, [token]);
+
+//   return (
+//     <Container sx={{ mt: 3 }}>
+//       <Typography variant="h3" textAlign="center" mb={3}>
+//         mai jini waree taire tasverr waikhe hoaee one waree yara ranjhay nay na heer waikhee hoeee
+//       </Typography>
+
+//       {loading && (
+//         <Typography textAlign="center">Loading...</Typography>
+//       )}
+
+//       {error && (
+//         <Typography textAlign="center" color="error">
+//           {error}
+//         </Typography>
+//       )}
+
+//       {users.map((user) => (
+//         <Typography key={user.id} sx={{ mb: 1 }}>
+//           {user.name || user.userName}
+//         </Typography>
+//       ))}
+//     </Container>
+//   );
+// }
+
+// export default Testing1;

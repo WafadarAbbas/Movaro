@@ -9,7 +9,6 @@ import Testing from '../pages/Testing/Testing.jsx';
 import Layout from '../pages/Layout/Layout.jsx';
 import Testing2 from '../pages/Testing/Testing2.jsx';
 import Testing3 from '../pages/Testing/Testing3.jsx';
-import Users from '../pages/users/users.jsx';
 import Profile from '../pages/Profile/Profile.jsx';
 import Callback from '../context/Callback.js';
 import SellerProfile from '../pages/SellerProfile/SellerProfile.jsx';
@@ -22,6 +21,8 @@ import BuyerSuccess from '../pages/Buyer/BuyerSuccess.jsx';
 import Home from '../pages/Landing/Home.jsx';
 import PageNotFound from '../pages/dashboard/PageNotFound.jsx';  
 import BuyerProfile from '../pages/Buyer/BuyerProfile.jsx';
+// import DocumentOption from '../pages/Document/documentoption.jsx';
+import Contract from '../pages/Document/Contract.jsx';
 
 const AppRoute = [
   {
@@ -41,7 +42,7 @@ const AppRoute = [
       },
 
       {
-        path: 'Testing',
+        path: '',
         element: <Outlet />,
         children: [
           { path: 'Testing', element: <Testing /> },
@@ -52,31 +53,34 @@ const AppRoute = [
       },
       {
         path: 'Profile',
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
         children: [{ path: '', element: <Profile /> }]
       },
 
       {
         path: 'SellerProfile',
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
         children: [{ path: '', element: <SellerProfile /> }]
       },
 
-      {
-        path: 'Buyer',
-        // element: <ProtectedRoute />,
-        children: [{ path: '', element: <Buyer /> }]
-      },
+     
 
       {
+  path: 'Buyer',
+  children: [
+    { path: '', element: <Buyer /> },           
+    { path: ':encrypted', element: <Buyer /> } 
+  ]
+},
+      {
         path: 'BuyerSuccess',
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
         children: [{ path: '', element: <BuyerSuccess /> }]
       },
 
          {
         path: 'BuyerProfile',
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute />,
         children: [{ path: '', element: <BuyerProfile/> }]
       },
       
@@ -92,7 +96,15 @@ const AppRoute = [
           { path: 'ChooseAction', element:<ChooseAction/> },
         ]
       },
-
+      
+ {
+  path: 'Contract',
+  children: [
+    { path: ':id', element: <Contract /> }
+  ]
+}
+,
+      
       { path: 'callback', element: <Callback/> },
       { path: 'Home', element: <Home/> },
 

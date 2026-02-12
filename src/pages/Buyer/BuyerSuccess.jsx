@@ -1,5 +1,4 @@
-
-import React, { useRef,  useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ApiCall from "../../Apicall/ApiCall";
 import { AppSettings } from "./../../config/app-settings.js";
 import Swal from "sweetalert2";
@@ -9,31 +8,34 @@ import {
   StepLabel,
   Box,
   Typography,
-  Button, Paper, Container, Grid
-  , RadioGroup, FormControlLabel, Radio
+  Button,
+  Paper,
+  Container,
+  Grid,
 } from "@mui/material";
-import { FaCar, FaMotorcycle, FaShip, FaTrailer, FaTruck, } from "react-icons/fa";
+import {
+  FaCar,
+  FaMotorcycle,
+  FaShip,
+  FaTrailer,
+  FaTruck,
+} from "react-icons/fa";
 import { MdElectricScooter } from "react-icons/md";
 import { FaMoneyBillWave } from "react-icons/fa";
-import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
-import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
+import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import GavelIcon from "@mui/icons-material/Gavel";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
-import HomeWorkIcon from "@mui/icons-material/HomeWork";
-import FormGroup from '@mui/material/FormGroup';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
 import BuyerHeader from "./BuyerHeader.js";
 import { useTranslation } from "react-i18next";
+import { useSignalR } from "../../context/SignalRContext.js";
+import { useUser } from "../../context/UserContext.js";
 
 export default function BuyerSuccess() {
-  const { t, i18n } = useTranslation();
+  const { connectToDeal, messages, connection, sendDealMessage } = useSignalR();
+  const { t } = useTranslation();
   const context = useContext(AppSettings);
-  const [value, setValue] = useState("");
   const [contractData, setContractData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -42,8 +44,11 @@ export default function BuyerSuccess() {
   const [sellerValuation, setSellerValuation] = useState(null);
   const [valuationToastShown, setValuationToastShown] = useState(false);
   const [vehicleInfo, setVehicleInfo] = useState(null);
-  const [contracId, setContractId] = useState(null);
+  const [contractId, setContractId] = useState(null);
   const [oldValuation, setOldValuation] = useState(null);
+  const [error, setError] = useState("");
+  const [isDealValid, setIsDealValid] = useState(false);
+    const { userId } = useUser();
 
   const steps = ["Connect Deal", "Valuation", "Contract"];
 
@@ -56,33 +61,113 @@ export default function BuyerSuccess() {
   }, []);
 
   useEffect(() => {
-    context.setAppHeaderNone(true);
+    if (activeStep !== 0) return;
 
+    const dataFromLocalStorage = localStorage.getItem("data");
+    let contractIdFromLocalStorage = null;
 
-    const fetchContract = async () => {
+    if (dataFromLocalStorage) {
       try {
-        const res = await ApiCall({
-          url: "https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=3295",
-          method: "GET",
+        const parsed = JSON.parse(dataFromLocalStorage);
+        contractIdFromLocalStorage = parsed.contractId;
+        setContractId(contractIdFromLocalStorage);
+      } catch (err) {
+        console.error("Error parsing data:", err);
+      }
+    }
+
+    if (!contractIdFromLocalStorage) {
+      console.warn("ContractId not found.");
+      setLoading(false);
+      return;
+    }
+
+    const checkExpiryAndFetchContract = async () => {
+      setLoading(true);
+      setError("");
+      setIsDealValid(false);
+
+      try {
+        const expiryRes = await ApiCall({
+          url: "/ContractMain/CheckDealExpiry",
+          method: "POST",
+          data: { id: contractIdFromLocalStorage },
         });
 
-        const data = res?.result || res?.data?.result;
+        if (expiryRes.data?.error) {
+          const expiryError =
+            expiryRes.data.error.message ||
+            expiryRes.data.error.details ||
+            "⚠️ Deal expiry check failed.";
+          setError(expiryError);
+          setIsDealValid(false);
+          return;
+        }
+
+        setIsDealValid(true);
+
+        const contractRes = await ApiCall({
+          url: "/ContractMain/GetContractMainById",
+          method: "GET",
+          params: { Id: contractIdFromLocalStorage },
+        });
+
+        const data = contractRes?.result || contractRes?.data?.result;
         setContractData(data);
-      } catch (error) {
-        console.error("❌ Error fetching contract:", error);
+        setVehicleInfo(data);
+      } catch (err) {
+        console.error("❌ Error during expiry check or contract fetch:", err);
+        setError(
+          err.response?.data?.error?.details ||
+            err.response?.data?.error?.message ||
+            "⚠️ Something went wrong while fetching contract."
+        );
+        setIsDealValid(false);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchContract();
+    checkExpiryAndFetchContract();
+  }, [activeStep]);
+
+  useEffect(() => {
+    if (!contractId) return;
+    if (!isDealValid) return;
+    if (error) return;
+
+    let isConnected = false;
+
+    const connect = async () => {
+      try {
+        await connectToDeal(contractId);
+        isConnected = true;
+
+      } catch (err) {
+        console.error("Error connecting via SignalR:", err);
+        Swal.fire("❌ Error", "Unable to connect via SignalR", "error");
+      }
+    };
+
+    connect();
 
     return () => {
-      context.setAppHeaderNone(false);
+      isConnected = false;
     };
-  }, [context]);
+  }, [contractId, isDealValid, error]);
 
+  useEffect(() => {
+    if (activeStep !== 0) return;
+    if (!contractData) return;
+    if (!isDealValid) return;
+    if (updated || submitting) return;
 
+    const timer = setTimeout(() => {
+      handleBuyerSuccess();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [activeStep, contractData, isDealValid, updated, submitting]);
 
   const handleBuyerSuccess = async () => {
     if (!contractData) return;
@@ -97,7 +182,8 @@ export default function BuyerSuccess() {
         sellerDealActive: contractData.sellerDealActive,
         sellerDealComplete: contractData.sellerDealComplete,
         vahicleTypeOptionId: contractData.vahicleTypeOptionId,
-        vahicleTypeOptionVahicleTypeName: contractData.vahicleTypeOptionVahicleTypeName,
+        vahicleTypeOptionVahicleTypeName:
+          contractData.vahicleTypeOptionVahicleTypeName,
         vahicleTypeOptionName: contractData.vahicleTypeOptionName,
         sellerDrivingLicensePath: "",
         sellerDrivingLicenseValidate: contractData.sellerDrivingLicenseValidate,
@@ -131,8 +217,8 @@ export default function BuyerSuccess() {
         carInfoMalus: contractData.carInfoMalus,
         carValuationBySeller: contractData.carValuationBySeller,
 
-        // 👇 BUYER UPDATE FIELDS
-        buyerUserId: contractData.buyerUserId,
+        // 👇 BUYER UPDATE
+        buyerUserId: userId,
         buyerDealStatus: contractData.buyerDealStatus,
         buyerDealConnected: true,
         buyerDealConfirmed: contractData.buyerDealConfirmed,
@@ -141,207 +227,172 @@ export default function BuyerSuccess() {
         lastModifierUserId: contractData.lastModifierUserId,
         creationTime: contractData.creationTime,
         creatorUserId: contractData.creatorUserId,
-        id: contractData.id
+        id: contractData.id,
       };
 
-
-      console.log("📌 PAYLOAD SENT TO UPDATE:", payload);
+     
 
       const contractUpdateRes = await ApiCall({
-        url: "https://localhost:44311/api/services/app/ContractMain/Update",
+        url: "/ContractMain/Update",
         method: "PUT",
         data: payload,
       });
 
-      console.log("✅ UPDATE RESPONSE:", contractUpdateRes);
-
-
       if (contractUpdateRes?.success === false || contractUpdateRes?.error) {
-        const errorMsg =
+        throw new Error(
           contractUpdateRes?.error?.details ||
-          contractUpdateRes?.error?.message ||
-          "Something went wrong while updating contract!";
-        Swal.fire("❌ Error", errorMsg, "error");
-      } else {
-        setUpdated(true);
-        Swal.fire("✅ Success", "Buyer deal marked connected!", "success");
+            contractUpdateRes?.error?.message ||
+            "Contract update failed"
+        );
       }
+
+      if (!connection) {
+        await connectToDeal(contractData.id);
+      }
+      await sendDealMessage("buyer", "Buyer connected to Seller");
+      setUpdated(true);
+      // Swal.fire("✅ Success", "Buyer connected & seller notified!", "success");
     } catch (error) {
-      console.error("❌ Update error:", error);
-      const errorMsg =
-        error?.error?.details ||
-        error?.error?.message ||
-        error?.response?.data?.error?.message ||
-        error?.message ||
-        "Unexpected server error!";
-      Swal.fire("❌ Error", errorMsg, "error");
+      console.error("❌ Buyer update error:", error);
+
+      Swal.fire(
+        "❌ Error",
+        error?.message || "Unexpected server error!",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
- 
   useEffect(() => {
-    if (activeStep === 1 && contractData?.id) {
-      let interval;
+    if (activeStep !== 1 || !contractId) return;
 
-      const checkValuation = async () => {
-        try {
-          const res = await ApiCall({
-            url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contractData.id}`,
-            method: "GET",
-          });
+    const valuationMsg = messages.find(
+      (msg) =>
+        msg.user === "seller" &&
+        (msg.message === "Seller added valuation" ||
+          msg.message === "Seller Updated valuation")
+    );
 
-          const latestData = res?.result || res?.data?.result;
-          setContractData(latestData);
-          setContractId(latestData.id);
+    if (!valuationMsg || valuationToastShown) return;
 
-          const valuation = latestData.carValuationBySeller;
-
-          // ---- IF VALUATION NOT YET ADDED ----
-          if (!valuation || valuation === 0) {
-            setSellerValuation(null);
-          }
-
-          // ---- IF VALUATION IS FINALLY ADDED ----
-          else {
-            setSellerValuation(valuation);
-
-            // Show toast only once
-            if (!valuationToastShown) {
-              toast.success("💰 Seller has added car valuation!", {
-                position: "top-right",
-              });
-              setValuationToastShown(true);
-            }
-
-            // 🔥 STOP API CALLS WHEN VALUATION ARRIVES
-            if (interval) clearInterval(interval);
-          }
-        } catch (err) {
-          console.error("Error fetching latest contract:", err);
-        }
-      };
-
-      // First call
-      checkValuation();
-
-      // Start polling
-      interval = setInterval(checkValuation, 10000);
-
-      return () => clearInterval(interval);
-    }
-  }, [activeStep, contractData?.id, valuationToastShown]);
-
-
-
-  // useEffect(() => {
-  //   if (activeStep !== 2 || !contracId) return;
-
-  //   const fetchVehicleInfo = async () => {
-  //     try {
-  //       const res = await ApiCall({
-  //         url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
-  //         method: "GET",
-  //       });
-
-  //       const latest = res?.result || res?.data?.result;
-
-
-  //       const newValuation = latest?.carValuationBySeller;
-
-  //       if (oldValuation !== null && newValuation !== oldValuation) {
-  //         Swal.fire({
-  //           icon: "info",
-  //           title: "Valuation Updated",
-  //           text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
-  //         });
-  //       }
-
-
-  //       setOldValuation(newValuation);
-
-
-  //       setVehicleInfo(latest);
-
-  //     } catch (err) {
-  //       console.error("Error fetching vehicle info:", err);
-  //     }
-  //   };
-
-
-  //   fetchVehicleInfo();
-
-
-  //   const intervalId = setInterval(fetchVehicleInfo, 10000);
-
-  //   return () => clearInterval(intervalId);
-
-  // }, [activeStep, contracId, oldValuation]);
-
-const intervalRef = useRef(null);
-useEffect(() => {
-  if (activeStep !== 2 || !contracId) return;
-
-  const fetchVehicleInfo = async () => {
-    try {
-      const res = await ApiCall({
-        url: `https://localhost:44311/api/services/app/ContractMain/GetContractMainById?Id=${contracId}`,
-        method: "GET",
-      });
-
-      const latest = res?.result || res?.data?.result;
-      const newValuation = latest?.carValuationBySeller;
-
-       
-      if (oldValuation !== null && newValuation !== oldValuation) {
-        Swal.fire({
-          icon: "info",
-          title: "Valuation Updated",
-          text: `Seller changed valuation from ${oldValuation} to ${newValuation}`,
+    const fetchLatestValuation = async () => {
+      try {
+        const res = await ApiCall({
+          url: "/ContractMain/GetContractMainById",
+          method: "GET",
+          params: { Id: contractId },
         });
 
-         
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
+        const latest = res?.result || res?.data?.result;
+        const valuation = latest?.carValuationBySeller;
+
+        if (!valuation || valuation === 0) return;
+        setContractData(latest);
+        setSellerValuation(valuation);
+
+        toast.success("💰 Seller has added car valuation!", {
+          position: "top-right",
+        });
+
+        setValuationToastShown(true);
+      } catch (err) {
+        console.error("Step-1 valuation fetch error:", err);
       }
+    };
 
-      setOldValuation(newValuation);
-      setContractId(latest);
+    fetchLatestValuation();
+  }, [messages, activeStep, contractId, valuationToastShown]);
 
-    } catch (err) {
-      console.error("Error fetching vehicle info:", err);
+  useEffect(() => {
+    if (activeStep !== 2 || !contractId) return;
+
+    const valuationMsg = messages.find(
+      (msg) =>
+        msg.user === "seller" &&
+        (msg.message === "Seller added valuation" ||
+          msg.message === "Seller Updated valuation")
+    );
+
+    if (!valuationMsg) return;
+
+    const fetchLatestContract = async () => {
+      try {
+        const res = await ApiCall({
+          url: "/ContractMain/GetContractMainById",
+          method: "GET",
+          params: { Id: contractData.id },
+        });
+
+        const latest = res?.result || res?.data?.result;
+        if (!latest) return;
+
+        const newValuation = latest.carValuationBySeller;
+
+        if (oldValuation !== null && oldValuation !== newValuation) {
+          toast.info(
+            `💰 Seller updated car valuation from ${oldValuation} to ${newValuation}!`,
+            { position: "top-right" }
+          );
+        } else if (oldValuation === null && newValuation) {
+          // toast.success("💰 Seller has added car valuation!", {
+          //   position: "top-right",
+          // });
+        }
+        setOldValuation(newValuation);
+        setVehicleInfo(latest);
+        setSellerValuation(newValuation);
+        setValuationToastShown(true);
+      } catch (err) {
+        console.error("Error fetching updated valuation:", err);
+      }
+    };
+
+    fetchLatestContract();
+  }, [messages, activeStep, contractId, oldValuation]);
+
+  const handleDealConfirm = async () => {
+    if (!contractId) {
+      Swal.fire("Error", "Contract ID not found", "error");
+      return;
+    }
+
+    try {
+      const res = await ApiCall({
+        url: "/ContractMain/DealCompletedByBuyer",
+        method: "POST",
+        data: { id: contractId },
+      });
+
+      if (res?.data?.success || res?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Deal Confirmed",
+          text: "Your deal has been confirmed successfully",
+        });
+      } else {
+        Swal.fire(
+          "Failed",
+          res?.data?.error?.message || "Deal confirmation failed",
+          "error"
+        );
+      }
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        error?.response?.data?.error?.message || "Something went wrong",
+        "error"
+      );
     }
   };
-
-  
-  fetchVehicleInfo();
-
-  
-  intervalRef.current = setInterval(fetchVehicleInfo, 10000);
-
-   
-  return () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
-
-}, [activeStep, contracId]); 
-
-
 
   return (
     <>
-
       <BuyerHeader />
 
       <Container>
         <Paper sx={{ p: 1, mt: 1 }}>
-
           <Stepper activeStep={activeStep} alternativeLabel sx={{ mt: 1 }}>
             {steps.map((label, index) => (
               <Step key={index}>
@@ -355,9 +406,25 @@ useEffect(() => {
               <Container maxWidth="md">
                 {loading ? (
                   <Typography>{t("buyerauth.step0.loading")}</Typography>
+                ) : error ? (
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      p: 3,
+                      mb: 3,
+                      textAlign: "center",
+                      borderRadius: 3,
+                      backgroundColor: "#ffe6e6",
+                      color: "#d32f2f",
+                    }}
+                  >
+                    <Typography variant="body1">{error}</Typography>
+                  </Paper>
                 ) : contractData ? (
-                  <Paper elevation={3} sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
-
+                  <Paper
+                    elevation={3}
+                    sx={{ p: 4, textAlign: "center", borderRadius: 3 }}
+                  >
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
                       {t("buyerauth.step0.title")}
                     </Typography>
@@ -372,33 +439,64 @@ useEffect(() => {
                         mt: 3,
                       }}
                     >
-                      <Box sx={{ mb: 2, textAlign: "center", fontSize: "60px" }}>
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("car") && <FaCar />}
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("motorcycle") && <FaMotorcycle />}
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("truck") && <FaTruck />}
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("boat") && <FaShip />}
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("camper") && <FaTrailer />}
-                        {contractData?.vahicleTypeOptionName?.toLowerCase().includes("moped") && <MdElectricScooter />}
+                      <Box
+                        sx={{ mb: 2, textAlign: "center", fontSize: "60px" }}
+                      >
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("car") && <FaCar />}
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("motorcycle") && <FaMotorcycle />}
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("truck") && <FaTruck />}
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("boat") && <FaShip />}
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("camper") && <FaTrailer />}
+                        {contractData?.vahicleTypeOptionName
+                          ?.toLowerCase()
+                          .includes("moped") && <MdElectricScooter />}
                       </Box>
 
                       <Grid container spacing={2}>
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.vehicleType")}</Typography>
-                          <Typography>{contractData.vahicleTypeOptionName || t("buyer.step0.na")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.vehicleType")}
+                          </Typography>
+                          <Typography>
+                            {contractData.vahicleTypeOptionName ||
+                              t("buyer.step0.na")}
+                          </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.name")}</Typography>
-                          <Typography>{contractData.carInfoVehicleDesignation || t("buyerauth.step0.na")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.name")}
+                          </Typography>
+                          <Typography>
+                            {contractData.carInfoVehicleDesignation ||
+                              t("buyerauth.step0.na")}
+                          </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.registrationNo")}</Typography>
-                          <Typography>{contractData.carInfoRegistrationNo || t("buyerauth.step0.na")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.registrationNo")}
+                          </Typography>
+                          <Typography>
+                            {contractData.carInfoRegistrationNo ||
+                              t("buyerauth.step0.na")}
+                          </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.firstInspectionDate")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.firstInspectionDate")}
+                          </Typography>
                           <Typography>
                             {contractData.carInfoInspectionDate
                               ? contractData.carInfoInspectionDate.split("T")[0]
@@ -406,26 +504,34 @@ useEffect(() => {
                           </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.registrationDate")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.registrationDate")}
+                          </Typography>
                           <Typography>
                             {contractData.carInfoRegistrationDate
-                              ? contractData.carInfoRegistrationDate.split("T")[0]
+                              ? contractData.carInfoRegistrationDate.split(
+                                  "T"
+                                )[0]
                               : t("buyerauth.step0.na")}
                           </Typography>
                         </Grid>
 
-                        <Grid size={{ xs: 6 }}>
-                          <Typography fontWeight="bold">{t("buyerauth.step0.contractId")}</Typography>
-                          <Typography>{contractData.id || t("buyerauth.step0.na")}</Typography>
+                        <Grid size={{ xs: 6, md: 6 }}>
+                          <Typography fontWeight="bold">
+                            {t("buyerauth.step0.contractId")}
+                          </Typography>
+                          <Typography>
+                            {contractData.id || t("buyerauth.step0.na")}
+                          </Typography>
                         </Grid>
                       </Grid>
                     </Paper>
 
-                    <Box sx={{ mt: 3 }}>
+                    {/* <Box sx={{ mt: 3 }}>
                       <Button
                         variant="contained"
-                        disabled={submitting || updated}
+                        disabled={submitting || updated || !isDealValid}  
                         onClick={handleBuyerSuccess}
                         sx={{
                           animation: !submitting && !updated ? "pulse 1.5s infinite" : "none",
@@ -442,14 +548,32 @@ useEffect(() => {
                             ? t("buyerauth.step0.connected")
                             : t("buyerauth.step0.connect")}
                       </Button>
+                    </Box> */}
+                    <Box sx={{ mt: 3, textAlign: "center" }}>
+                      {!updated ? (
+                        <Typography color="text.secondary">
+                          Connecting with seller, please wait...
+                        </Typography>
+                      ) : (
+                        <Typography
+                          color="success.main"
+                          fontWeight="bold"
+                        ></Typography>
+                      )}
                     </Box>
 
-                    <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
+                    <Box
+                      sx={{
+                        mt: 4,
+                        display: "flex",
+                        justifyContent: "flex-end",
+                      }}
+                    >
                       <Button
                         variant="contained"
                         color="success"
                         size="small"
-                        disabled={!updated}
+                        disabled={!updated || !isDealValid}
                         onClick={() => setActiveStep(1)}
                       >
                         {t("buyerauth.step0.next")}
@@ -469,32 +593,29 @@ useEffect(() => {
                   sx={{
                     p: 4,
 
-
                     textAlign: "center",
                   }}
                 >
-                  {/* Vehicle Icon (Same logic as step 0) */}
                   <Box sx={{ mb: 3, fontSize: "48px", color: "#00d4c4" }}>
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("car") && (
-                      <FaCar />
-                    )}
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("motorcycle") && (
-                      <FaMotorcycle />
-                    )}
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("truck") && (
-                      <FaTruck />
-                    )}
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("boat") && (
-                      <FaShip />
-                    )}
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("camper") && (
-                      <FaTrailer />
-                    )}
-                    {contractData?.vahicleTypeOptionName?.toLowerCase().includes("moped") && (
-                      <MdElectricScooter />
-                    )}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("car") && <FaCar />}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("motorcycle") && <FaMotorcycle />}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("truck") && <FaTruck />}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("boat") && <FaShip />}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("camper") && <FaTrailer />}
+                    {contractData?.vahicleTypeOptionName
+                      ?.toLowerCase()
+                      .includes("moped") && <MdElectricScooter />}
                   </Box>
-
 
                   <Typography variant="h6" gutterBottom>
                     {t("buyerauth.step1.title")}
@@ -502,7 +623,9 @@ useEffect(() => {
 
                   {sellerValuation ? (
                     <Typography variant="body1" sx={{ mt: 2 }}>
-                     {t("buyerauth.step1.valuation", { value: sellerValuation })}
+                      {t("buyerauth.step1.valuation", {
+                        value: sellerValuation,
+                      })}
                     </Typography>
                   ) : (
                     <Typography
@@ -511,16 +634,16 @@ useEffect(() => {
                         mt: 2,
                         color: "red",
                         fontWeight: "bold",
-                        animation: "pulse 2.5s infinite", // 🔥 Animation apply
+                        animation: "pulse 2.5s infinite",
 
                         "@keyframes pulse": {
                           "0%": {
                             transform: "scale(0.9)",
-                            boxShadow: "0 0 0 0 rgba(255, 0, 0, 0.7)",   // red glow
+                            boxShadow: "0 0 0 0 rgba(255, 0, 0, 0.7)",
                           },
                           "70%": {
                             transform: "scale(1.05)",
-                            boxShadow: "0 0 0 10px rgba(255, 0, 0, 0)",  // red fade out
+                            boxShadow: "0 0 0 10px rgba(255, 0, 0, 0)",
                           },
                           "100%": {
                             transform: "scale(0.9)",
@@ -529,126 +652,294 @@ useEffect(() => {
                         },
                       }}
                     >
-                       {t("buyerauth.step1.waiting")}
+                      {t("buyerauth.step1.waiting")}
                     </Typography>
-
                   )}
-
 
                   <Button
                     variant="contained"
                     sx={{ mt: 4 }}
+                    color="success"
                     onClick={() => setActiveStep(2)}
                     disabled={!sellerValuation}
                   >
-                {t("buyerauth.step1.next")}
+                    {t("buyerauth.step1.next")}
                   </Button>
                 </Paper>
               </Container>
             )}
 
+            {activeStep === 2 && (
+              <Container maxWidth="md">
+                <Paper elevation={3} sx={{ p: 4, margin: "40px auto" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}
+                  >
+                    {t("buyerauth.step2.title")}
+                  </Typography>
 
-           {activeStep === 2 && (
-  <Container maxWidth="md">
-    <Paper elevation={3} sx={{ p: 4, margin: "40px auto" }}>
-      <Typography variant="h6" sx={{ mb: 3, textAlign: "center", fontWeight: "bold" }}>
-        {t("buyerauth.step2.title")}
-      </Typography>
+                  {!vehicleInfo ? (
+                    <Typography>{t("buyerauth.step2.loading")}</Typography>
+                  ) : (
+                    <Box
+                      sx={{
+                        border: "1px solid #ccc",
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        p: 2,
+                      }}
+                    >
+                      <DataRow
+                        label="Registration No"
+                        value={vehicleInfo.carInfoRegistrationNo}
+                      />
+                      <DataRow
+                        label="Vehicle Designation"
+                        value={vehicleInfo.carInfoVehicleDesignation}
+                      />
+                      <DataRow
+                        label="Trade Name"
+                        value={vehicleInfo.carInfoTradeName}
+                      />
+                      <DataRow
+                        label="Vehicle Years"
+                        value={vehicleInfo.carInfoVehicleYears}
+                      />
+                      <DataRow
+                        label="Registration Date"
+                        value={vehicleInfo.carInfoRegistrationDate}
+                      />
+                      <DataRow
+                        label="Number of Users"
+                        value={vehicleInfo.carInfoNumberOfUsers}
+                      />
+                      <DataRow
+                        label="Waxelbarge"
+                        value={vehicleInfo.carInfoWaxelbarge}
+                      />
+                      <DataRow
+                        label="4-Wheel Drive"
+                        value={vehicleInfo.carInfoFourWheelDrive ? "Yes" : "No"}
+                      />
+                      <DataRow label="Fuel" value={vehicleInfo.carInfoFuel} />
+                      <DataRow
+                        label="Inspection Date"
+                        value={vehicleInfo.carInfoInspectionDate}
+                      />
+                      <DataRow
+                        label="Previous Inspection Date"
+                        value={vehicleInfo.carInfoPreviousInspectionDate}
+                      />
+                      <DataRow
+                        label="Inspection Station"
+                        value={vehicleInfo.carInfoInspectionStation}
+                      />
+                      <DataRow
+                        label="Inspection Group"
+                        value={vehicleInfo.carInfoInspectionGroup}
+                      />
+                      <DataRow
+                        label="Feeding Stall"
+                        value={vehicleInfo.carInfoFeedingStall}
+                      />
+                      <DataRow label="Tax" value={vehicleInfo.carInfoTax} />
+                      <DataRow
+                        label="Malus"
+                        value={vehicleInfo.carInfoMalus || "-"}
+                      />
+                      <DataRow
+                        label="Valuation"
+                        value={
+                          vehicleInfo.carValuationBySeller
+                            ? vehicleInfo.carValuationBySeller
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                            : "-"
+                        }
+                      />
+                    </Box>
+                  )}
 
-      {!vehicleInfo ? (
-        <Typography>{t("buyerauth.step2.loading")}</Typography>
-      ) : (
-        <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2 }}>
-          <DataRow label="Registration No" value={vehicleInfo.carInfoRegistrationNo} />
-          <DataRow label="Vehicle Designation" value={vehicleInfo.carInfoVehicleDesignation} />
-          <DataRow label="Trade Name" value={vehicleInfo.carInfoTradeName} />
-          <DataRow label="Vehicle Years" value={vehicleInfo.carInfoVehicleYears} />
-          <DataRow label="Registration Date" value={vehicleInfo.carInfoRegistrationDate} />
-          <DataRow label="Number of Users" value={vehicleInfo.carInfoNumberOfUsers} />
-          <DataRow label="Waxelbarge" value={vehicleInfo.carInfoWaxelbarge} />
-          <DataRow label="4-Wheel Drive" value={vehicleInfo.carInfoFourWheelDrive ? "Yes" : "No"} />
-          <DataRow label="Fuel" value={vehicleInfo.carInfoFuel} />
-          <DataRow label="Inspection Date" value={vehicleInfo.carInfoInspectionDate} />
-          <DataRow label="Previous Inspection Date" value={vehicleInfo.carInfoPreviousInspectionDate} />
-          <DataRow label="Inspection Station" value={vehicleInfo.carInfoInspectionStation} />
-          <DataRow label="Inspection Group" value={vehicleInfo.carInfoInspectionGroup} />
-          <DataRow label="Feeding Stall" value={vehicleInfo.carInfoFeedingStall} />
-          <DataRow label="Tax" value={vehicleInfo.carInfoTax} />
-          <DataRow label="Malus" value={vehicleInfo.carInfoMalus || "-"} />
-          <DataRow label="Valuation" value={vehicleInfo.carValuationBySeller || "-"} />
-        </Box>
-      )}
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      p: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <FaMoneyBillWave />
+                      {t("buyerauth.step2.priceInfo")}
+                    </Typography>
+                    <Box
+                      sx={{
+                        backgroundColor: "#f1efefff",
+                        borderRadius: 1,
+                        p: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Typography variant="body2">
+                        {t("buyerauth.step2.priceDesc")}
+                      </Typography>
+                    </Box>
+                  </Box>
 
-       
-      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
-          <FaMoneyBillWave />
-          {t("buyerauth.step2.priceInfo")}
-        </Typography>
-        <Box sx={{ backgroundColor: "#f1efefff", borderRadius: 1, p: 1, mt: 1 }}>
-          <Typography variant="body2">{t("buyerauth.step2.priceDesc")}</Typography>
-        </Box>
-      </Box>
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      p: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <AirportShuttleIcon />
+                      {t("buyerauth.step2.deliveryInfo")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.deliveryDesc")}
+                    </Typography>
+                  </Box>
 
-       
-      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
-          <AirportShuttleIcon />
-          {t("buyerauth.step2.deliveryInfo")}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.deliveryDesc")}</Typography>
-      </Box>
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      p: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <AirportShuttleIcon />
+                      {t("buyerauth.step2.conditionInfo")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.conditionDesc1")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {t("buyerauth.step2.conditionDesc2")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {t("buyerauth.step2.conditionDesc3")}
+                    </Typography>
+                  </Box>
 
-       
-      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
-          <AirportShuttleIcon />
-          {t("buyerauth.step2.conditionInfo")}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.conditionDesc1")}</Typography>
-        <Typography variant="body2" sx={{ mt: 0.5 }}>{t("buyerauth.step2.conditionDesc2")}</Typography>
-        <Typography variant="body2" sx={{ mt: 0.5 }}>{t("buyerauth.step2.conditionDesc3")}</Typography>
-      </Box>
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      p: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <DescriptionIcon />
+                      {t("buyerauth.step2.ownership")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.ownershipDesc1")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.ownershipDesc2")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.ownershipDesc3")}
+                    </Typography>
+                  </Box>
 
-      
-      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
-          <DescriptionIcon />
-          {t("buyerauth.step2.ownership")}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc1")}</Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc2")}</Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.ownershipDesc3")}</Typography>
-      </Box>
+                  <Box
+                    sx={{
+                      border: "1px solid #ccc",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      p: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <DirectionsCarFilledIcon />
+                      {t("buyerauth.step2.transportAgency")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.transportAgencyDesc1")}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {t("buyerauth.step2.transportAgencyDesc2")}
+                    </Typography>
+                  </Box>
 
-      
-      <Box sx={{ border: "1px solid #ccc", boxShadow: 3, borderRadius: 2, p: 2, mt: 2 }}>
-        <Typography variant="body1" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
-          <DirectionsCarFilledIcon />
-          {t("buyerauth.step2.transportAgency")}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.transportAgencyDesc1")}</Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>{t("buyerauth.step2.transportAgencyDesc2")}</Typography>
-      </Box>
-
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-        <Button variant="contained" color="primary" size="small" onClick={() => setActiveStep(3)}>
-          {t("buyerauth.step2.next")}
-        </Button>
-      </Box>
-    </Paper>
-  </Container>
-)}
-
-
-
+                  <Box
+                    sx={{
+                      mt: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="success"
+                      size="large"
+                      onClick={handleDealConfirm}
+                    >
+                      Deal Confirm
+                    </Button>
+                  </Box>
+                </Paper>
+              </Container>
+            )}
           </Box>
         </Paper>
       </Container>
     </>
   );
 }
-
 
 const DataRow = ({ label, value }) => (
   <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>

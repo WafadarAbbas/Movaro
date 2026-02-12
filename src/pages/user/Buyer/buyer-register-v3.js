@@ -1,20 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AppSettings } from './../../../config/app-settings.js';
-import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+
 import logo from "../../../assets/logoBankIdwhite.png";
 import Swal from "sweetalert2";
 import {
   Box,
   Button,
   Typography,
-  Stepper,
-  Step,
-  StepLabel,
   TextField,
   Paper,
   Divider,
-  InputAdornment,
   FormControlLabel,
   Checkbox,
   Container,
@@ -22,14 +18,12 @@ import {
   FormLabel,
 } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext.js";
+  import AuthApiCall from "../../../Apicall/AuthApiCall.js";
 import { Formik, Form } from "formik";
 import Grid from "@mui/material/Grid";
 
-// import ApiCall from '../../Apicall/ApiCall.js';
-import axios from 'axios';
 import * as Yup from "yup";
 
-const steps = ["Verify with BankID", "Complete Account Details"];
 
 
 function RegisterV3() {
@@ -43,13 +37,13 @@ function RegisterV3() {
 
   const [redirect, setRedirect] = useState(false);
 
- useEffect(() => {
-  context.setAppHeaderNone(true);   
+  useEffect(() => {
+    context.setAppHeaderNone(true);
 
-  return () => {
-    context.setAppHeaderNone(false);  
-  };
-}, []);
+    return () => {
+      context.setAppHeaderNone(false);
+    };
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -177,17 +171,15 @@ function RegisterV3() {
               try {
                 setLoading(true);
 
-                const response = await axios.post(
-                  "https://localhost:44311/api/services/app/User/RegisterExternalUser",
-                  payload,
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
 
-                console.log("✅ API Response:", response.data);
+
+                const response = await AuthApiCall({
+                  url: "/services/app/User/RegisterExternalUser",
+                  method: "POST",
+                  data: payload,
+                });
+
+
 
                 if (response.data?.success) {
                   Swal.fire({
@@ -230,7 +222,7 @@ function RegisterV3() {
 
                 <Box>
                   <Typography variant="subtitle1" mb={2} mt={1}>
-                  Your identity has been verified with BankID.
+                    Your identity has been verified with BankID.
                   </Typography>
 
                   <Grid container spacing={2} mb={2}>
@@ -308,7 +300,7 @@ function RegisterV3() {
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 12 }}>
-                        <FormLabel
+                      <FormLabel
                         component="legend"
                         sx={{
                           fontWeight: 600,
@@ -318,7 +310,7 @@ function RegisterV3() {
                           display: "block",
                         }}
                       >
-                      Email Address
+                        Email Address
                       </FormLabel>
                       <TextField
                         fullWidth
@@ -333,7 +325,7 @@ function RegisterV3() {
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 12 }}>
-                          <FormLabel
+                      <FormLabel
                         component="legend"
                         sx={{
                           fontWeight: 600,
@@ -343,7 +335,7 @@ function RegisterV3() {
                           display: "block",
                         }}
                       >
-                      Contact Number
+                        Contact Number
                       </FormLabel>
                       <TextField
                         fullWidth
@@ -359,7 +351,7 @@ function RegisterV3() {
 
 
                     <Grid size={{ xs: 12, sm: 12 }}>
-                        <FormLabel
+                      <FormLabel
                         component="legend"
                         sx={{
                           fontWeight: 600,
@@ -369,7 +361,7 @@ function RegisterV3() {
                           display: "block",
                         }}
                       >
-                      Password
+                        Password
                       </FormLabel>
                       <TextField
                         fullWidth

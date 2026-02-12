@@ -24,7 +24,7 @@ import { useAuth } from "../../context/AuthContext.js";
 import { Formik, Form } from "formik";
 import Grid from "@mui/material/Grid";
 import myImage2 from "../../assets/c3.jpg";
-import ApiCall from '../../Apicall/ApiCall.js';
+import AuthApiCall from "../../Apicall/AuthApiCall";
 import axios from 'axios';
 import * as Yup from "yup";
 
@@ -173,15 +173,11 @@ function RegisterV2() {
               try {
                 setLoading(true);
 
-                const response = await axios.post(
-                  "https://localhost:44311/api/services/app/User/RegisterExternalUser",
-                  payload,
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
+                const response = await AuthApiCall({
+                  url: "/services/app/User/RegisterExternalUser",
+                  method: "POST",
+                  data: payload,
+                });
 
                 // console.log("✅ API Response:", response.data);
 

@@ -7,6 +7,15 @@
     "buyCardTitle": "I want to buy",
     "buyCardDesc": "Enter registration number or scan the seller’s QR code to continue."
   },
+   "document": {
+    "title": "Klargo Document",
+    "subtitle": "Select a document to preview",
+    "contractTitle": "Contract of sale",
+    "contractDesc": "Used vehicle purchase agreement",
+    "vehicleTitle": "Vehicle report",
+    "vehicleDesc": "Detailed report on vehicle condition",
+    "previewBtn": "Show preview"
+  },
   "home": {
     "heroTitle": "Safe vehicle transaction in one flow",
     "heroSubtitle": "Contracts, payment, ownership transfer and insurance. Everything guided between seller and buyer.",
@@ -283,7 +292,7 @@
     "SaleCreated": "The sale has been created",
     "askBuyer": "Ask the buyer to scan the QR code or enter the registration number in their app to connect to the sale.",
     "available": "Available to buyer: Yes",
-    "proceed": "Proceed to purchase contract.",
+    "proceed": " Proceed to purchase contract.",
     "sellCarForTitle": "What do you want to sell the car for?",
     "registrationNo": "Registration No",
     "vehicle": "Vehicle",
@@ -368,7 +377,7 @@
     "connectSellerTitle": "Connect with Seller",
     "connectSellerSubtitle": "Click the button below to notify the seller.",
     "dealConnected": "Buyer deal successfully connected! ✅",
-    "sellerValuation": "Car Valuation by Seller: {{valuation}}",
+    "sellerValue": "Car Valuation Added by Seller",
     "waitingValuation": "Waiting for seller to add valuation...",
     "vehicleInformation": "Vehicle Information",
     "registrationNo": "Registration No",

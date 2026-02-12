@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {   Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AppSettings } from './../../config/app-settings.js';
- import logo from "../../../src/assets/logoBankIdwhite.png";
+import logo from "../../../src/assets/logoBankIdwhite.png";
 import Swal from "sweetalert2";
 import {
   Box,
   Button,
   Typography,
- 
+
   TextField,
   Paper,
   Divider,
-  
+
   FormControlLabel,
   Checkbox,
   Container,
@@ -21,10 +21,11 @@ import {
 import { useAuth } from "../../context/AuthContext.js";
 import { Formik, Form } from "formik";
 import Grid from "@mui/material/Grid";
-import axios from 'axios';
+
+import AuthApiCall from "../../Apicall/AuthApiCall";
 import * as Yup from "yup";
 
- 
+
 
 
 function RegisterV3() {
@@ -38,15 +39,15 @@ function RegisterV3() {
 
   const [redirect, setRedirect] = useState(false);
 
- useEffect(() => {
-  context.setAppHeaderNone(true);   
+  useEffect(() => {
+    context.setAppHeaderNone(true);
 
-  return () => {
-    context.setAppHeaderNone(false);  
-  };
-}, []);
+    return () => {
+      context.setAppHeaderNone(false);
+    };
+  }, []);
 
-  
+
 
   if (redirect) {
     return <Navigate to='/dashboard' />;
@@ -175,15 +176,13 @@ function RegisterV3() {
               try {
                 setLoading(true);
 
-                const response = await axios.post(
-                  "https://localhost:44311/api/services/app/User/RegisterExternalUser",
-                  payload,
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
+
+
+                const response = await AuthApiCall({
+                  url: "/services/app/User/RegisterExternalUser",
+                  method: "POST",
+                  data: payload,
+                });
 
                 console.log("✅ API Response:", response.data);
 
@@ -537,7 +536,7 @@ function RegisterV3() {
                         )}
                       </Button>
                     ) : (
-                       
+
                       <Button
                         variant="contained"
                         sx={{ mb: 1, backgroundColor: "#00acc1" }}

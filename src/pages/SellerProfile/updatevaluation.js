@@ -19,7 +19,7 @@ const UpadteValuation = (props) => {
     onSubmit: async (values) => {
       try {
         const response = await ApiCall({
-          url: `https://localhost:44311/api/services/app/CarContractValDetail/Create`,
+          url: "/CarContractValDetail/Create",
           method: "POST",
           data: {
             contractMainId: props.contractId,
@@ -28,26 +28,34 @@ const UpadteValuation = (props) => {
           },
         });
 
-        Swal.fire("Success", "Car valuation Updated!", "success");
+        const isSuccess = response?.success === true || response?.status === 200;
 
-        // close modal
-        props.close.current.click();
+        if (isSuccess) {
+          Swal.fire("Success", "Car valuation Updated!", "success");
 
-        // refresh parent
-        if (props.onUpdated) props.onUpdated();
+          // ✅ Only after successful API call
+          if (props.sendDealMessage && props.connection) {
+            await props.sendDealMessage(
+              "seller",
+              "Seller Updated valuation"
+            );
+          }
+
+          // close modal
+          props.close.current.click();
+
+          // refresh parent
+          if (props.onUpdated) props.onUpdated();
+        } else {
+          Swal.fire("Error", "Failed to update valuation!", "error");
+        }
 
       } catch (error) {
         console.error("Error updating valuation:", error);
-
-        const backendError =
-          error?.error?.details ||
-          error?.error?.message ||
-          error?.message ||
-          "Failed to update valuation";
-
-        Swal.fire("Error", backendError, "error");
+        Swal.fire("Error", "Unexpected server error occurred!", "error");
       }
-    },
+    }
+
   });
 
   return (
@@ -107,7 +115,7 @@ const UpadteValuation = (props) => {
               </form>
 
               <hr />
- 
+
             </div>
           </div>
         </div>

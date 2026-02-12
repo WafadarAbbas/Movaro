@@ -6,11 +6,10 @@ import logo from '../../assets/Klargo1.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Items from './navItems/items.jsx';
 import { AppSettings } from './../../config/app-settings.js';
-import { useUser } from "../../context/UserContext.js";
 import { Container } from "@mui/material";
 function Header() {
 
-  const { userName } = useUser();
+   
   return (
     <AppSettings.Consumer>
       {({

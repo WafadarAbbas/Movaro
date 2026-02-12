@@ -4,7 +4,7 @@ export const getToken = () => {
     try {
         const encryptedToken = localStorage.getItem('authToken');
         if (encryptedToken) {
-          const secretKey = "my-super-secret-key";
+          const secretKey = "klargo-secret-key";
             const bytes = CryptoJS.AES.decrypt(encryptedToken, secretKey);
             const decryptedToken = bytes.toString(CryptoJS.enc.Utf8);
       

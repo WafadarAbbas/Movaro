@@ -4,21 +4,20 @@ import { Link } from 'react-router-dom';
 // import DropdownProfile from './dropdown/profile.jsx';
 import logo from '../../assets/Klargo1.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import Items from './navItems/items.jsx';
-import { AppSettings } from './../../config/app-settings.js';
+ 
 import { useTranslation } from "react-i18next";
 import { Container } from "@mui/material";
 import React, { useState } from "react";
 import { Menu, MenuItem, Typography, Avatar, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { FaUserEdit, FaSignOutAlt } from "react-icons/fa";
+import {FaSignOutAlt } from "react-icons/fa";
 import PersonIcon from "@mui/icons-material/Person";
 import { useUser } from "../../context/UserContext.js";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 function BuyerHeader() {
     const navigate = useNavigate();
-    const { t, i18n } = useTranslation();
-    const { profileImage, userName } = useUser();
+    const {i18n } = useTranslation();
+    const { userName } = useUser();
     const [langAnchorEl, setLangAnchorEl] = useState(null);
     const langOpen = Boolean(langAnchorEl);
     const [language, setLanguage] = useState(
