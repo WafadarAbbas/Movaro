@@ -100,7 +100,7 @@ const Contract = () => {
     <Container maxWidth="md" sx={{ mt: 2, px: 2 }}>
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button variant="contained" onClick={handlePrint} disabled={loading}>
-          {loading ? "Loading...." : "Print"}
+          {loading ? "Loading..." : "Print"}
         </Button>
       </Box>
 
