@@ -8,7 +8,7 @@ const Footer = () => {
         style={{ backgroundColor: 'white', flexDirection: 'row' }}
       >
     <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
-          Copyright © 2024 Movaro. All rights reserved.
+          Copyright © 2024 Klargo. All rights reserved.
         </div>
         <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
           Version 7.3.0.0 [20240330]

@@ -31,9 +31,11 @@ import BuyerHeader from "./BuyerHeader.js";
 import { useTranslation } from "react-i18next";
 import { useSignalR } from "../../context/SignalRContext.js";
 import { useUser } from "../../context/UserContext.js";
+import { useNavigate } from "react-router-dom";
 
 export default function BuyerSuccess() {
-  const { connectToDeal, messages, connection, sendDealMessage } = useSignalR();
+    const navigate = useNavigate();
+  const { connectToDeal, messages, connection, sendDealMessage, leaveDealGroup } = useSignalR();
   const { t } = useTranslation();
   const context = useContext(AppSettings);
   const [contractData, setContractData] = useState(null);
@@ -352,40 +354,57 @@ export default function BuyerSuccess() {
     fetchLatestContract();
   }, [messages, activeStep, contractId, oldValuation]);
 
-  const handleDealConfirm = async () => {
-    if (!contractId) {
-      Swal.fire("Error", "Contract ID not found", "error");
-      return;
-    }
+ const handleDealConfirm = async () => {
+  if (!contractId) {
+    Swal.fire("Error", "Contract ID not found", "error");
+    return;
+  }
 
-    try {
-      const res = await ApiCall({
-        url: "/ContractMain/DealCompletedByBuyer",
-        method: "POST",
-        data: { id: contractId },
+  setLoading(true); // start loading
+
+  try {
+    const res = await ApiCall({
+      url: "/ContractMain/DealCompletedByBuyer",
+      method: "POST",
+      data: { id: contractId },
+    });
+
+    if (res?.data?.success || res?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Deal Confirmed",
+        text: "Your deal has been confirmed successfully",
+      }).then(async () => {
+        // ✅ Leave SignalR deal group before navigating
+        if (leaveDealGroup) {
+          try {
+            await leaveDealGroup();
+          } catch (err) {
+            console.error("Failed to leave SignalR deal group:", err);
+          }
+        }
+
+        // Navigate to contract page
+        navigate(`/Contract/${contractId}`);
       });
-
-      if (res?.data?.success || res?.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Deal Confirmed",
-          text: "Your deal has been confirmed successfully",
-        });
-      } else {
-        Swal.fire(
-          "Failed",
-          res?.data?.error?.message || "Deal confirmation failed",
-          "error"
-        );
-      }
-    } catch (error) {
+    } else {
       Swal.fire(
-        "Error",
-        error?.response?.data?.error?.message || "Something went wrong",
+        "Failed",
+        res?.data?.error?.message || "Deal confirmation failed",
         "error"
       );
     }
-  };
+  } catch (error) {
+    Swal.fire(
+      "Error",
+      error?.response?.data?.error?.message || "Something went wrong",
+      "error"
+    );
+  } finally {
+    setLoading(false); // stop loading
+  }
+};
+
 
   return (
     <>

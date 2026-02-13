@@ -60,7 +60,7 @@ function SellerProfile() {
   const refClose = useRef(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { connectToDeal, messages, connection, sendDealMessage } = useSignalR();
+  const { connectToDeal, messages, connection, sendDealMessage,leaveDealGroup } = useSignalR();
   // -------------------Maneging States-------------------------------
   const [value, setValue] = useState("");
   const [activeStep, setActiveStep] = useState(0);
@@ -552,46 +552,53 @@ function SellerProfile() {
   //   }
   // };
 
-  const handleSellerDealConfirm = async () => {
-    if (!lastId) {
-      Swal.fire("Error", "Contract ID not found", "error");
-      return;
-    }
+const handleSellerDealConfirm = async () => {
+  if (!lastId) {
+    Swal.fire("Error", "Contract ID not found", "error");
+    return;
+  }
 
-    setLoading(true); // start loading
+  setLoading(true);
 
-    try {
-      const res = await ApiCall({
-        url: "/ContractMain/DealCompletedBySeller",
-        method: "POST",
-        data: { id: lastId },
+  try {
+    const res = await ApiCall({
+      url: "/ContractMain/DealCompletedBySeller",
+      method: "POST",
+      data: { id: lastId },
+    });
+
+    if (res?.data?.success || res?.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Deal Confirmed",
+        text: "Deal has been completed successfully by seller",
+      }).then(async () => {
+        // Cleanup SignalR
+        if (leaveDealGroup) {
+          await leaveDealGroup();
+        }
+
+        // Navigate to contract page
+        navigate(`/Contract/${lastId}`);
       });
-
-      if (res?.data?.success || res?.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Deal Confirmed",
-          text: "Deal has been completed successfully by seller",
-        }).then(() => {
-          navigate(`/Contract/${lastId}`);
-        });
-      } else {
-        Swal.fire(
-          "Failed",
-          res?.data?.error?.message || "Deal confirmation failed",
-          "error",
-        );
-      }
-    } catch (error) {
+    } else {
       Swal.fire(
-        "Error",
-        error?.response?.data?.error?.message || "Something went wrong",
+        "Failed",
+        res?.data?.error?.message || "Deal confirmation failed",
         "error",
       );
-    } finally {
-      setLoading(false); // stop loading
     }
-  };
+  } catch (error) {
+    Swal.fire(
+      "Error",
+      error?.response?.data?.error?.message || "Something went wrong",
+      "error",
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // const convertCarData = (carData) => {
   //   return {
@@ -663,155 +670,246 @@ function SellerProfile() {
 
   // ------------------------------------------
 
-  const generateRegistrationNumber = () => {
-    // generate 3 random uppercase letters
-    const letters = Array.from({ length: 3 }, () =>
-      String.fromCharCode(65 + Math.floor(Math.random() * 26)),
-    ).join("");
+ 
+const generateRegistrationNumber = () => {
+  const letters = Array.from({ length: 3 }, () =>
+    String.fromCharCode(65 + Math.floor(Math.random() * 26))
+  ).join("");
 
-    // generate 3 random digits
-    const numbers = Math.floor(100 + Math.random() * 900); // ensures 3 digits
+  const numbers = Math.floor(100 + Math.random() * 900);
 
-    return letters + numbers;
-  };
+  return letters + numbers;
+};
 
-  const dummyCarApiResponse = [
-    {
-      Registreringsnummer: generateRegistrationNumber(),
-      Fordonsuppgifter: {
-        Fordonsbenamning: "TOYOTA PRIUS",
-        Handelsbeteckning: null,
-        Arsmodell: null,
-        Fordonsar: 2006,
-        Registreringsdatum: "2006-11-24T00:00:00",
-      },
-      FordonBrukareAgare: {
-        AntalBrukare: 7,
-      },
-      TekniskData: {
-        Vaxellada: "V",
-        Fyrhjulsdrift: false,
-        Drivmedel: [{ Drivmedel: "Bensin" }, { Drivmedel: "El" }],
-      },
-      Miljoklassning: {
-        ElfordonKonfiguration: null,
-      },
-      Besiktning: {
-        Besiktningsdatum: "2025-08-14T00:00:00",
-        BesiktningsdatumTOM: "2026-10-31T00:00:00",
-        Dispensbesiktningsgrupp: null,
-        Besiktningsgrupp: "36/24/14",
-        Matarstallning: 388358,
-        Besiktningsstation: "CARSPECT STOCKHOLM BOTKYRKA NORSBORG",
-        Besiktningsprogramkod: 6,
-        ForegaendeBesiktningsdatum: "2025-08-11T00:00:00",
-        ForegaendeBesiktningsprogramkod: 5,
-      },
-      Beraknat: {
-        Skatt: {
-          Skatt: 360,
-          Malus: null,
-        },
+// 🔹 Car Names List (30)
+const carNames = [
+  "TOYOTA PRIUS",
+  "HONDA CIVIC",
+  "BMW 320I",
+  "AUDI A4",
+  "MERCEDES C200",
+  "VOLVO XC60",
+  "TESLA MODEL 3",
+  "FORD FOCUS",
+  "HYUNDAI ELANTRA",
+  "KIA SPORTAGE",
+  "TOYOTA COROLLA",
+  "HONDA ACCORD",
+  "BMW X5",
+  "AUDI A6",
+  "MERCEDES E300",
+  "VOLVO V60",
+  "TESLA MODEL Y",
+  "FORD FIESTA",
+  "HYUNDAI TUCSON",
+  "KIA CEED",
+  "NISSAN QASHQAI",
+  "SKODA OCTAVIA",
+  "MAZDA CX-5",
+  "PEUGEOT 3008",
+  "RENAULT CLIO",
+  "VOLKSWAGEN GOLF",
+  "SEAT LEON",
+  "OPEL ASTRA",
+  "SUBARU OUTBACK",
+  "MITSUBISHI OUTLANDER",
+];
+
+// 🔹 Random Car Name Generator
+const generateCarName = () => {
+  const randomIndex = Math.floor(Math.random() * carNames.length);
+  return carNames[randomIndex];
+};
+
+// 🔹 Dummy API Response
+const dummyCarApiResponse = [
+  {
+    Registreringsnummer: generateRegistrationNumber(),
+
+    Fordonsuppgifter: {
+      Fordonsbenamning: generateCarName(), // 👈 Random Name
+      Handelsbeteckning: null,
+      Arsmodell: null,
+      Fordonsar: 2006,
+      Registreringsdatum: "2006-11-24T00:00:00",
+    },
+
+    FordonBrukareAgare: {
+      AntalBrukare: 7,
+    },
+
+    TekniskData: {
+      Vaxellada: "V",
+      Fyrhjulsdrift: false,
+      Drivmedel: [{ Drivmedel: "Bensin" }, { Drivmedel: "El" }],
+    },
+
+    Miljoklassning: {
+      ElfordonKonfiguration: null,
+    },
+
+    Besiktning: {
+      Besiktningsdatum: "2025-08-14T00:00:00",
+      BesiktningsdatumTOM: "2026-10-31T00:00:00",
+      Dispensbesiktningsgrupp: null,
+      Besiktningsgrupp: "36/24/14",
+      Matarstallning: 388358,
+      Besiktningsstation: "CARSPECT STOCKHOLM BOTKYRKA NORSBORG",
+      Besiktningsprogramkod: 6,
+      ForegaendeBesiktningsdatum: "2025-08-11T00:00:00",
+      ForegaendeBesiktningsprogramkod: 5,
+    },
+
+    Beraknat: {
+      Skatt: {
+        Skatt: 360,
+        Malus: null,
       },
     },
-  ];
+  },
+];
+
+  // const handleSearch = async () => {
+  //   if (!registration) return;
+
+  //   setLoading(true);
+  //   setError("");
+  //   setCarData(null);
+
+  //   try {
+   
+  //     const rawCar = dummyCarApiResponse[0];
+  //     setCarData(rawCar);
+
+  //     // ✅ Create car using dummy converted data
+  //     const carCreateRes = await ApiCall({
+  //       url: "/CarInfo/Create",
+  //       method: "POST",
+  //       data: convertCarData(rawCar),
+  //     });
+
+  //     const newCar = carCreateRes?.result || carCreateRes?.data?.result;
+
+  //     if (!newCar?.id) {
+  //       throw new Error("Car created but ID not received.");
+  //     }
+
+  //     // 3️⃣ Fetch latest Contract
+  //     const contractRes = await ApiCall({
+  //       url: "/ContractMain/GetContractMainById",
+  //       method: "GET",
+  //       params: { Id: contractData.id },
+  //     });
+
+  //     const latestContract = contractRes?.result || contractRes?.data?.result;
+
+  //     if (!latestContract) {
+  //       throw new Error("Failed to fetch contract data.");
+  //     }
+
+  //     // 4️⃣ Prepare Contract Payload
+  //     const contractPayload = {
+  //       ...latestContract,
+  //       carInfoId: newCar.id,
+  //       carInfoVehicleDesignation: newCar.vehicleDesignation,
+  //       carInfoTradeName: newCar.tradeName,
+  //       carInfoYearModel: newCar.yearModel,
+  //       carInfoVehicleYears: newCar.vehicleYears,
+  //       carInfoRegistrationDate: newCar.registrationDate,
+  //       carInfoNumberOfUsers: newCar.numberOfUsers,
+  //       carInfoWaxelbarge: newCar.waxelbarge,
+  //       carInfoFourWheelDrive: newCar.fourWheelDrive?.toString() || "False",
+  //       carInfoFuel: newCar.fuel,
+  //       carInfoElectricVehicleConfiguration:
+  //         newCar.electricVehicleConfiguration,
+  //       carInfoInspectionDate: newCar.inspectionDate,
+  //       carInfoInspectionDateEMPTY: newCar.inspectionDateEMPTY,
+  //       carInfoDispensationInspectionGroup: newCar.dispensationInspectionGroup,
+  //       carInfoInspectionGroup: newCar.inspectionGroup,
+  //       carInfoFeedingStall: newCar.feedingStall,
+  //       carInfoInspectionStation: newCar.inspectionStation,
+  //       carInfoInspectionProgramCode: newCar.inspectionProgramCode,
+  //       carInfoPreviousInspectionDate: newCar.previousInspectionDate,
+  //       carInfoPreviousInspectionProgramCode:
+  //         newCar.previousInspectionProgramCode,
+  //       carInfoTax: newCar.tax,
+  //       carInfoMalus: newCar.malus,
+  //       carValuationBySeller: 0,
+  //       sellerDealComplete: false,
+  //       sellerDrivingLicensePath: "",
+  //     };
+
+  //     // 5️⃣ Update ContractMain
+  //     await ApiCall({
+  //       url: "/ContractMain/Update",
+  //       method: "PUT",
+  //       data: contractPayload,
+  //     });
+ 
+  //     if (contractData?.id) {
+  //       await connectToDeal(contractData.id);
+  //     }
+
+  //     setActiveStep(3);
+  //   } catch (err) {
+  //     console.error(err);
+  //     Swal.fire("❌ Error", err.message || "Unexpected error", "error");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
 
   const handleSearch = async () => {
-    if (!registration) return;
+  if (!registration) return;
 
-    setLoading(true);
-    setError("");
-    setCarData(null);
+  setLoading(true);
+  setError("");
+  setCarData(null);
 
-    try {
-      // ❌ PAID API BYPASSED
-      // const countRes = await ApiCall({ ... });
+  // ✅ Reset buyer connection state and messages
+  setBuyerConnected(false);
+  setBuyerToastShown(false);
+  messages.length = 0; // Or if messages from context, add a reset method in SignalRContext
 
-      // ❌ PAID API BYPASSED
-      // const searchRes = await ApiCall({ ... });
+  try {
+    const rawCar = dummyCarApiResponse[0];
+    setCarData(rawCar);
 
-      // ✅ USE DUMMY DATA
-      const rawCar = dummyCarApiResponse[0];
-      setCarData(rawCar);
+    const carCreateRes = await ApiCall({
+      url: "/CarInfo/Create",
+      method: "POST",
+      data: convertCarData(rawCar),
+    });
 
-      // ✅ Create car using dummy converted data
-      const carCreateRes = await ApiCall({
-        url: "/CarInfo/Create",
-        method: "POST",
-        data: convertCarData(rawCar),
-      });
+    const newCar = carCreateRes?.result || carCreateRes?.data?.result;
+    if (!newCar?.id) throw new Error("Car created but ID not received.");
 
-      const newCar = carCreateRes?.result || carCreateRes?.data?.result;
+    const contractRes = await ApiCall({
+      url: "/ContractMain/GetContractMainById",
+      method: "GET",
+      params: { Id: contractData.id },
+    });
 
-      if (!newCar?.id) {
-        throw new Error("Car created but ID not received.");
-      }
+    const latestContract = contractRes?.result || contractRes?.data?.result;
+    if (!latestContract) throw new Error("Failed to fetch contract data.");
 
-      // 3️⃣ Fetch latest Contract
-      const contractRes = await ApiCall({
-        url: "/ContractMain/GetContractMainById",
-        method: "GET",
-        params: { Id: contractData.id },
-      });
+    const contractPayload = { ...latestContract, carInfoId: newCar.id };
+    await ApiCall({ url: "/ContractMain/Update", method: "PUT", data: contractPayload });
 
-      const latestContract = contractRes?.result || contractRes?.data?.result;
-
-      if (!latestContract) {
-        throw new Error("Failed to fetch contract data.");
-      }
-
-      // 4️⃣ Prepare Contract Payload
-      const contractPayload = {
-        ...latestContract,
-        carInfoId: newCar.id,
-        carInfoVehicleDesignation: newCar.vehicleDesignation,
-        carInfoTradeName: newCar.tradeName,
-        carInfoYearModel: newCar.yearModel,
-        carInfoVehicleYears: newCar.vehicleYears,
-        carInfoRegistrationDate: newCar.registrationDate,
-        carInfoNumberOfUsers: newCar.numberOfUsers,
-        carInfoWaxelbarge: newCar.waxelbarge,
-        carInfoFourWheelDrive: newCar.fourWheelDrive?.toString() || "False",
-        carInfoFuel: newCar.fuel,
-        carInfoElectricVehicleConfiguration:
-          newCar.electricVehicleConfiguration,
-        carInfoInspectionDate: newCar.inspectionDate,
-        carInfoInspectionDateEMPTY: newCar.inspectionDateEMPTY,
-        carInfoDispensationInspectionGroup: newCar.dispensationInspectionGroup,
-        carInfoInspectionGroup: newCar.inspectionGroup,
-        carInfoFeedingStall: newCar.feedingStall,
-        carInfoInspectionStation: newCar.inspectionStation,
-        carInfoInspectionProgramCode: newCar.inspectionProgramCode,
-        carInfoPreviousInspectionDate: newCar.previousInspectionDate,
-        carInfoPreviousInspectionProgramCode:
-          newCar.previousInspectionProgramCode,
-        carInfoTax: newCar.tax,
-        carInfoMalus: newCar.malus,
-        carValuationBySeller: 0,
-        sellerDealComplete: false,
-        sellerDrivingLicensePath: "",
-      };
-
-      // 5️⃣ Update ContractMain
-      await ApiCall({
-        url: "/ContractMain/Update",
-        method: "PUT",
-        data: contractPayload,
-      });
-
-      // 6️⃣ SignalR
-      if (contractData?.id) {
-        await connectToDeal(contractData.id);
-      }
-
-      setActiveStep(3);
-    } catch (err) {
-      console.error(err);
-      Swal.fire("❌ Error", err.message || "Unexpected error", "error");
-    } finally {
-      setLoading(false);
+    // ✅ Connect to SignalR for new deal
+    if (contractData?.id) {
+      await connectToDeal(contractData.id);
     }
-  };
+
+    setActiveStep(3); // Move to QR step
+  } catch (err) {
+    console.error(err);
+    Swal.fire("❌ Error", err.message || "Unexpected error", "error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const convertCarData = (carData) => {
     return {
@@ -1281,7 +1379,7 @@ function SellerProfile() {
                       {QR ? (
                         <QRCode
                           value={QR}
-                          size={210}
+                          size={140}
                           level="M"
                           bgColor="#ffffff"
                           fgColor="#000000"
@@ -1294,7 +1392,7 @@ function SellerProfile() {
                       )}
                     </Box>
 
-                    <Container maxWidth="sm" sx={{ marginTop: 5 }}>
+                    <Container maxWidth="sm" sx={{ marginTop: 2 }}>
                       <Typography
                         variant="body2"
                         gutterBottom
@@ -1304,7 +1402,7 @@ function SellerProfile() {
                       </Typography>
                       <Box
                         sx={{
-                          mt: 2,
+                          mt: 1,
                           p: 1,
                           borderRadius: "12px",
                           border: "2px solid #ff9f63",
@@ -1329,7 +1427,7 @@ function SellerProfile() {
                         fontWeight="bold"
                         color={buyerConnected ? "green" : "red"}
                         sx={{
-                          marginTop: 2,
+                          marginTop: 1,
                           backgroundColor: buyerConnected
                             ? "#c6f7d4ff"
                             : "#f7c6c6ff",
@@ -1347,7 +1445,7 @@ function SellerProfile() {
                         fontWeight="bold"
                         color={buyerConnected ? "green" : "red"}
                         sx={{
-                          marginTop: 2,
+                          marginTop: 1,
                           backgroundColor: buyerConnected
                             ? "#c6f7d4ff"
                             : "#f7c6c6ff",
@@ -1364,7 +1462,7 @@ function SellerProfile() {
                     </Container>
                   </Box>
 
-                  <Box display="flex" justifyContent="center" gap={2} mt={3}>
+                  <Box display="flex" justifyContent="center" gap={2} >
                     <Button
                       type="submit"
                       variant="contained"

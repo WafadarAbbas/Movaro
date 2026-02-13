@@ -187,7 +187,7 @@ const Contract = () => {
                     <b>Email:</b> {sellerData?.emailAddress || "XXX"}
                   </Typography>
                   <Typography variant="body2">
-                    <b>Phone:</b> {sellerData?.phoneNumber || "XXX"}
+                    <b>Phone:</b> {sellerData?.personalContact || "XXX"}
                   </Typography>
                 </Box>
               </Box>
@@ -205,7 +205,7 @@ const Contract = () => {
                     <b>Email:</b> {buyerData?.emailAddress || "XXX"}
                   </Typography>
                   <Typography variant="body2">
-                    <b>Phone:</b> {buyerData?.phoneNumber || "XXX"}
+                    <b>Phone:</b> {buyerData?.personalContact || "XXX"}
                   </Typography>
                 </Box>
               </Box>
@@ -443,7 +443,9 @@ const Contract = () => {
               <Typography variant="body2" color="text.secondary">
                 Total price:
               </Typography>
-              <Typography fontWeight="bold">359 000 SEK</Typography>
+              <Typography fontWeight="bold">
+                {contractData?.carValuationBySeller} 
+              </Typography>
             </Box>
 
             <Box display="flex" justifyContent="space-between" mb={2.5}>

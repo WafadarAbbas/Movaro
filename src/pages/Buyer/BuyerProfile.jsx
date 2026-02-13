@@ -53,7 +53,7 @@ const steps = [
 ];
 
 function BuyerProfile() {
-  const { connectToDeal, messages, connection, sendDealMessage } = useSignalR();
+  const { connectToDeal, messages, connection, sendDealMessage, leaveDealGroup } = useSignalR();
   const { t } = useTranslation();
   const { userId } = useUser();
   const navigate = useNavigate();
@@ -433,13 +433,13 @@ function BuyerProfile() {
     fetchVehicleInfo();
   }, [messages, activeStep, contractId, oldValuation]);
 
- const handleDealConfirm = async () => {
+const handleDealConfirm = async () => {
   if (!contractId) {
     Swal.fire("Error", "Contract ID not found", "error");
     return;
   }
 
-  setLoading(true); 
+  setLoading(true);
 
   try {
     const res = await ApiCall({
@@ -453,8 +453,17 @@ function BuyerProfile() {
         icon: "success",
         title: "Deal Confirmed",
         text: "Your deal has been completed successfully",
-      }).then(() => {
-        
+      }).then(async () => {
+        // ✅ Leave SignalR deal group before navigating
+        if (leaveDealGroup) {
+          try {
+            await leaveDealGroup();
+          } catch (err) {
+            console.error("Failed to leave SignalR deal group:", err);
+          }
+        }
+
+        // Navigate to contract page
         navigate(`/Contract/${contractId}`);
       });
     } else {
@@ -471,9 +480,10 @@ function BuyerProfile() {
       "error"
     );
   } finally {
-    setLoading(false);  
+    setLoading(false);
   }
 };
+
 
   return (
     <Container maxWidth="md">
@@ -687,6 +697,7 @@ function BuyerProfile() {
               mb={3}
               gap={1}
             >
+              
               <TextField
                 placeholder="Enter registration number"
                 variant="outlined"
