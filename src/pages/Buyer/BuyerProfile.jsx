@@ -26,6 +26,7 @@ import {
   RadioGroup,
   Radio,
   FormControlLabel,
+  Skeleton,
 } from "@mui/material";
 import ApiCall from "../../Apicall/ApiCall.js";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
@@ -35,7 +36,6 @@ import FormGroup from "@mui/material/FormGroup";
 import { useSignalR } from "../../context/SignalRContext.js";
 import SearchIcon from "@mui/icons-material/Search";
 import { useUser } from "../../context/UserContext.js";
-import { Skeleton } from "@mui/material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
@@ -53,7 +53,13 @@ const steps = [
 ];
 
 function BuyerProfile() {
-  const { connectToDeal, messages, connection, sendDealMessage, leaveDealGroup } = useSignalR();
+  const {
+    connectToDeal,
+    messages,
+    connection,
+    sendDealMessage,
+    leaveDealGroup,
+  } = useSignalR();
   const { t } = useTranslation();
   const { userId } = useUser();
   const navigate = useNavigate();
@@ -74,7 +80,6 @@ function BuyerProfile() {
   const [updated, setUpdated] = useState(false);
   const [oldValuation, setOldValuation] = useState(null);
   const [isDealValid, setIsDealValid] = useState(false);
-  
 
   useEffect(() => {
     const fetchContractMain = async () => {
@@ -372,23 +377,51 @@ function BuyerProfile() {
     }
   }, [activeStep]);
 
+  // useEffect(() => {
+  //   if (activeStep === 3) {
+  //     const dealMsg = messages.find(
+  //       (msg) =>
+  //         msg.message === "Buyer connected! Valuation entered" ||
+  //         msg.message === "Seller added valuation"
+  //     );
+
+  //     if (dealMsg && !valuationToastShown) {
+  //       toast.success("💰 Seller has added car valuation!", {
+  //         position: "top-right",
+  //       });
+  //       setValuationToastShown(true);
+  //       setSellerValuation(true);
+  //     }
+  //   }
+  // }, [messages, activeStep, valuationToastShown]);
+
   useEffect(() => {
-    if (activeStep === 3) {
+    if (activeStep === 3 && !valuationToastShown) {
       const dealMsg = messages.find(
         (msg) =>
-          msg.message === "Buyer connected! Valuation entered" ||
-          msg.message === "Seller added valuation"
+          msg.message
+            ?.toLowerCase()
+            .includes("Buyer connected! Valuation entered") ||
+          msg.message?.toLowerCase().includes("seller added valuation"),
       );
 
-      if (dealMsg && !valuationToastShown) {
-        toast.success("💰 Seller has added car valuation!", {
-          position: "top-right",
-        });
+      if (dealMsg) {
+        toast.success("💰 Seller has added car valuation!");
         setValuationToastShown(true);
         setSellerValuation(true);
       }
     }
   }, [messages, activeStep, valuationToastShown]);
+
+  useEffect(() => {
+    let timer;
+
+    if (activeStep === 3 && sellerValuation) {
+      timer = setTimeout(() => setActiveStep(4), 2000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [activeStep, sellerValuation]);
 
   useEffect(() => {
     if (activeStep !== 4 || !contractId) return;
@@ -397,7 +430,7 @@ function BuyerProfile() {
       (msg) =>
         msg.user === "seller" &&
         (msg.message === "Seller added valuation" ||
-          msg.message === "Seller Updated valuation")
+          msg.message === "Seller Updated valuation"),
     );
 
     if (!valuationMsg) return;
@@ -418,7 +451,7 @@ function BuyerProfile() {
         if (oldValuation !== null && newValuation !== oldValuation) {
           toast.info(
             `Seller updated valuation from ${oldValuation} → ${newValuation}`,
-            { position: "top-right" }
+            { position: "top-right" },
           );
         }
         setOldValuation(newValuation);
@@ -433,57 +466,56 @@ function BuyerProfile() {
     fetchVehicleInfo();
   }, [messages, activeStep, contractId, oldValuation]);
 
-const handleDealConfirm = async () => {
-  if (!contractId) {
-    Swal.fire("Error", "Contract ID not found", "error");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const res = await ApiCall({
-      url: "/ContractMain/DealCompletedByBuyer",
-      method: "POST",
-      data: { id: contractId },
-    });
-
-    if (res?.data?.success || res?.success) {
-      Swal.fire({
-        icon: "success",
-        title: "Deal Confirmed",
-        text: "Your deal has been completed successfully",
-      }).then(async () => {
-        // ✅ Leave SignalR deal group before navigating
-        if (leaveDealGroup) {
-          try {
-            await leaveDealGroup();
-          } catch (err) {
-            console.error("Failed to leave SignalR deal group:", err);
-          }
-        }
-
-        // Navigate to contract page
-        navigate(`/Contract/${contractId}`);
-      });
-    } else {
-      Swal.fire(
-        "Failed",
-        res?.data?.error?.message || "Deal confirmation failed",
-        "error"
-      );
+  const handleDealConfirm = async () => {
+    if (!contractId) {
+      Swal.fire("Error", "Contract ID not found", "error");
+      return;
     }
-  } catch (error) {
-    Swal.fire(
-      "Error",
-      error?.response?.data?.error?.message || "Something went wrong",
-      "error"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setLoading(true);
+
+    try {
+      const res = await ApiCall({
+        url: "/ContractMain/DealCompletedByBuyer",
+        method: "POST",
+        data: { id: contractId },
+      });
+
+      if (res?.data?.success || res?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Deal Confirmed",
+          text: "Your deal has been completed successfully",
+        }).then(async () => {
+          // ✅ Leave SignalR deal group before navigating
+          if (leaveDealGroup) {
+            try {
+              await leaveDealGroup();
+            } catch (err) {
+              console.error("Failed to leave SignalR deal group:", err);
+            }
+          }
+
+          // Navigate to contract page
+          navigate(`/Contract/${contractId}`);
+        });
+      } else {
+        Swal.fire(
+          "Failed",
+          res?.data?.error?.message || "Deal confirmation failed",
+          "error",
+        );
+      }
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        error?.response?.data?.error?.message || "Something went wrong",
+        "error",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container maxWidth="md">
@@ -697,7 +729,6 @@ const handleDealConfirm = async () => {
               mb={3}
               gap={1}
             >
-              
               <TextField
                 placeholder="Enter registration number"
                 variant="outlined"
@@ -758,7 +789,7 @@ const handleDealConfirm = async () => {
                 </Typography>
               </Box>
             )}
-  
+
             <Box display="flex" justifyContent="right" gap={2}>
               <Button
                 variant="contained"
@@ -826,7 +857,6 @@ const handleDealConfirm = async () => {
                   textAlign: "center",
                 }}
               >
-                {/* Vehicle Icon (Same logic as step 0) */}
                 <Box sx={{ mb: 3, fontSize: "48px", color: "#00d4c4" }}>
                   {contractMainData?.vahicleTypeOptionName
                     ?.toLowerCase()
@@ -884,15 +914,7 @@ const handleDealConfirm = async () => {
                   </Typography>
                 )}
 
-                <Button
-                  variant="contained"
-                  color="success"
-                  sx={{ mt: 4 }}
-                  onClick={() => setActiveStep(4)}
-                  disabled={!sellerValuation}
-                >
-                  Next
-                </Button>
+               
               </Paper>
             </Container>
           </Box>
@@ -902,7 +924,33 @@ const handleDealConfirm = async () => {
           <Box py={2}>
             <Container maxWidth="md">
               {!contractMainData ? (
-                <Typography>Loading vehicle information...</Typography>
+                <Box
+                  sx={{
+                    border: "1px solid #ccc",
+                    boxShadow: 3,
+                    borderRadius: 2,
+                    p: 1,
+                  }}
+                >
+                  <Typography variant="h6" fontWeight="bold" mb={1}>
+                    <Skeleton width="40%" />
+                  </Typography>
+
+                  
+                  {Array.from({ length: 18 }).map((_, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Skeleton width="30%" />  
+                      <Skeleton width="50%" />  
+                    </Box>
+                  ))}
+                </Box>
               ) : (
                 <Box
                   sx={{
@@ -992,7 +1040,7 @@ const handleDealConfirm = async () => {
                           {Number(
                             contractMainData.carValuationBySeller
                               .toString()
-                              .replace(/\s/g, "")
+                              .replace(/\s/g, ""),
                           )
                             .toLocaleString("en-US")
                             .replace(/,/g, " ")}
@@ -1368,16 +1416,18 @@ const handleDealConfirm = async () => {
                   mb: 2,
                 }}
               >
-            <Button
-  variant="contained"
-  color="success"
-  size="large"
-  onClick={handleDealConfirm}
-  disabled={loading}  
-  startIcon={loading && <CircularProgress size={20} color="inherit" />}
->
-  {loading ? "Confirming..." : "Deal Confirm"}
-</Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="large"
+                  onClick={handleDealConfirm}
+                  disabled={loading}
+                  startIcon={
+                    loading && <CircularProgress size={20} color="inherit" />
+                  }
+                >
+                  {loading ? "Confirming..." : "Deal Confirm"}
+                </Button>
               </Box>
             </Container>
           </Box>

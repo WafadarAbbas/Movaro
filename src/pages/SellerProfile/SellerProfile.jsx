@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { CircularProgress, FormControlLabel } from "@mui/material";
+import { CircularProgress, FormControlLabel, Skeleton } from "@mui/material";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import {
@@ -46,6 +46,7 @@ import HomeWorkIcon from "@mui/icons-material/HomeWork";
 import FormGroup from "@mui/material/FormGroup";
 import { useSignalR } from "../../context/SignalRContext.js";
 import { useNavigate } from "react-router-dom";
+
 
 const steps = [
   "Choose Vehicles",
@@ -727,7 +728,7 @@ const dummyCarApiResponse = [
     Registreringsnummer: generateRegistrationNumber(),
 
     Fordonsuppgifter: {
-      Fordonsbenamning: generateCarName(), // 👈 Random Name
+      Fordonsbenamning: generateCarName(),  
       Handelsbeteckning: null,
       Arsmodell: null,
       Fordonsar: 2006,
@@ -1686,145 +1687,138 @@ const dummyCarApiResponse = [
               {t("seller.vehicleInformation")}
             </Typography>
 
+            
             {!finalContract ? (
-              <Typography>Loading vehicle information...</Typography>
-            ) : (
-              <Box
-                sx={{
-                  border: "1px solid #ccc",
-                  boxShadow: 3,
-                  borderRadius: 2,
-                  p: 2,
-                }}
-              >
-                <DataRow
-                  label={t("seller.car.steps.registrationNo")}
-                  value={finalContract.carInfoRegistrationNo || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.vehicleDesignation")}
-                  value={finalContract.carInfoVehicleDesignation || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.tradeName")}
-                  value={finalContract.carInfoTradeName || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.yearModel")}
-                  value={finalContract.carInfoYearModel || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.vehicleYears")}
-                  value={finalContract.carInfoVehicleYears || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.registrationDate")}
-                  value={finalContract.carInfoRegistrationDate || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.numberOfUsers")}
-                  value={finalContract.carInfoNumberOfUsers || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.axleWeight")}
-                  value={finalContract.carInfoWaxelbarge || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.fourWheelDrive")}
-                  value={
-                    finalContract.carInfoFourWheelDrive
-                      ?.toString()
-                      .toLowerCase() === "true"
-                      ? t("seller.car.steps.yes")
-                      : t("seller.car.steps.no")
-                  }
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.fuel")}
-                  value={finalContract.carInfoFuel || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.evConfig")}
-                  value={
-                    finalContract.carInfoElectricVehicleConfiguration || "-"
-                  }
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.inspectionDate")}
-                  value={finalContract.carInfoInspectionDate || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.prevInspectionDate")}
-                  value={finalContract.carInfoPreviousInspectionDate || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.inspectionStation")}
-                  value={finalContract.carInfoInspectionStation || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.inspectionGroup")}
-                  value={finalContract.carInfoInspectionGroup || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.feedingStall")}
-                  value={finalContract.carInfoFeedingStall || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.tax")}
-                  value={finalContract.carInfoTax || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.malus")}
-                  value={finalContract.carInfoMalus || "-"}
-                />
-
-                <DataRow
-                  label={t("seller.car.steps.valuation")}
-                  value={
-                    <Typography
-                      sx={{
-                        fontWeight: "bold",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      {finalContract.carValuationBySeller
-                        ? finalContract.carValuationBySeller
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                        : "-"}
-                      <FaEdit
-                        onClick={() => createRef.current.click()}
-                        style={{
-                          cursor: "pointer",
-                          fontSize: "20px",
-                          color: "#ff9f63",
-                        }}
-                        title="Edit"
-                      />
-                    </Typography>
-                  }
-                />
-              </Box>
-            )}
+  <Box
+    sx={{
+      border: "1px solid #ccc",
+      boxShadow: 3,
+      borderRadius: 2,
+      p: 2,
+    }}
+  >
+    
+    {Array.from({ length: 20 }).map((_, idx) => (
+      <Box key={idx} sx={{ mb: 1 }}>
+        <Skeleton variant="text" width="60%" height={30} />
+      </Box>
+    ))}
+  </Box>
+) : (
+  <Box
+    sx={{
+      border: "1px solid #ccc",
+      boxShadow: 3,
+      borderRadius: 2,
+      p: 2,
+    }}
+  >
+    <DataRow
+      label={t("seller.car.steps.registrationNo")}
+      value={finalContract.carInfoRegistrationNo || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.vehicleDesignation")}
+      value={finalContract.carInfoVehicleDesignation || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.tradeName")}
+      value={finalContract.carInfoTradeName || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.yearModel")}
+      value={finalContract.carInfoYearModel || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.vehicleYears")}
+      value={finalContract.carInfoVehicleYears || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.registrationDate")}
+      value={finalContract.carInfoRegistrationDate || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.numberOfUsers")}
+      value={finalContract.carInfoNumberOfUsers || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.axleWeight")}
+      value={finalContract.carInfoWaxelbarge || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.fourWheelDrive")}
+      value={
+        finalContract.carInfoFourWheelDrive?.toString().toLowerCase() === "true"
+          ? t("seller.car.steps.yes")
+          : t("seller.car.steps.no")
+      }
+    />
+    <DataRow
+      label={t("seller.car.steps.fuel")}
+      value={finalContract.carInfoFuel || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.evConfig")}
+      value={finalContract.carInfoElectricVehicleConfiguration || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.inspectionDate")}
+      value={finalContract.carInfoInspectionDate || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.prevInspectionDate")}
+      value={finalContract.carInfoPreviousInspectionDate || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.inspectionStation")}
+      value={finalContract.carInfoInspectionStation || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.inspectionGroup")}
+      value={finalContract.carInfoInspectionGroup || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.feedingStall")}
+      value={finalContract.carInfoFeedingStall || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.tax")}
+      value={finalContract.carInfoTax || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.malus")}
+      value={finalContract.carInfoMalus || "-"}
+    />
+    <DataRow
+      label={t("seller.car.steps.valuation")}
+      value={
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {finalContract.carValuationBySeller
+            ? finalContract.carValuationBySeller
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+            : "-"}
+          <FaEdit
+            onClick={() => createRef.current.click()}
+            style={{
+              cursor: "pointer",
+              fontSize: "20px",
+              color: "#ff9f63",
+            }}
+            title="Edit"
+          />
+        </Typography>
+      }
+    />
+  </Box>
+)}
 
             <Box
               sx={{
