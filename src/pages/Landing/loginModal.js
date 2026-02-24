@@ -113,7 +113,7 @@ useEffect(() => {
         },
       };
 
-      
+      console.log(payload);
 
       try {
         setLoading(true);
@@ -203,7 +203,7 @@ navigate("/user/ChooseAction", { replace: true });
         } else {
           const backendError =
             response.data?.error?.details ||
-            response.data?.error?.message ||
+            // response.data?.error?.message ||
             response.data?.message ||
             "Invalid credentials or unexpected response.";
 
@@ -215,7 +215,7 @@ navigate("/user/ChooseAction", { replace: true });
 
         const backendError =
           error.response?.data?.error?.details ||
-          error.response?.data?.error?.message ||
+          // error.response?.data?.error?.message ||
           error.response?.data?.message ||
           "Something went wrong while logging in.";
 

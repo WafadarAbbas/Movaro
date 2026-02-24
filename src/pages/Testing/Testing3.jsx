@@ -131,90 +131,13 @@ import Swal from "sweetalert2";
 import ApiCall from "../../Apicall/ApiCall";
 
 function Testing3() {
-  const [registration, setRegistration] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [carData, setCarData] = useState(null);
+ 
 
-  const handleCheckCar = async () => {
-    if (!registration) {
-      Swal.fire("Missing", "Please enter registration number", "warning");
-      return;
-    }
-
-    setLoading(true);
-    setCarData(null);
-
-    try {
-      const res = await ApiCall({
-        url: "/CarInfo/GetVehicleInfo",
-        method: "GET",
-        params: { Id: registration },
-      });
-
-      console.log("API SUCCESS RESPONSE 👉", res);
-
-      const result = res?.data?.result;
-
-      if (!result || result.length === 0) {
-        Swal.fire("Not Found", "Car not found", "info");
-        return;
-      }
-
-      setCarData(result[0]);
-      Swal.fire("Success", "Car data fetched successfully", "success");
-
-    } catch (err) {
-      console.error("API ERROR 👉", err);
-
-      const backendError = err?.response?.data?.error;
-
-      if (backendError) {
-        Swal.fire(
-          backendError.message || "Error",
-          backendError.details || "Backend error occurred",
-          "error"
-        );
-      } else {
-        Swal.fire("Error", err.message || "Unexpected error", "error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+ 
 
   return (
     <Container maxWidth="sm">
-      <Paper sx={{ p: 3, mt: 5 }}>
-        <Typography variant="h6" mb={2}>
-          Car API Test
-        </Typography>
-
-        <TextField
-          fullWidth
-          label="Registration Number"
-          value={registration}
-          onChange={(e) => setRegistration(e.target.value)}
-        />
-
-        <Button
-          fullWidth
-          sx={{ mt: 2 }}
-          variant="contained"
-          onClick={handleCheckCar}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} /> : "Check Car"}
-        </Button>
-
-        {carData && (
-          <Box mt={3}>
-            <Typography variant="subtitle2">Result:</Typography>
-            <pre style={{ fontSize: 12 }}>
-              {JSON.stringify(carData, null, 2)}
-            </pre>
-          </Box>
-        )}
-      </Paper>
+       
     </Container>
   );
 }

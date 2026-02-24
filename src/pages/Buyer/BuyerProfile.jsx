@@ -487,7 +487,7 @@ function BuyerProfile() {
           title: "Deal Confirmed",
           text: "Your deal has been completed successfully",
         }).then(async () => {
-          // ✅ Leave SignalR deal group before navigating
+      
           if (leaveDealGroup) {
             try {
               await leaveDealGroup();
@@ -790,7 +790,7 @@ function BuyerProfile() {
               </Box>
             )}
 
-            <Box display="flex" justifyContent="right" gap={2}>
+            {/* <Box display="flex" justifyContent="right" gap={2}>
               <Button
                 variant="contained"
                 sx={{ background: "#ff9f43" }}
@@ -804,7 +804,27 @@ function BuyerProfile() {
               >
                 Continue
               </Button>
-            </Box>
+            </Box> */}
+            <Button
+  variant="contained"
+  sx={{ background: "#ff9f43" }}
+  disabled={!contractId || !isDealValid || loading}
+  onClick={async () => {
+    try {
+      setLoading(true);
+      await connectToDeal(contractId);
+      setActiveStep(2);
+    } finally {
+      setLoading(false);
+    }
+  }}
+>
+  {loading ? (
+    <CircularProgress size={22} sx={{ color: "#fff" }} />
+  ) : (
+    "Continue"
+  )}
+</Button>
           </Box>
         )}
         {/*----------------------- Step 2 ---------------------- */}

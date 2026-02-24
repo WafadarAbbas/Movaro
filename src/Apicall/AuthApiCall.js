@@ -15,7 +15,7 @@ const AuthApiCall = async ({ url, method = "POST", data = null, params = null })
   } catch (error) {
     Swal.fire(
       "Error",
-      error?.response?.data?.error?.message || "Something went wrong",
+      error?.response?.data?.error?.details || "Something went wrong",
       "error"
     );
 

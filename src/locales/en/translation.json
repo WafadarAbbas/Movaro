@@ -22,16 +22,16 @@
     "startDeal": "Start the deal",
     "seeHowItWorks": "See how it works",
     "security": {
-      "bankId": "BankID",
+      "bankId": "Placeholder1",
       "dataSecurity": "Data security in Sweden",
       "trustedSources": "Vehicle data from trusted sources",
-      "partners": "BankID · Zmarta · Bilvision · Klarna · Tink · Nordea"
+      "partners": "Placeholder2 · Placeholder3 · Placeholder4 · Placeholder5 · Placeholder6 · Placeholder7"
     },
     "cards": {
       "contract": {
         "title": "Contract",
         "line1": "Legally binding agreement",
-        "line2": "Parties: verified with BankID",
+        "line2": "Parties: verified with place",
         "line3": "Vehicle: OWN 457",
         "line4": "Time: 12:41 • Ref: •••9Q2F"
       },
@@ -54,7 +54,7 @@
         "line1": "Transportstyrelsen",
         "line2": "Opens automatically",
         "line3": "Details pre-filled",
-        "line4": "Sign with BankID",
+        "line4": "Sign with place",
         "line5": "Confirmation in Klargo"
       }
     },
@@ -92,7 +92,7 @@
         "text": "Create the deal, set price and terms, sign it. Payment from the buyer is confirmed in real time in the app. Ownership transfer opens automatically at Transportstyrelsen and the confirmation appears in Klargo.",
         "list": [
           "Price & terms",
-          "BankID signing",
+          "place signing",
           "Confirmed payment"
         ],
         "button": "Explore seller flow"
@@ -113,7 +113,7 @@
     "serviceCards": [
       {
         "icon": "ShieldOutlinedIcon",
-        "title": "Verify with BankID",
+        "title": "Verify with place",
         "text": "Secure identification for both parties."
       },
       {
@@ -129,7 +129,7 @@
       {
         "icon": "CheckCircleOutlineOutlinedIcon",
         "title": "Complete ownership transfer",
-        "text": "Transportstyrelsen opens automatically. Sign with BankID."
+        "text": "Transportstyrelsen opens automatically. Sign with placeholder."
       },
       {
         "icon": "VerifiedUserOutlinedIcon",
@@ -221,13 +221,13 @@
     "partnersSectionTitle": "Partners and Security",
     "partnersSectionSubtitle": "Klargo uses established payment, data, and insurance partners. Exact offers may vary per deal.",
     "partnersList": [
-      "BankID",
-      "Bilvision",
-      "Trustly",
-      "Klarna",
-      "Tink",
-      "Nordea",
-      "Zmarta"
+      "placeholder1",
+      "placeholder2",
+      "placeholder3",
+      "placeholder4",
+      "placeholder5",
+      "placeholder6",
+      "placeholder7"
     ],
     "navLinks": [
       {

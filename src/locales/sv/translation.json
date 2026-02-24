@@ -22,16 +22,16 @@
     "startDeal": "Starta affären",
     "seeHowItWorks": "Se hur det funkar",
     "security": {
-      "bankId": "BankID",
+      "bankId": "Placeholder1",
       "dataSecurity": "Datasäkerhet i Sverige",
       "trustedSources": "Fordonsdata från betrodda källor",
-      "partners": "BankID · Zmarta · Bilvision · Klarna · Tink · Nordea"
+      "partners": "Placeholder2 · Placeholder3 · Placeholder4 · Placeholder5 · Placeholder6 · Placeholder7"
     },
     "cards": {
       "contract": {
         "title": "Kontrakt",
         "line1": "Juridiskt bindande avtal",
-        "line2": "Parter: verifierade med BankID",
+        "line2": "Parter: verifierade med placehol",
         "line3": "Fordon: OWN 457",
         "line4": "Tid: 12:41 • Ref: •••9Q2F"
       },
@@ -54,7 +54,7 @@
         "line1": "Transportstyrelsen",
         "line2": "Öppnas automatiskt",
         "line3": "Uppgifter ifyllda",
-        "line4": "Signera med BankID",
+        "line4": "Signera med placeholder",
         "line5": "Bekräftelse i Klargo"
       }
     },
@@ -92,7 +92,7 @@
         "text": "Skapa affären, ange pris och villkor, signera. Betalning från köparen bekräftas i realtid i appen. Ägarbytet öppnas automatiskt hos Transportstyrelsen och bekräftelsen visas i Klargo.",
         "list": [
           "Pris & villkor",
-          "BankID-signering",
+          "Placeholder-signering",
           "Bekräftad betalning"
         ],
         "button": "Utforska säljflödet"
@@ -221,13 +221,13 @@
     "partnersSectionTitle": "Partners och trygghet",
     "partnersSectionSubtitle": "Klargo använder etablerade betalnings-, data- och försäkringspartners. Exakta erbjudanden kan variera per affär.",
     "partnersList": [
-      "BankID",
-      "Bilvision",
-      "Trustly",
-      "Klarna",
-      "Tink",
-      "Nordea",
-      "Zmarta"
+      "placeholder1",
+      "placeholder2",
+      "placeholder3",
+      "placeholder4",
+      "placeholder5",
+      "placeholder6",
+      "placeholder7"
     ],
     "navLinks": [
       {
@@ -257,7 +257,7 @@
       "emailPassword": "EMAIL & LÖSENORD"
     },
     "bankId": {
-      "secureLogin": "Säkra inloggning med ditt svenska BankID.",
+      "secureLogin": "Säkra inloggning med ditt svenska placeholder.",
       "openBankId": "ÖPPNA BANKID",
       "showQRCode": "VISA QR-KOD",
       "needHelp": "Behöver du hjälp med inloggning?",

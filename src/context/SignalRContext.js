@@ -81,7 +81,7 @@ export const SignalRProvider = ({ children }) => {
 
     // 2️⃣ Create new connection
     const conn = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:44311/signalr-notificationHub")
+         .withUrl("https://klargo.api.jinnahtechnologies.com/signalr-notificationHub")
       .withAutomaticReconnect()
       .build();
 

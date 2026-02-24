@@ -22,7 +22,7 @@ export const UserProvider = ({ children }) => {
       const token = bytes.toString(CryptoJS.enc.Utf8);
 
       const sessionResponse = await axios.get(
-        "https://localhost:44311/api/services/app/Session/GetCurrentLoginInformations",
+        "https://klargo.api.jinnahtechnologies.com/api/services/app/Session/GetCurrentLoginInformations",
         {
           headers: {
             Authorization: `Bearer ${token}`,

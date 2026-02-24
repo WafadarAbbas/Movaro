@@ -546,7 +546,7 @@ const Home = () => {
                     mb={1}
                   >
                     <ShieldOutlinedIcon sx={{ fontSize: 18, color: "#555" }} />
-                    <Typography variant="body2">{t("home.security.bankId")}</Typography>
+                    <Typography variant="body2">placeholde</Typography>
 
                     <LockOutlinedIcon sx={{ fontSize: 18, color: "#555" }} />
                     <Typography variant="body2">
