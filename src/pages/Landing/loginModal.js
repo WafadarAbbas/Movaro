@@ -83,8 +83,8 @@ useEffect(() => {
         isSeller: false,
         isBuyer: false,
         bankIdSSN: "string",
-        surname: "string",
-        name: "string",
+        surname: values.email,
+        name: values.email,
         country: "string",
         createExternalUserRegisterLogDto: {
           identityToken: "string",

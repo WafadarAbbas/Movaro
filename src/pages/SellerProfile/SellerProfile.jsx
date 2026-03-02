@@ -118,7 +118,7 @@ function SellerProfile() {
             return;
           }
 
-          // console.log("📦 Full Contract Data:", contractData3);
+         
           setCarRegNo(contractData3.carInfoRegistrationNo || "");
 
           const currentTime = new Date().toISOString();
@@ -128,7 +128,7 @@ function SellerProfile() {
             time: currentTime,
           };
 
-          console.log("Data to Encrypt:", minimalData);
+          // console.log("Data to Encrypt:", minimalData);
 
           const secretKey = "Klargo3613";
           const encrypted = CryptoJS.AES.encrypt(
@@ -136,15 +136,15 @@ function SellerProfile() {
             secretKey,
           ).toString();
 
-          console.log(encrypted);
+          // console.log(encrypted);
 
-          const qrUrl = `http://localhost:3000/Buyer/${encodeURIComponent(
+          const qrUrl = `http://klargo.jinnahtechnologies.com/Buyer/${encodeURIComponent(
             encrypted,
           )}`;
 
           setQR(qrUrl);
 
-          console.log("🔒 Encrypted URL:", qrUrl);
+          // console.log("🔒 Encrypted URL:", qrUrl);
         } catch (error) {
           console.error("❌ Error fetching contract data:", error);
           Swal.fire(
@@ -682,7 +682,7 @@ const generateRegistrationNumber = () => {
   return letters + numbers;
 };
 
-// 🔹 Car Names List (30)
+ 
 const carNames = [
   "TOYOTA PRIUS",
   "HONDA CIVIC",
@@ -866,16 +866,16 @@ const dummyCarApiResponse = [
 
   setLoading(true);
   setError("");
-  setCarData(null);
+  // setCarData(null);
 
-  // ✅ Reset buyer connection state and messages
+ 
   setBuyerConnected(false);
   setBuyerToastShown(false);
-  messages.length = 0; // Or if messages from context, add a reset method in SignalRContext
+  messages.length = 0;  
 
   try {
     const rawCar = dummyCarApiResponse[0];
-    setCarData(rawCar);
+    // setCarData(rawCar);
 
     const carCreateRes = await ApiCall({
       url: "/CarInfo/Create",
@@ -898,12 +898,12 @@ const dummyCarApiResponse = [
     const contractPayload = { ...latestContract, carInfoId: newCar.id };
     await ApiCall({ url: "/ContractMain/Update", method: "PUT", data: contractPayload });
 
-    // ✅ Connect to SignalR for new deal
+     
     if (contractData?.id) {
       await connectToDeal(contractData.id);
     }
 
-    setActiveStep(3); // Move to QR step
+    setActiveStep(3);  
   } catch (err) {
     console.error(err);
     Swal.fire("❌ Error", err.message || "Unexpected error", "error");

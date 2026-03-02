@@ -75,7 +75,7 @@ export default function Seller() {
 
       const data = JSON.parse(decryptedText);
 
-      console.log("🔓 Decrypted Data:", data);
+      // console.log("🔓 Decrypted Data:", data);
       // alert(`ContractId: ${data.contractId}\nSellerUserId: ${data.sellerUserId}`);
 
       // ---------------- Save to localStorage ----------------
@@ -84,7 +84,7 @@ export default function Seller() {
           contractId: data.contractId,
           sellerUserId: data.sellerUserId
         }));
-        console.log("✅ Saved to localStorage as 'data'");
+        // console.log("✅ Saved to localStorage as 'data'");
       }
 
     } catch (err) {

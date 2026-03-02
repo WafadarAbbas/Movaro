@@ -106,7 +106,7 @@ function BuyerProfile() {
           }
 
           setContractMainData(data);
-          console.log(data);
+          // console.log(data);
         } catch (err) {
           console.error("Error fetching contract:", err);
           setError("⚠ Something went wrong while fetching contract data.");
@@ -790,21 +790,7 @@ function BuyerProfile() {
               </Box>
             )}
 
-            {/* <Box display="flex" justifyContent="right" gap={2}>
-              <Button
-                variant="contained"
-                sx={{ background: "#ff9f43" }}
-                onClick={async () => {
-                  if (contractId && isDealValid) {
-                    await connectToDeal(contractId);
-                    setActiveStep(2);
-                  }
-                }}
-                disabled={!contractId || !isDealValid || loading}
-              >
-                Continue
-              </Button>
-            </Box> */}
+            
             <Button
   variant="contained"
   sx={{ background: "#ff9f43" }}

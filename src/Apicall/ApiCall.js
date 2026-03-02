@@ -17,7 +17,7 @@ const ApiCall = async ({ url, method = "GET", data = null, params = null }) => {
         Authorization: token ? `Bearer ${token}` : "",
       },
     });
-console.log("api response", response.status, response);
+// console.log("api response", response.status, response);
     return response;
   } catch (error) {
     const status = error?.response?.status;

@@ -80,11 +80,11 @@ function App() {
 	return (
 		<SignalRProvider>
 <CriiptoVerifyProvider
-      domain="jinnah-test.criipto.id"
-      clientID="urn:my:application:identifier:42807"
-      acrValues="urn:grn:authn:se:bankid:another-device"
-      redirectUri="http://localhost:3000/callback"
-      scope="openid profile"
+  domain={process.env.REACT_APP_CRIIPTO_DOMAIN}
+  clientID={process.env.REACT_APP_CRIIPTO_CLIENT_ID}
+  acrValues={process.env.REACT_APP_CRIIPTO_ACR}
+  redirectUri={process.env.REACT_APP_CRIIPTO_REDIRECT_URI}
+  scope={process.env.REACT_APP_CRIIPTO_SCOPE}
 >
 <AuthProvider>
 <UserProvider>
